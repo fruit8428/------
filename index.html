@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大清天朵二期社區 AI 管理助手</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #f8fafc;
+    }
+    .badge-resident { background-color: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .badge-property { background-color: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    .badge-committee { background-color: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+    @media print {
+      body * { visibility: hidden; }
+      #printableArea, #printableArea * { visibility: visible; }
+      #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+  <!-- 中央氣象署豪大雨緊急警報橫幅 (預設隱藏，警特報時動態顯現) -->
+  <div id="cwa-top-alert-banner" class="hidden bg-gradient-to-r from-rose-700 via-red-600 to-amber-600 text-white px-4 py-2.5 shadow-lg border-b border-rose-800 animate-pulse-subtle">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm">
+      <div class="flex items-center space-x-2">
+        <span class="p-1 rounded bg-white/20 font-bold text-xs flex items-center space-x-1">
+          <i data-lucide="cloud-lightning" class="w-4 h-4 text-amber-200"></i>
+          <span>CWA 豪大雨警特報</span>
+        </span>
+        <span class="font-semibold" id="cwa-banner-text">中央氣象署已發布台北市豪大雨特報！系統已主動推播一級防汛警戒至管委會及管理員</span>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="switchTab('flood')" class="underline font-bold hover:text-amber-100 flex items-center space-x-1">
+          <span>查看現場應變 SOP</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+        <button onclick="dismissBanner()" class="text-white/80 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 頂部導覽列 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+          <i data-lucide="building-2" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl font-bold tracking-tight text-slate-900">大清天朵二期</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-medium">AI 社區管理助手</span>
+          </div>
+          <p class="text-xs text-slate-500">固德物業服務團隊 × 第五屆管理委員會</p>
+        </div>
+      </div>
+
+      <!-- 中央氣象局連線狀態指示與身分切換 -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- 氣象局連線即時膠囊 -->
+        <button onclick="switchTab('flood')" id="cwa-pill" class="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="cwa-pill-text">中央氣象署連線中 · 水情正常</span>
+        </button>
+
+        <!-- 身分切換器 -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl text-xs sm:text-sm font-medium">
+          <button id="btn-role-resident" onclick="switchRole('resident')" class="px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 shadow-sm bg-white text-emerald-700">
+            <i data-lucide="home" class="w-4 h-4"></i>
+            <span>住戶 (A-8F-1)</span>
+          </button>
+          <button id="btn-role-property" onclick="switchRole('property')" class="px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 text-slate-600 hover:text-slate-900">
+            <i data-lucide="briefcase" class="w-4 h-4"></i>
+            <span>固德物業 (總幹事)</span>
+          </button>
+          <button id="btn-role-committee" onclick="switchRole('committee')" class="px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 text-slate-600 hover:text-slate-900">
+            <i data-lucide="scale" class="w-4 h-4"></i>
+            <span>管委會委員</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 功能頁籤導覽 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 flex overflow-x-auto space-x-6 text-sm font-medium">
+      <button onclick="switchTab('chat')" id="tab-chat" class="tab-btn py-3 border-b-2 border-sky-600 text-sky-600 flex items-center space-x-2 whitespace-nowrap">
+        <i data-lucide="bot" class="w-4 h-4"></i>
+        <span>AI 智能交談</span>
+      </button>
+      <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2 whitespace-nowrap">
+        <i data-lucide="file-check" class="w-4 h-4"></i>
+        <span>Skill 1: 規約邏輯檢核</span>
+      </button>
+      <button onclick="switchTab('flood')" id="tab-flood" class="tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2 whitespace-nowrap relative">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600"></i>
+        <span>Skill 5: 防汛演練與氣象推播</span>
+        <span id="tab-flood-badge" class="w-2 h-2 rounded-full bg-rose-500 absolute top-2 right-0 hidden"></span>
+      </button>
+      <button onclick="switchTab('vision')" id="tab-vision" class="tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2 whitespace-nowrap">
+        <i data-lucide="camera" class="w-4 h-4"></i>
+        <span>Skill 2: 影像辨識與派單</span>
+      </button>
+      <button onclick="switchTab('finance')" id="tab-finance" class="tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2 whitespace-nowrap">
+        <i data-lucide="receipt" class="w-4 h-4"></i>
+        <span>Skill 3: 財務銷帳與對帳</span>
+      </button>
+      <button onclick="switchTab('petty')" id="tab-petty" class="tab-btn py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center space-x-2 whitespace-nowrap">
+        <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+        <span>Skill 4: 零用金多重簽核</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 主內容容器 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- 身分提示與權限告知 Banner -->
+    <div id="role-banner" class="mb-6 p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50/70 border-emerald-200">
+      <div class="flex items-center space-x-3">
+        <span id="role-badge" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-100 text-emerald-800">住戶模式</span>
+        <div class="text-sm text-slate-700" id="role-desc">
+          當前綁定戶別：<strong>A棟8樓之1（饒先生）</strong>。您可查詢個人繳費狀態、通報社區異常狀況或查詢公告。
+        </div>
+      </div>
+      <div class="text-xs text-slate-500 flex items-center space-x-1.5">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+        <span>隱私保護協議生效中（他人個資自動遮蔽）</span>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 1: AI 智能交談視窗 -->
+    <!-- ============================================== -->
+    <section id="view-chat" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[650px]">
+        <!-- 聊天室頂部 -->
+        <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <div class="w-10 h-10 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold">天朵</div>
+              <span class="w-3 h-3 bg-emerald-500 border-2 border-white rounded-full absolute bottom-0 right-0"></span>
+            </div>
+            <div>
+              <div class="font-semibold text-slate-900 text-sm">大清天朵二期 AI 社區管理助手</div>
+              <div class="text-xs text-emerald-600 flex items-center space-x-1">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>系統連線正常 · 向量規約知識庫 & 氣象局即時介接就緒</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="clearChatHistory()" class="text-xs text-slate-400 hover:text-slate-600 flex items-center space-x-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>重置對話</span>
+          </button>
+        </div>
+
+        <!-- 聊天對話流 -->
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4">
+          <!-- 系統預設訊息 -->
+          <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs flex-shrink-0">AI</div>
+            <div class="bg-slate-100 text-slate-800 rounded-2xl rounded-tl-none p-3.5 text-sm max-w-[85%] leading-relaxed shadow-sm">
+              您好！我是<strong>大清天朵二期社區 AI 管理助手</strong>。我具備嚴謹的規約比對邏輯（含地下室防水閘門檢測與定期演練規約）、中央氣象局豪大雨主動推播、影像辨識自動派單、財務自動銷帳查詢與零用金三委員簽核流程支援能力。<br><br>
+              您可以直接輸入您的提問，或點選右側快捷指令進行體驗！
+            </div>
+          </div>
+        </div>
+
+        <!-- 聊天輸入區 -->
+        <div class="p-3.5 border-t border-slate-200 bg-white rounded-b-2xl">
+          <form onsubmit="handleChatSubmit(event)" class="flex items-center space-x-2">
+            <input type="text" id="chat-input" placeholder="請輸入您的問題或指令（如：防汛防水閘門檢測規定、氣象局豪大雨防汛流程...）" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+            <button type="submit" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-medium rounded-xl text-sm flex items-center space-x-1.5 shadow-sm transition-all">
+              <span>發送</span>
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 側邊：快捷情境測試卡片 -->
+      <div class="space-y-4">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-semibold text-slate-900 text-sm flex items-center space-x-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+              <span>當前身分快捷情境測試</span>
+            </h3>
+          </div>
+          <div id="quick-prompts" class="space-y-2">
+            <!-- 動態根據身分填入 -->
+          </div>
+        </div>
+
+        <!-- 規範遵循摘要卡 -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-5 rounded-2xl shadow-sm">
+          <h4 class="text-sm font-semibold flex items-center space-x-2 mb-3 text-sky-400">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+            <span>社區防汛與管理核心準則</span>
+          </h4>
+          <ul class="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+            <li class="flex items-start space-x-2">
+              <span class="text-amber-400 font-bold">1. 汛期實兵操演：</span>
+              <span>每年5月系統排程提醒，防水閘門閉合須於15分鐘內完成並驗收。</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-rose-400 font-bold">2. 豪大雨即時推播：</span>
+              <span>氣象署發布特報60秒內，主動推播通知管委會與管理員啟動SOP。</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-emerald-400 font-bold">3. 隱私與中立性：</span>
+              <span>住戶金流帳號隱碼保護，規約衝突客觀呈現不代為做最終決策。</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: Skill 1 規約與決議邏輯檢核 -->
+    <!-- ============================================== -->
+    <section id="view-rules" class="hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+              <i data-lucide="scale" class="w-5 h-5 text-indigo-600"></i>
+              <span>Skill 1: 規約與決議邏輯檢核 (AI 知識庫)</span>
+            </h2>
+            <p class="text-sm text-slate-500 mt-1">針對管委會提案或住戶疑義，檢索歷屆區權會與公約，客觀剖析潛在邏輯矛盾與法定衝突。</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 font-medium border border-indigo-200 self-start md:self-auto">
+            管委會 / 物業 專用檢核模組
+          </span>
+        </div>
+
+        <!-- 查詢輸入與熱門議案 -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <div class="relative flex-1">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400"></i>
+              <input type="text" id="rule-query-input" placeholder="請輸入擬決議之提案或問題（例如：防水閘門檢測與每年5月實際操演規定）" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+            </div>
+            <button onclick="executeRuleCheck()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium flex items-center justify-center space-x-2 shadow-sm transition-all">
+              <i data-lucide="cpu" class="w-4 h-4"></i>
+              <span>執行邏輯檢核</span>
+            </button>
+          </div>
+
+          <!-- 常見檢核範例按鈕區 -->
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-slate-500 font-medium">常見檢核範例：</span>
+            <button onclick="fillRuleQuery('地下室車道防水閘門檢測及每年5月實際操演與防汛規定？')" class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-colors font-semibold flex items-center space-x-1">
+              <span>🛡️ 防水閘門檢測及實際操演</span>
+            </button>
+            <button onclick="fillRuleQuery('管委會委員提議放寬走廊放置薄型鞋櫃，是否合規？')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition-colors">
+              🚪 走廊開放薄型鞋櫃案
+            </button>
+            <button onclick="fillRuleQuery('住戶擬於地下停車場私人車位加裝電動車充電樁之規定？')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition-colors">
+              ⚡ 私人車位加裝充電樁
+            </button>
+            <button onclick="fillRuleQuery('冷氣室外機懸掛於外牆陽台立面之合規性？')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition-colors">
+              ❄️ 冷氣室外機安裝位置
+            </button>
+          </div>
+        </div>
+
+        <!-- 檢核四象限標準輸出結果 -->
+        <div id="rule-result-container" class="mt-8 hidden">
+          <div class="border-t border-slate-200 pt-6">
+            <div class="flex items-center space-x-2 text-indigo-900 font-semibold mb-4 text-base">
+              <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i>
+              <span>AI 規約邏輯檢核報告書</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <!-- 1. 相關規約條文 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <div class="flex items-center space-x-2 text-slate-900 font-semibold text-sm mb-2">
+                  <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">1</span>
+                  <span>相關規約條文 (條文檢索)</span>
+                </div>
+                <div id="res-rules" class="text-xs text-slate-700 leading-relaxed space-y-2">
+                  <!-- 動態注入 -->
+                </div>
+              </div>
+
+              <!-- 2. 歷史決策慣例 -->
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <div class="flex items-center space-x-2 text-slate-900 font-semibold text-sm mb-2">
+                  <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">2</span>
+                  <span>歷史決策慣例 (歷屆會議紀錄)</span>
+                </div>
+                <p id="res-history" class="text-xs text-slate-700 leading-relaxed">
+                  <!-- 動態注入 -->
+                </p>
+              </div>
+
+              <!-- 3. 潛在邏輯矛盾或衝突點 -->
+              <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-4">
+                <div class="flex items-center space-x-2 text-amber-900 font-semibold text-sm mb-2">
+                  <span class="w-6 h-6 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold">3</span>
+                  <span>潛在邏輯矛盾或衝突點 (AI 邏輯比對)</span>
+                </div>
+                <p id="res-conflicts" class="text-xs text-amber-800 leading-relaxed">
+                  <!-- 動態注入 -->
+                </p>
+              </div>
+
+              <!-- 4. 建議處理方式 -->
+              <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-4">
+                <div class="flex items-center space-x-2 text-indigo-900 font-semibold text-sm mb-2">
+                  <span class="w-6 h-6 rounded-full bg-indigo-200 text-indigo-800 flex items-center justify-center text-xs font-bold">4</span>
+                  <span>建議處理方式 (客觀中立原則)</span>
+                </div>
+                <div id="res-recommendations" class="text-xs text-indigo-900 leading-relaxed whitespace-pre-line">
+                  <!-- 動態注入 -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 規約知識庫總覽 -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center space-x-2">
+          <i data-lucide="book-marked" class="w-4 h-4 text-slate-600"></i>
+          <span>社區向量知識庫現有公約與規程一覽 (含防汛防水閘門規程)</span>
+        </h3>
+        <div id="bylaw-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- 動態載入規約卡片 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 3: Skill 5 防汛演練與氣象局連線推播中心 -->
+    <!-- ============================================== -->
+    <section id="view-flood" class="hidden space-y-6">
+      <!-- 頂部重點橫幅 -->
+      <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+                <i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i>
+                <span>Skill 5: 社區防汛預警與防水閘門操演自動化</span>
+              </h2>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                氣象署連線運作中
+              </span>
+            </div>
+            <p class="text-xs text-slate-300 mt-1">每年 5 月系統主動發訊息提醒防水閘門實兵操演 · 主動介接中央氣象局豪大雨特報並推播至管委會與管理員</p>
+          </div>
+          <!-- 模擬測試快捷按鈕 -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="triggerMayScheduledReminder()" class="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs flex items-center space-x-1.5 shadow-sm transition-all">
+              <i data-lucide="calendar-bell" class="w-4 h-4"></i>
+              <span>模擬觸發「5月演練提醒」</span>
+            </button>
+            <button onclick="toggleCwaAlert('heavy_rain')" class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs flex items-center space-x-1.5 shadow-sm transition-all">
+              <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+              <span>模擬氣象局【豪大雨特報】</span>
+            </button>
+            <button onclick="toggleCwaAlert('normal')" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xl text-xs flex items-center space-x-1.5 transition-all">
+              <i data-lucide="sun" class="w-4 h-4"></i>
+              <span>解除特報</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 兩大核心卡片：每年5月演練 vs 中央氣象署豪大雨推播 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- 模組 A: 每年 5 月系統主動發訊息提醒演練 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center space-x-2">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">
+                  <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
+                </span>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm">每年 5 月例行防水閘門檢測與實兵操演排程</h3>
+                  <p class="text-[11px] text-slate-500">規約依據：第四屆區權會防汛作業手冊第 3 條</p>
+                </div>
+              </div>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                自動排程已啟用
+              </span>
+            </div>
+
+            <!-- 四大操演要求指標 -->
+            <div class="grid grid-cols-2 gap-3 my-4 text-xs">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">年度操演排程</span>
+                <strong class="text-slate-800 text-sm">每年 5 月 1 日 ~ 20 日</strong>
+                <span class="text-[10px] text-emerald-600 block mt-0.5">系統排程主動提醒發送</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">閉合合格時間標準</span>
+                <strong class="text-slate-800 text-sm">15 分鐘以內完成</strong>
+                <span class="text-[10px] text-slate-500 block mt-0.5">上次操演耗時 11分35秒 (合格)</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">防汛沙包盤點要求</span>
+                <strong class="text-slate-800 text-sm">法定備妥 ≥ 50 包</strong>
+                <span class="text-[10px] text-emerald-600 block mt-0.5">目前庫存：60 包 (全數完好)</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                <span class="text-slate-400 block mb-0.5">機電設施測試</span>
+                <strong class="text-slate-800 text-sm">3組沉水抽水泵</strong>
+                <span class="text-[10px] text-emerald-600 block mt-0.5">強制啟動運轉測試正常</span>
+              </div>
+            </div>
+
+            <!-- 演練 SOP 檢查單 -->
+            <div class="space-y-2 text-xs text-slate-700 bg-amber-50/50 p-3.5 rounded-xl border border-amber-200/70">
+              <div class="font-bold text-amber-900 flex items-center space-x-1.5">
+                <i data-lucide="check-square" class="w-4 h-4 text-amber-700"></i>
+                <span>每年 5 月物業與管委會必行四大檢測：</span>
+              </div>
+              <ul class="space-y-1.5 pl-4 list-disc text-slate-700">
+                <li><strong>機械結構軌道清理：</strong>車道兩側立柱凹槽與地面軌道淤泥清除、潤滑防鏽。</li>
+                <li><strong>橡膠止水條密封檢驗：</strong>檢查彈性及老化龜裂，確保閉合時滴水不漏。</li>
+                <li><strong>實兵組裝測時：</strong>召集全體管理員現場動手組裝擋板並旋緊迫緊螺栓。</li>
+                <li><strong>紀錄張貼公告：</strong>演練成果填造檢核表，由主委簽核後公告住戶官方 LINE。</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 推播記錄 -->
+          <div class="border-t border-slate-100 pt-3">
+            <span class="text-xs font-bold text-slate-700 block mb-2">5月份排程推播訊息紀錄：</span>
+            <div id="may-reminder-log" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1 max-h-36 overflow-y-auto">
+              <!-- 動態注入 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 模組 B: 中央氣象局 (CWA) 豪大雨即時主動推播 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center space-x-2">
+                <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-sm">
+                  <i data-lucide="cloud-rain" class="w-4 h-4"></i>
+                </span>
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm">中央氣象局 (CWA) 豪大雨連線推播</h3>
+                  <p class="text-[11px] text-slate-500">介接台北市水情特報 · 主動推播管委會與管理員</p>
+                </div>
+              </div>
+              <span id="cwa-status-tag" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                正常無警報
+              </span>
+            </div>
+
+            <!-- 即時氣象面板 -->
+            <div class="my-4 p-4 rounded-xl border transition-all" id="cwa-weather-card">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <i data-lucide="cloud" class="w-6 h-6 text-sky-600" id="cwa-icon"></i>
+                  <div>
+                    <div class="text-sm font-bold text-slate-900" id="cwa-alert-title">天氣正常 (無豪雨特報)</div>
+                    <div class="text-xs text-slate-500" id="cwa-forecast-text">台北市降雨機率 10%，氣象穩定。</div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-slate-400 block">觀測站點</span>
+                  <span class="text-xs font-mono font-bold text-slate-700">台北市信義區</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 防汛應變 SOP (當有警特報時高亮) -->
+            <div class="space-y-2 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200" id="cwa-sop-box">
+              <div class="font-bold text-slate-800 flex items-center justify-between">
+                <span class="flex items-center space-x-1.5">
+                  <i data-lucide="bell-ring" class="w-4 h-4 text-rose-600"></i>
+                  <span>豪大雨發布時系統自動推播 SOP：</span>
+                </span>
+                <span class="text-[10px] text-slate-400">延遲 &lt; 60秒</span>
+              </div>
+              <div class="space-y-1.5 text-slate-600">
+                <div class="flex items-start space-x-2">
+                  <span class="text-rose-600 font-bold">1. 現場管理員：</span>
+                  <span>立即至地下室車道確認防汛閘門擋板就定位，啟動沉水泵運轉測試。</span>
+                </div>
+                <div class="flex items-start space-x-2">
+                  <span class="text-indigo-600 font-bold">2. 管委會委員：</span>
+                  <span>群組即時接收水情推播與現場整備回報照片，掌控抽水與備妥狀況。</span>
+                </div>
+                <div class="flex items-start space-x-2">
+                  <span class="text-emerald-600 font-bold">3. 社區住戶群：</span>
+                  <span>推播提醒地下停車場 B1~B3 車主留意水情與移車準備。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+            <!-- 推播日誌 -->
+          <div class="border-t border-slate-100 pt-3">
+            <span class="text-xs font-bold text-slate-700 block mb-2">緊急推播歷史稽核日誌：</span>
+            <div id="cwa-push-log" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 max-h-36 overflow-y-auto">
+              <!-- 動態注入 -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 4: Skill 2 影像辨識與自動派單 -->
+    <!-- ============================================== -->
+    <section id="view-vision" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 上傳與辨識操作卡 -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <i data-lucide="camera" class="w-5 h-5 text-sky-600"></i>
+              <span>Skill 2: 影像辨識與自動派單</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">住戶 LINE 上傳或 CCTV Webhook 自動截圖，Vision AI 即時判斷並精準派單。</p>
+          </div>
+
+          <!-- 示範情境選擇 -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-2">選擇示範影像或情境：</label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="selectDemoVision('trash')" class="p-2.5 rounded-xl border border-slate-200 text-left hover:border-sky-500 hover:bg-sky-50 transition-all">
+                <span class="font-semibold block text-slate-800">🗑️ 走廊垃圾棄置</span>
+                <span class="text-slate-400 text-[11px]">紙箱、雜物堆放</span>
+              </button>
+              <button onclick="selectDemoVision('lost')" class="p-2.5 rounded-xl border border-slate-200 text-left hover:border-sky-500 hover:bg-sky-50 transition-all">
+                <span class="font-semibold block text-slate-800">🎒 大廳遺失物品</span>
+                <span class="text-slate-400 text-[11px]">水壺、個人隨身物</span>
+              </button>
+              <button onclick="selectDemoVision('damage')" class="p-2.5 rounded-xl border border-slate-200 text-left hover:border-sky-500 hover:bg-sky-50 transition-all">
+                <span class="font-semibold block text-slate-800">⚠️ 梯廳地磚破損</span>
+                <span class="text-slate-400 text-[11px]">公設損壞報修</span>
+              </button>
+              <button onclick="selectDemoVision('cctv')" class="p-2.5 rounded-xl border border-slate-200 text-left hover:border-sky-500 hover:bg-sky-50 transition-all">
+                <span class="font-semibold block text-slate-800">📹 CCTV 違規截圖</span>
+                <span class="text-slate-400 text-[11px]">逃生梯堆置時間戳</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 預覽圖框 -->
+          <div class="space-y-2">
+            <span class="text-xs font-semibold text-slate-700">影像預覽：</span>
+            <div class="relative w-full h-44 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center">
+              <img id="vision-preview-img" src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60" alt="預覽" class="w-full h-full object-cover">
+              <span id="vision-tag-badge" class="absolute top-2 left-2 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-500 text-white shadow-sm">
+                待辨識
+              </span>
+            </div>
+          </div>
+
+          <!-- 通報地點與描述 -->
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">事發地點：</label>
+              <input type="text" id="vision-location" value="B1 資源回收室旁走道" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg">
+            </div>
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">狀況說明：</label>
+              <input type="text" id="vision-desc" value="走道堆積未依規定分類的大型紙箱與保麗龍" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg">
+            </div>
+          </div>
+
+          <button onclick="submitVisionDispatch()" class="w-full py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center space-x-2 shadow-sm transition-all">
+            <i data-lucide="scan" class="w-4 h-4"></i>
+            <span>啟動 Vision AI 自動派單</span>
+          </button>
+        </div>
+
+        <!-- 派單紀錄與即時工單中心 -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-900 text-sm flex items-center space-x-2">
+              <i data-lucide="list-todo" class="w-4 h-4 text-sky-600"></i>
+              <span>社區即時派單工單中心</span>
+            </h3>
+            <span class="text-xs text-slate-500" id="dispatch-count-text">共 2 筆派單紀錄</span>
+          </div>
+
+          <div id="dispatch-list" class="space-y-3 flex-1 overflow-y-auto max-h-[560px]">
+            <!-- 動態填入派單紀錄 -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 5: Skill 3 財務銷帳與對帳 -->
+    <!-- ============================================== -->
+    <section id="view-finance" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 銀行入帳自動解析與銷帳模擬 -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <i data-lucide="landmark" class="w-5 h-5 text-emerald-600"></i>
+              <span>Skill 3: 銀行入帳自動銷帳</span>
+            </h2>
+            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-medium">後台自動化</span>
+          </div>
+          <p class="text-xs text-slate-500">系統自動解析銀行入帳通知 Email，提取【金額】與【帳號末5碼】，核對戶別並自動生成收據。</p>
+
+          <!-- 銀行信件模擬輸入 -->
+          <div class="space-y-3 text-xs">
+            <label class="block font-semibold text-slate-700">模擬銀行匯款通知郵件：</label>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <div class="flex justify-between">
+                <span class="text-slate-500">轉入帳號：</span>
+                <span class="font-mono text-slate-700">808 玉山銀行 社區公積金專戶</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500">匯款金額：</span>
+                <input type="number" id="bank-input-amount" value="3850" class="w-28 px-2 py-1 bg-white border border-slate-300 rounded font-mono font-bold text-slate-900 text-right">
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-slate-500">扣款帳號末5碼：</span>
+                <input type="text" id="bank-input-suffix" value="68821" class="w-28 px-2 py-1 bg-white border border-slate-300 rounded font-mono font-bold text-slate-900 text-right">
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="fillBankSample('68821', 3850)" class="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 text-center transition-colors">
+                帶入 A-8F-1 (NT$3,850)
+              </button>
+              <button onclick="fillBankSample('98765', 3500)" class="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 text-center transition-colors">
+                帶入 B-5F-2 (NT$3,500)
+              </button>
+            </div>
+
+            <button onclick="submitBankReconciliation()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center space-x-2 shadow-sm transition-all">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              <span>觸發自動對帳與電子銷帳</span>
+            </button>
+          </div>
+
+          <!-- 電子收據產生預覽 -->
+          <div id="receipt-preview-box" class="hidden mt-4 p-4 border-2 border-dashed border-emerald-300 rounded-xl bg-emerald-50/50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-emerald-800 flex items-center space-x-1">
+                <i data-lucide="file-badge-2" class="w-4 h-4"></i>
+                <span>LINE 電子管理費收據</span>
+              </span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-200 text-emerald-900 font-bold">已入帳銷帳</span>
+            </div>
+            <div class="text-xs text-slate-700 space-y-1 font-mono" id="receipt-details">
+              <!-- 動態產生 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 社區全體戶別繳納明細清單 -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm flex items-center space-x-2">
+                <i data-lucide="users" class="w-4 h-4 text-emerald-600"></i>
+                <span>社區管理費繳納狀態儀表板</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5" id="finance-access-hint">管委會 / 物業 全體名冊檢視權限</p>
+            </div>
+            <div class="flex items-center space-x-2 text-xs">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium" id="paid-count-badge">已繳: 3 戶</span>
+              <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 font-medium" id="unpaid-count-badge">未繳: 2 戶</span>
+            </div>
+          </div>
+
+          <!-- 繳納表格 -->
+          <div class="flex-1 overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-600">
+              <thead class="text-slate-400 bg-slate-50 border-y border-slate-100 uppercase tracking-wider">
+                <tr>
+                  <th class="py-3 px-3">戶別</th>
+                  <th class="py-3 px-3">區分所有權人</th>
+                  <th class="py-3 px-3 text-right">應繳金額</th>
+                  <th class="py-3 px-3 text-center">扣款末5碼</th>
+                  <th class="py-3 px-3 text-center">繳費狀態</th>
+                  <th class="py-3 px-3 text-right">入帳日期</th>
+                </tr>
+              </thead>
+              <tbody id="resident-table-body" class="divide-y divide-slate-100">
+                <!-- 動態注入表格內容 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 6: Skill 4 零用金多重簽核 -->
+    <!-- ============================================== -->
+    <section id="view-petty" class="hidden space-y-6">
+      <!-- 委員審核精煉指標 ( Constraints: 資訊精煉：總支出、剩餘零用金、最大筆開銷 TOP 3 ) -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 class="text-lg font-bold text-white">Skill 4: 固德物業零用金審核流</h2>
+              <span id="petty-final-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                已全數核准結算
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">每月零用金上限 10 萬元整，需經 3 位指定管委會委員全數同意方得結算撥款。</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="openApprovalPdfModal()" id="btn-view-certificate" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center space-x-2 shadow-sm transition-all">
+              <i data-lucide="award" class="w-4 h-4"></i>
+              <span>預覽/列印結算核准書</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 資訊精煉三大重點卡 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-5">
+          <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+            <span class="text-xs text-slate-400 block mb-1">本月申報總支出</span>
+            <div class="text-2xl font-bold font-mono text-white" id="stat-total-spent">NT$ 37,700</div>
+            <span class="text-[11px] text-slate-400 mt-1 block">共 5 筆維修與消耗憑證</span>
+          </div>
+          <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+            <span class="text-xs text-slate-400 block mb-1">剩餘零用金額度 (上限 10 萬)</span>
+            <div class="text-2xl font-bold font-mono text-emerald-400" id="stat-remaining">NT$ 62,300</div>
+            <span class="text-[11px] text-emerald-400/80 mt-1 block">符合公共安全預備金餘額</span>
+          </div>
+          <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+            <span class="text-xs text-slate-400 block mb-1">最大筆開銷 TOP 3 (AI 摘要)</span>
+            <div id="stat-top3" class="text-xs text-slate-200 space-y-1 font-mono">
+              <!-- 動態注入 -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 三位委員多重簽核進度卡 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- 1. 主任委員 -->
+        <div id="card-officer-director" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">主任委員</span>
+              <span id="badge-director" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">已同意</span>
+            </div>
+            <div class="text-sm font-bold text-slate-900">陳建宏 委員</div>
+            <p id="comment-director" class="text-xs text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-lg">各項費用單據核對無誤，同意核銷撥款。</p>
+            <div class="text-[11px] text-slate-400 mt-2 font-mono" id="time-director">簽核時間：2026-09-17 10:15</div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex gap-2">
+            <button onclick="approvePettyCash('director', 'approved')" class="flex-1 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-semibold transition-colors">同意</button>
+            <button onclick="approvePettyCash('director', 'rejected')" class="flex-1 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold transition-colors">退回</button>
+          </div>
+        </div>
+
+        <!-- 2. 財務委員 -->
+        <div id="card-officer-finance" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700">財務委員</span>
+              <span id="badge-finance" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">已同意</span>
+            </div>
+            <div class="text-sm font-bold text-slate-900">林秀玲 委員</div>
+            <p id="comment-finance" class="text-xs text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-lg">單據齊全，未逾零用金10萬元上限，同意。</p>
+            <div class="text-[11px] text-slate-400 mt-2 font-mono" id="time-finance">簽核時間：2026-09-17 11:30</div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex gap-2">
+            <button onclick="approvePettyCash('finance', 'approved')" class="flex-1 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-semibold transition-colors">同意</button>
+            <button onclick="approvePettyCash('finance', 'rejected')" class="flex-1 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold transition-colors">退回</button>
+          </div>
+        </div>
+
+        <!-- 3. 監察委員 -->
+        <div id="card-officer-supervisor" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700">監察委員</span>
+              <span id="badge-supervisor" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">已同意</span>
+            </div>
+            <div class="text-sm font-bold text-slate-900">王國華 委員</div>
+            <p id="comment-supervisor" class="text-xs text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-lg">已完成五項單據審核無誤，全額核准。</p>
+            <div class="text-[11px] text-slate-400 mt-2 font-mono" id="time-supervisor">簽核時間：2026-09-17 18:15</div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex gap-2">
+            <button onclick="approvePettyCash('supervisor', 'approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors">同意核准</button>
+            <button onclick="promptReject('supervisor')" class="flex-1 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold transition-colors">退回補正</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 零用金使用明細憑證清單 -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-slate-900 text-sm flex items-center space-x-2">
+            <i data-lucide="receipt-text" class="w-4 h-4 text-slate-600"></i>
+            <span>固德物業 2026年09月份 零用金支出項目與單據憑證清單</span>
+          </h3>
+          <span class="text-xs font-mono text-slate-500">上限額度：NT$ 100,000</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left text-slate-600">
+            <thead class="text-slate-400 bg-slate-50 border-y border-slate-100 uppercase tracking-wider">
+              <tr>
+                <th class="py-2.5 px-3">日期</th>
+                <th class="py-2.5 px-3">類別</th>
+                <th class="py-2.5 px-3">支出項目名稱與事由</th>
+                <th class="py-2.5 px-3">發票/收據號碼</th>
+                <th class="py-2.5 px-3 text-right">支出金額 (NT$)</th>
+              </tr>
+            </thead>
+            <tbody id="petty-table-body" class="divide-y divide-slate-100">
+              <!-- 動態注入 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 零用金結算核准書 (可預覽與列印) -->
+  <!-- ============================================== -->
+  <div id="pdf-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <h3 class="font-bold text-slate-900 text-sm flex items-center space-x-2">
+          <i data-lucide="file-check-2" class="w-4 h-4 text-indigo-600"></i>
+          <span>大清天朵二期社區 - 零用金結算核准書</span>
+        </h3>
+        <button onclick="closeApprovalPdfModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-6 text-sm" id="printableArea">
+        <div class="text-center border-b-2 border-slate-900 pb-4">
+          <h2 class="text-xl font-bold text-slate-900">大清天朵二期社區公寓大廈管理委員會</h2>
+          <div class="text-xs text-slate-500 mt-1">零用金結算核准證明書 (固德物業委辦)</div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div><span class="text-slate-500">申報月份：</span><strong id="pdf-month">2026年09月份</strong></div>
+          <div><span class="text-slate-500">核准編號：</span><span class="font-mono" id="pdf-code">APP-202609-PETTY-01</span></div>
+          <div><span class="text-slate-500">總核銷金額：</span><strong class="text-emerald-700 font-mono text-sm" id="pdf-spent">NT$ 37,700</strong></div>
+          <div><span class="text-slate-500">次月應補足額：</span><strong class="text-indigo-700 font-mono text-sm" id="pdf-replenish">NT$ 37,700</strong></div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold text-slate-800 mb-2">支出明細摘要：</h4>
+          <div id="pdf-items-summary" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg space-y-1 font-mono">
+            <!-- 注入清單 -->
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-4">
+          <h4 class="text-xs font-bold text-slate-800 mb-3">管委會法定三委員簽核認可：</h4>
+          <div class="grid grid-cols-3 gap-3 text-center text-xs">
+            <div class="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+              <div class="text-slate-400 text-[10px]">主任委員</div>
+              <div class="font-bold text-slate-800 mt-1">陳建宏</div>
+              <div class="text-[10px] text-emerald-600 font-semibold mt-1">✓ 電子認可</div>
+            </div>
+            <div class="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+              <div class="text-slate-400 text-[10px]">財務委員</div>
+              <div class="font-bold text-slate-800 mt-1">林秀玲</div>
+              <div class="text-[10px] text-emerald-600 font-semibold mt-1">✓ 電子認可</div>
+            </div>
+            <div class="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
+              <div class="text-slate-400 text-[10px]">監察委員</div>
+              <div class="font-bold text-slate-800 mt-1">王國華</div>
+              <div class="text-[10px] text-emerald-600 font-semibold mt-1" id="pdf-supervisor-status">✓ 電子認可</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end space-x-3">
+        <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>列印 / 另存為 PDF</span>
+        </button>
+        <button onclick="closeApprovalPdfModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold">
+          關閉
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+    大清天朵二期社區 AI 管理助手 · 固德物業管理中心 × 第五屆管理委員會
+  </footer>
+
+  <!-- 應用邏輯與互動指令 Script -->
+  <script>
+    // 全域狀態
+    let currentRole = 'resident';
+    let currentUnit = 'A-8F-1';
+    let currentTab = 'chat';
+    let appData = null;
+
+    // 身分配置
+    const roleConfigs = {
+      resident: {
+        badge: '住戶模式 (Resident)',
+        badgeClass: 'badge-resident',
+        bannerClass: 'bg-emerald-50/70 border-emerald-200',
+        desc: '當前綁定戶別：<strong>A棟8樓之1（饒先生）</strong>。您可查詢個人繳費狀態、通報社區異常狀況或查詢公告。',
+        quickPrompts: [
+          { text: '我這個月管理費繳了嗎？', icon: 'receipt' },
+          { text: '地下室車道防水閘門每年演練與防汛規定？', icon: 'shield-alert' },
+          { text: '通報走廊堆放紙箱垃圾（附圖）', icon: 'camera' },
+          { text: '請問社區可以帶寵物進電梯嗎？', icon: 'help-circle' }
+        ]
+      },
+      property: {
+        badge: '固德物業人員 (Gude)',
+        badgeClass: 'badge-property',
+        bannerClass: 'bg-blue-50/70 border-blue-200',
+        desc: '固德物業案場總幹事視角。可接收清潔/遺失物派單、上傳每月零用金結算報表、排定防汛操演、查詢繳費明細。',
+        quickPrompts: [
+          { text: '檢核防水閘門保養規約與每年5月演練SOP', icon: 'shield-check' },
+          { text: '物業已上傳本月零用金支出報表，請發起簽核', icon: 'clipboard-list' },
+          { text: '查詢本月未繳管理費的住戶名冊', icon: 'users' },
+          { text: '模擬中央氣象局豪大雨特報並推播應變SOP', icon: 'cloud-rain' }
+        ]
+      },
+      committee: {
+        badge: '管委會委員 (Committee)',
+        badgeClass: 'badge-committee',
+        bannerClass: 'bg-purple-50/70 border-purple-200',
+        desc: '管委會委員視角。可進行零用金報表批審（多重簽核）、監督防汛操演、查詢歷屆決議與規約邏輯檢核比對。',
+        quickPrompts: [
+          { text: '地下室防水閘門若未落實演練，遇淹水管委會有何法律責任？', icon: 'scale' },
+          { text: '請比對走廊放置鞋櫃是否違反社區歷史決議？', icon: 'file-text' },
+          { text: '請列出本月待審核的零用金報表摘要與 TOP 3 開銷', icon: 'pie-chart' },
+          { text: '社區地下室私人車位安裝充電樁之法規要求？', icon: 'zap' }
+        ]
+      }
+    };
+
+    // 初始化載入
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      await fetchStatusAndData();
+      renderRoleUI();
+      renderBylaws();
+      renderDispatches();
+      renderPettyCash();
+      renderResidentsTable();
+      renderFloodSystem();
+    });
+
+    // 取得後端資料
+    async function fetchStatusAndData() {
+      try {
+        const [resStatus, resDispatches, resPetty, resBylaws, resResidents, resFlood] = await Promise.all([
+          fetch('/api/status').then(r => r.json()),
+          fetch('/api/dispatches').then(r => r.json()),
+          fetch('/api/petty_cash').then(r => r.json()),
+          fetch('/api/bylaws').then(r => r.json()),
+          fetch(`/api/residents?role=${currentRole}&unit=${currentUnit}`).then(r => r.json()),
+          fetch('/api/flood_system').then(r => r.json())
+        ]);
+        appData = {
+          status: resStatus,
+          dispatches: resDispatches.dispatches,
+          petty_cash: resPetty.petty_cash,
+          bylaws: resBylaws.bylaws,
+          residents: resResidents.residents || [resResidents.resident],
+          flood_system: resFlood.flood_system
+        };
+      } catch (err) {
+        console.error("無法連線至本地後端", err);
+      }
+    }
+
+    // 切換分頁
+    function switchTab(tabId) {
+      currentTab = tabId;
+      ['chat', 'rules', 'flood', 'vision', 'finance', 'petty'].forEach(t => {
+        const el = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-${t}`);
+        if (el && btn) {
+          if (t === tabId) {
+            el.classList.remove('hidden');
+            btn.classList.add('border-sky-600', 'text-sky-600');
+            btn.classList.remove('border-transparent', 'text-slate-500');
+          } else {
+            el.classList.add('hidden');
+            btn.classList.remove('border-sky-600', 'text-sky-600');
+            btn.classList.add('border-transparent', 'text-slate-500');
+          }
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // 切換身分
+    async function switchRole(role) {
+      currentRole = role;
+      renderRoleUI();
+      await fetchStatusAndData();
+      renderResidentsTable();
+    }
+
+    function renderRoleUI() {
+      ['resident', 'property', 'committee'].forEach(r => {
+        const btn = document.getElementById(`btn-role-${r}`);
+        if (r === currentRole) {
+          btn.className = "px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 shadow-sm bg-white font-bold " + 
+            (r === 'resident' ? 'text-emerald-700' : (r === 'property' ? 'text-blue-700' : 'text-purple-700'));
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg transition-all flex items-center space-x-1.5 text-slate-600 hover:text-slate-900";
+        }
+      });
+
+      const config = roleConfigs[currentRole];
+      const badge = document.getElementById('role-badge');
+      const desc = document.getElementById('role-desc');
+
+      badge.textContent = config.badge;
+      badge.className = "px-2.5 py-1 text-xs font-semibold rounded-lg " + config.badgeClass;
+      desc.innerHTML = config.desc;
+
+      const promptContainer = document.getElementById('quick-prompts');
+      promptContainer.innerHTML = '';
+      config.quickPrompts.forEach(p => {
+        const btn = document.createElement('button');
+        btn.onclick = () => {
+          document.getElementById('chat-input').value = p.text;
+          handleChatSubmit(new Event('submit'));
+        };
+        btn.className = "w-full text-left p-2.5 rounded-xl border border-slate-200 text-xs text-slate-700 hover:border-sky-400 hover:bg-sky-50 transition-all flex items-center space-x-2";
+        btn.innerHTML = `<i data-lucide="${p.icon}" class="w-4 h-4 text-sky-600"></i><span>${p.text}</span>`;
+        promptContainer.appendChild(btn);
+      });
+      lucide.createIcons();
+    }
+
+    // 防汛與氣象局連線系統渲染
+    function renderFloodSystem() {
+      if (!appData || !appData.flood_system) return;
+      const flood = appData.flood_system;
+      const cwa = flood.cwa_weather;
+
+      // 頂部橫幅與膠囊
+      const banner = document.getElementById('cwa-top-alert-banner');
+      const pill = document.getElementById('cwa-pill');
+      const pillText = document.getElementById('cwa-pill-text');
+      const floodBadge = document.getElementById('tab-flood-badge');
+
+      if (cwa.alert_level === 'heavy_rain') {
+        banner.classList.remove('hidden');
+        document.getElementById('cwa-banner-text').textContent = `${cwa.alert_name}！系統已自動推播一級防汛警戒至管委會及物業管理員群組！`;
+        pill.className = "flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 hover:bg-rose-200 transition-colors animate-pulse";
+        pillText.textContent = "🌧️ 中央氣象署：台北市【豪大雨特報】";
+        floodBadge.classList.remove('hidden');
+
+        // 氣象卡片樣式更新
+        document.getElementById('cwa-weather-card').className = "my-4 p-4 rounded-xl border border-rose-300 bg-rose-50/70";
+        document.getElementById('cwa-alert-title').textContent = cwa.alert_name;
+        document.getElementById('cwa-alert-title').className = "text-sm font-bold text-rose-900";
+        document.getElementById('cwa-forecast-text').textContent = cwa.rainfall_forecast;
+        document.getElementById('cwa-status-tag').textContent = "🚨 一級防汛警戒中";
+        document.getElementById('cwa-status-tag').className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-600 text-white shadow-sm";
+      } else {
+        banner.classList.add('hidden');
+        pill.className = "flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors";
+        pillText.textContent = "中央氣象署連線中 · 水情正常";
+        floodBadge.classList.add('hidden');
+
+        document.getElementById('cwa-weather-card').className = "my-4 p-4 rounded-xl border border-slate-200 bg-slate-50";
+        document.getElementById('cwa-alert-title').textContent = "天氣正常 (無豪雨特報)";
+        document.getElementById('cwa-alert-title').className = "text-sm font-bold text-slate-900";
+        document.getElementById('cwa-forecast-text').textContent = cwa.rainfall_forecast;
+        document.getElementById('cwa-status-tag').textContent = "正常無警報";
+        document.getElementById('cwa-status-tag').className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+      }
+
+      // 5月排程提醒歷史記錄
+      const reminderLog = document.getElementById('may-reminder-log');
+      reminderLog.innerHTML = flood.annual_drill.reminder_history.map(item => `
+        <div class="p-2 bg-white rounded-lg border border-slate-200">
+          <div class="flex justify-between items-center text-[10px] text-slate-400 font-mono">
+            <span>${item.time}</span>
+            <span class="text-amber-700 font-bold font-sans">推播對象：${item.recipients}</span>
+          </div>
+          <div class="font-bold text-slate-800 text-xs mt-0.5">${item.title}</div>
+          <p class="text-[11px] text-slate-600 mt-1">${item.content}</p>
+        </div>
+      `).join('');
+
+      // CWA 緊急推播日誌
+      const cwaLog = document.getElementById('cwa-push-log');
+      cwaLog.innerHTML = cwa.broadcast_logs.length > 0 ? cwa.broadcast_logs.map(log => `
+        <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+          <div class="flex justify-between items-center text-[10px]">
+            <span class="font-mono text-slate-400">${log.time}</span>
+            <span class="px-1.5 py-0.2 rounded font-bold ${log.level.includes('豪大雨') ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700'}">${log.level}</span>
+          </div>
+          <p class="text-xs text-slate-700 mt-1 font-sans leading-relaxed whitespace-pre-line">${log.message}</p>
+          <div class="mt-1.5 text-[10px] text-emerald-600 font-medium">✓ ${log.status}</div>
+        </div>
+      `).join('') : '<div class="text-slate-400 italic text-center py-2">目前無緊急推播事件</div>';
+
+      lucide.createIcons();
+    }
+
+    function dismissBanner() {
+      document.getElementById('cwa-top-alert-banner').classList.add('hidden');
+    }
+
+    // 觸發每年5月例行排程提醒
+    async function triggerMayScheduledReminder() {
+      try {
+        const res = await fetch('/api/trigger_may_reminder', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          await fetchStatusAndData();
+          renderFloodSystem();
+          alert('🔔【系統每年5月排程提醒已觸發】\n已主動推播防汛演練通知至「固德物業總幹事」與「管委會全體委員」LINE 群組！');
+        }
+      } catch (err) {
+        alert('觸發失敗');
+      }
+    }
+
+    // 切換中央氣象局豪大雨特報
+    async function toggleCwaAlert(level) {
+      try {
+        const res = await fetch('/api/cwa_weather_alert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ level })
+        });
+        const data = await res.json();
+        if (data.success) {
+          await fetchStatusAndData();
+          renderFloodSystem();
+          if (level === 'heavy_rain') {
+            alert('🚨【中央氣象局豪大雨特報已發布】\n系統已於 1.2 秒內主動推播緊急防汛警報至「管委會全體委員」及「固德物業管理員」，現場一級防汛 SOP 已啟動！');
+          } else {
+            alert('☀️ 豪大雨特報已解除，已向管委會與物業推播水情趨緩通知。');
+          }
+        }
+      } catch (err) {
+        alert('操作失敗');
+      }
+    }
+
+    // 對話處理
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage('user', text);
+      input.value = '';
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, role: currentRole, unit: currentUnit })
+        });
+        const data = await res.json();
+        appendChatMessage('ai', data.reply);
+      } catch (err) {
+        appendChatMessage('ai', '系統連線異常，正在重新嘗試...');
+      }
+    }
+
+    function appendChatMessage(sender, text) {
+      const chatBox = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = sender === 'user' ? "flex items-start justify-end space-x-3" : "flex items-start space-x-3";
+
+      const formatted = text.replace(/\n/g, '<br>');
+      if (sender === 'user') {
+        msgDiv.innerHTML = `
+          <div class="bg-sky-600 text-white rounded-2xl rounded-tr-none p-3 text-sm max-w-[85%] leading-relaxed shadow-sm">
+            ${formatted}
+          </div>
+          <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs flex-shrink-0 font-bold">我</div>
+        `;
+      } else {
+        msgDiv.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs flex-shrink-0 font-bold">AI</div>
+          <div class="bg-slate-100 text-slate-800 rounded-2xl rounded-tl-none p-3.5 text-sm max-w-[85%] leading-relaxed shadow-sm font-sans">
+            ${formatted}
+          </div>
+        `;
+      }
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function clearChatHistory() {
+      const chatBox = document.getElementById('chat-messages');
+      chatBox.innerHTML = `
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs flex-shrink-0">AI</div>
+          <div class="bg-slate-100 text-slate-800 rounded-2xl rounded-tl-none p-3.5 text-sm max-w-[85%] leading-relaxed shadow-sm">
+            對話已重置。您可以隨時提出防水閘門防汛、氣象局推播、規約比對、影像通報、財務銷帳或零用金簽核相關問題。
+          </div>
+        </div>
+      `;
+    }
+
+    // Skill 1: 規約邏輯檢核
+    function fillRuleQuery(q) {
+      document.getElementById('rule-query-input').value = q;
+      executeRuleCheck();
+    }
+
+    async function executeRuleCheck() {
+      const query = document.getElementById('rule-query-input').value.trim();
+      if (!query) return;
+
+      try {
+        const res = await fetch('/api/verify_rule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const data = await res.json();
+
+        document.getElementById('rule-result-container').classList.remove('hidden');
+
+        const rulesEl = document.getElementById('res-rules');
+        rulesEl.innerHTML = data.related_rules.map(r => `<div class="p-2 bg-white rounded border border-slate-200">${r}</div>`).join('');
+
+        document.getElementById('res-history').textContent = data.historical_practice;
+        document.getElementById('res-conflicts').textContent = data.conflicts;
+        document.getElementById('res-recommendations').textContent = data.recommendations;
+
+        lucide.createIcons();
+      } catch (err) {
+        alert('檢核服務呼叫失敗');
+      }
+    }
+
+    function renderBylaws() {
+      if (!appData || !appData.bylaws) return;
+      const list = document.getElementById('bylaw-list');
+      list.innerHTML = appData.bylaws.map(b => `
+        <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-1.5 py-0.5 rounded">${b.source}</span>
+          <h4 class="text-xs font-bold text-slate-900 mt-2">${b.title}</h4>
+          <p class="text-[11px] text-slate-600 mt-1 line-clamp-3">${b.content}</p>
+        </div>
+      `).join('');
+    }
+
+    // Skill 2: 影像辨識與自動派單
+    const demoVisionScenarios = {
+      trash: {
+        category: 'Trash',
+        category_name: '垃圾棄置',
+        location: 'B1 梯廳安全梯轉角',
+        description: '走廊棄置大型紙箱與家庭垃圾未依規定丟棄',
+        badgeClass: 'bg-rose-500',
+        img: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60'
+      },
+      lost: {
+        category: 'Lost Item',
+        category_name: '遺失物',
+        location: '1F 中庭兒童遊戲區',
+        description: '黑色雙肩後背包一只，內有保溫瓶',
+        badgeClass: 'bg-amber-500',
+        img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=60'
+      },
+      damage: {
+        category: 'Damage',
+        category_name: '設施損壞',
+        location: 'A棟7F公共梯廳',
+        description: '天花板感應崁燈脫落懸掛，有掉落疑慮',
+        badgeClass: 'bg-red-600',
+        img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=60'
+      },
+      cctv: {
+        category: 'Other',
+        category_name: 'CCTV 違規嫌疑',
+        location: 'B2 逃生門口 [CAM-03 截圖]',
+        description: '住戶搬家推車長時間阻擋常閉防火門，標記時間戳 18:04:12',
+        badgeClass: 'bg-purple-600',
+        img: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=600&auto=format&fit=crop&q=60'
+      }
+    };
+
+    let selectedScenario = demoVisionScenarios.trash;
+
+    function selectDemoVision(key) {
+      selectedScenario = demoVisionScenarios[key];
+      document.getElementById('vision-preview-img').src = selectedScenario.img;
+      document.getElementById('vision-location').value = selectedScenario.location;
+      document.getElementById('vision-desc').value = selectedScenario.description;
+      const tag = document.getElementById('vision-tag-badge');
+      tag.textContent = selectedScenario.category_name;
+      tag.className = `absolute top-2 left-2 px-2 py-0.5 rounded-md text-xs font-bold text-white shadow-sm ${selectedScenario.badgeClass}`;
+    }
+
+    async function submitVisionDispatch() {
+      const loc = document.getElementById('vision-location').value;
+      const desc = document.getElementById('vision-desc').value;
+
+      try {
+        const res = await fetch('/api/vision_dispatch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            category: selectedScenario.category,
+            location: loc,
+            description: desc,
+            reporter: currentRole === 'resident' ? '住戶通報 (A-8F-1)' : '巡檢通報 (固德物業)',
+            image_url: selectedScenario.img
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          await fetchStatusAndData();
+          renderDispatches();
+          alert(`✅ Vision AI 派單成功！\n工單編號：${data.dispatch.id}\n派發目標：${data.dispatch.target_team}`);
+        }
+      } catch (err) {
+        alert('派單連線錯誤');
+      }
+    }
+
+    function renderDispatches() {
+      if (!appData || !appData.dispatches) return;
+      const list = document.getElementById('dispatch-list');
+      document.getElementById('dispatch-count-text').textContent = `共 ${appData.dispatches.length} 筆派單紀錄`;
+
+      list.innerHTML = appData.dispatches.map(d => `
+        <div class="p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 transition-all flex flex-col sm:flex-row items-start gap-4">
+          <img src="${d.image_url}" alt="縮圖" class="w-20 h-20 rounded-lg object-cover border border-slate-200 flex-shrink-0">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-mono font-bold text-sky-700">${d.id}</span>
+              <span class="text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                d.category === 'Trash' ? 'bg-amber-100 text-amber-800' :
+                d.category === 'Lost Item' ? 'bg-blue-100 text-blue-800' :
+                d.category === 'Damage' ? 'bg-rose-100 text-rose-800' : 'bg-purple-100 text-purple-800'
+              }">${d.category_name}</span>
+              <span class="text-[11px] text-slate-400">${d.time}</span>
+            </div>
+            <div class="text-xs font-bold text-slate-900 mt-1 flex items-center space-x-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span>${d.location}</span>
+            </div>
+            <p class="text-xs text-slate-600 mt-1">${d.description}</p>
+            <div class="mt-2 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-100 pt-2">
+              <span>推播對象：<strong class="text-slate-700">${d.target_team}</strong></span>
+              <span class="px-2 py-0.5 rounded bg-slate-100 font-semibold text-slate-700">${d.status}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    // Skill 3: 財務銷帳與對帳
+    function fillBankSample(suffix, amount) {
+      document.getElementById('bank-input-suffix').value = suffix;
+      document.getElementById('bank-input-amount').value = amount;
+    }
+
+    async function submitBankReconciliation() {
+      const amount = document.getElementById('bank-input-amount').value;
+      const suffix = document.getElementById('bank-input-suffix').value;
+
+      try {
+        const res = await fetch('/api/reconcile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, account_suffix: suffix })
+        });
+        const data = await res.json();
+        if (data.success && data.matched) {
+          const rec = data.receipt;
+          const box = document.getElementById('receipt-preview-box');
+          box.classList.remove('hidden');
+          document.getElementById('receipt-details').innerHTML = `
+            <div>收據單號：${rec.receipt_no}</div>
+            <div>繳費戶別：${rec.unit} (${rec.resident_name})</div>
+            <div>實收金額：NT$ ${rec.amount.toLocaleString()}</div>
+            <div>轉入帳號：玉山銀行 (扣款帳號末5碼 ${rec.account_masked})</div>
+            <div>繳納項目：${rec.item}</div>
+            <div>銷帳時間：${rec.date}</div>
+          `;
+          await fetchStatusAndData();
+          renderResidentsTable();
+          alert(`🎉 自動對帳成功！\n戶別【${rec.unit}】管理費 NT$ ${rec.amount} 元 已自動完成銷帳，並推播電子收據給住戶！`);
+        } else {
+          alert(`⚠️ 對帳提醒：\n${data.message}`);
+        }
+      } catch (err) {
+        alert('對帳服務錯誤');
+      }
+    }
+
+    function renderResidentsTable() {
+      if (!appData || !appData.residents) return;
+      const tbody = document.getElementById('resident-table-body');
+      
+      const paidCount = appData.residents.filter(r => r.paid).length;
+      const unpaidCount = appData.residents.length - paidCount;
+
+      document.getElementById('paid-count-badge').textContent = `已繳: ${paidCount} 戶`;
+      document.getElementById('unpaid-count-badge').textContent = `未繳: ${unpaidCount} 戶`;
+
+      const isResident = currentRole === 'resident';
+      document.getElementById('finance-access-hint').textContent = isResident ? 
+        '住戶隱私模式：依公寓大廈管理規範與個資法，僅顯示您授權綁定之戶別' : 
+        '管委會 / 物業 視角：全社區住戶繳費清單與欠繳名冊';
+
+      tbody.innerHTML = appData.residents.map(r => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="py-3 px-3 font-semibold text-slate-800">${r.unit}</td>
+          <td class="py-3 px-3">${r.name}</td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-slate-800">NT$ ${r.fee.toLocaleString()}</td>
+          <td class="py-3 px-3 text-center font-mono text-slate-500">${r.account_suffix}</td>
+          <td class="py-3 px-3 text-center">
+            ${r.paid ? 
+              '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">已繳費</span>' : 
+              '<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-semibold text-[11px]">未繳費</span>'
+            }
+          </td>
+          <td class="py-3 px-3 text-right font-mono text-slate-400">${r.payment_date || '--'}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Skill 4: 零用金審核
+    function renderPettyCash() {
+      if (!appData || !appData.petty_cash) return;
+      const petty = appData.petty_cash;
+
+      const totalSpent = petty.items.reduce((sum, i) => sum + i.amount, 0);
+      const remaining = petty.limit - totalSpent;
+
+      document.getElementById('stat-total-spent').textContent = `NT$ ${totalSpent.toLocaleString()}`;
+      document.getElementById('stat-remaining').textContent = `NT$ ${remaining.toLocaleString()}`;
+
+      const top3 = [...petty.items].sort((a, b) => b.amount - a.amount).slice(0, 3);
+      document.getElementById('stat-top3').innerHTML = top3.map((t, idx) => `
+        <div class="flex justify-between">
+          <span class="truncate pr-2">${idx + 1}. ${t.title}</span>
+          <span class="font-bold text-amber-300">NT$ ${t.amount.toLocaleString()}</span>
+        </div>
+      `).join('');
+
+      const apps = petty.approvals;
+      ['director', 'finance', 'supervisor'].forEach(k => {
+        const off = apps[k];
+        const badge = document.getElementById(`badge-${k}`);
+        const comment = document.getElementById(`comment-${k}`);
+        const time = document.getElementById(`time-${k}`);
+
+        if (off.status === 'approved') {
+          badge.textContent = '已同意';
+          badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
+        } else if (off.status === 'rejected') {
+          badge.textContent = '已退回';
+          badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700';
+        } else {
+          badge.textContent = '待簽核';
+          badge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+        }
+
+        comment.textContent = off.comment || (off.status === 'pending' ? '尚未簽核審查' : '無意見');
+        time.textContent = `簽核時間：${off.time || '--'}`;
+      });
+
+      const finalBadge = document.getElementById('petty-final-badge');
+      if (petty.final_status === 'approved') {
+        finalBadge.textContent = '已全數核准結算';
+        finalBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+      } else if (petty.final_status === 'rejected') {
+        finalBadge.textContent = '有委員退回 (待物業補正)';
+        finalBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40';
+      } else {
+        finalBadge.textContent = '審核中 (等待委員同意)';
+        finalBadge.className = 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+      }
+
+      const tbody = document.getElementById('petty-table-body');
+      tbody.innerHTML = petty.items.map(i => `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="py-2.5 px-3 font-mono text-slate-500">${i.date}</td>
+          <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-slate-100 font-semibold text-slate-700">${i.category}</span></td>
+          <td class="py-2.5 px-3 font-semibold text-slate-800">${i.title}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-400">${i.invoice}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900">NT$ ${i.amount.toLocaleString()}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function approvePettyCash(officer, decision, comment = '') {
+      try {
+        const res = await fetch('/api/petty_cash/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ officer, decision, comment })
+        });
+        const data = await res.json();
+        if (data.success) {
+          appData.petty_cash = data.petty_cash;
+          renderPettyCash();
+          if (data.petty_cash.final_status === 'approved') {
+            alert('🎉 恭喜！全體 3 位委員已同意簽核，系統已自動生成「零用金結算核准書」PDF！');
+          }
+        }
+      } catch (err) {
+        alert('簽核操作失敗');
+      }
+    }
+
+    function promptReject(officer) {
+      const reason = prompt('請輸入退回補正之原因（將即時通知固德物業）：', '請補附梯廳照明燈管購買發票正本照片');
+      if (reason) {
+        approvePettyCash(officer, 'rejected', reason);
+      }
+    }
+
+    // 核准書 Modal
+    function openApprovalPdfModal() {
+      if (!appData || !appData.petty_cash) return;
+      const petty = appData.petty_cash;
+      const totalSpent = petty.items.reduce((sum, i) => sum + i.amount, 0);
+
+      document.getElementById('pdf-month').textContent = petty.month;
+      document.getElementById('pdf-spent').textContent = `NT$ ${totalSpent.toLocaleString()}`;
+      document.getElementById('pdf-replenish').textContent = `NT$ ${totalSpent.toLocaleString()}`;
+
+      const itemsEl = document.getElementById('pdf-items-summary');
+      itemsEl.innerHTML = petty.items.map((i, idx) => `
+        <div class="flex justify-between py-0.5 border-b border-slate-200">
+          <span>${idx + 1}. [${i.category}] ${i.title} (${i.invoice})</span>
+          <span class="font-bold">NT$ ${i.amount.toLocaleString()}</span>
+        </div>
+      `).join('');
+
+      const supStatus = document.getElementById('pdf-supervisor-status');
+      if (petty.approvals.supervisor.status === 'approved') {
+        supStatus.textContent = '✓ 電子認可 (2026-09-17)';
+        supStatus.className = 'text-[10px] text-emerald-600 font-semibold mt-1';
+      } else {
+        supStatus.textContent = '⏳ 待簽核';
+        supStatus.className = 'text-[10px] text-amber-600 font-semibold mt-1';
+      }
+
+      document.getElementById('pdf-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeApprovalPdfModal() {
+      document.getElementById('pdf-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
