@@ -82,10 +82,10 @@
           <span>智能交談</span>
         </button>
 
-        <!-- 2. 規約檢核 (Indigo 紫藍色系) -->
+        <!-- 2. 公寓大廈管理條例 (Indigo 紫藍色系) -->
         <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100">
           <i data-lucide="file-check" class="w-4 h-4"></i>
-          <span>規約檢核</span>
+          <span>公寓大廈管理條例</span>
         </button>
 
         <!-- 3. 防汛氣象 (Amber 暖橘色系) -->
@@ -158,7 +158,7 @@
     </section>
 
     <!-- ============================================== -->
-    <!-- TAB 2: 規約檢核 (字大、按鈕化、點擊展開) -->
+    <!-- TAB 2: 公寓大廈管理條例 (字大、按鈕化、點擊展開) -->
     <!-- ============================================== -->
     <section id="view-rules" class="hidden space-y-4">
       <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm space-y-4">
@@ -190,11 +190,11 @@
         <div id="rule-result-container" class="hidden border-t-2 border-slate-100 pt-5 space-y-4">
           <div class="font-bold text-slate-900 text-base sm:text-lg flex items-center space-x-2">
             <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i>
-            <span>規約邏輯檢核報告書</span>
+            <span>公寓大廈管理條例檢核報告書</span>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="p-4 bg-slate-50 rounded-xl border-2 border-slate-200 text-sm leading-relaxed">
-              <span class="font-bold text-slate-900 block mb-1.5 text-sm sm:text-base">1. 相關規約條文</span>
+              <span class="font-bold text-slate-900 block mb-1.5 text-sm sm:text-base">1. 相關規約與法規條文</span>
               <div id="res-rules" class="text-slate-700 space-y-1.5"></div>
             </div>
             <div class="p-4 bg-slate-50 rounded-xl border-2 border-slate-200 text-sm leading-relaxed">
@@ -218,7 +218,7 @@
         <button onclick="toggleElement('bylaws-accordion')" class="w-full px-5 py-3.5 text-sm sm:text-base font-bold text-slate-800 flex items-center justify-between hover:bg-slate-50 transition-colors">
           <span class="flex items-center space-x-2">
             <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i>
-            <span>查看完整社區規約與會議決議庫 (共 7 條)</span>
+            <span>查看公寓大廈管理條例與社區規約庫 (共 7 條)</span>
           </span>
           <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
         </button>
@@ -842,7 +842,7 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    // Skill 1: 規約邏輯檢核
+    // Skill 1: 公寓大廈管理條例檢核
     function fillRuleQuery(q) {
       document.getElementById('rule-query-input').value = q;
       executeRuleCheck();
