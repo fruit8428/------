@@ -120,9 +120,8 @@
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-4">
 
     <!-- 單行身分提示條 (加大字體) -->
-    <div class="flex items-center justify-between text-sm sm:text-base text-slate-700 pb-3 mb-4 border-b border-slate-200 font-medium">
+    <div class="text-sm sm:text-base text-slate-700 pb-3 mb-4 border-b border-slate-200 font-medium">
       <span id="role-desc">當前登入：<strong>住戶（A棟8樓之1 · 饒先生）</strong></span>
-      <span class="text-xs text-slate-400 font-mono" id="runtime-badge-text">雲端免伺服器模式</span>
     </div>
 
     <!-- ============================================== -->
@@ -685,7 +684,6 @@
             residents: resResidents.residents || [resResidents.resident],
             flood_system: resFlood.flood_system
           };
-          document.getElementById('runtime-badge-text').textContent = '本地伺服器模式 (Port: 8080)';
           return;
         }
       } catch (e) {}
@@ -693,7 +691,6 @@
       isStandalone = true;
       const local = localStorage.getItem('daqing_community_data');
       appData = local ? JSON.parse(local) : JSON.parse(JSON.stringify(SEED_DATA));
-      document.getElementById('runtime-badge-text').textContent = 'GitHub Pages 雲端免伺服器模式';
     }
 
     function saveLocal() {
