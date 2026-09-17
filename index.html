@@ -9,11 +9,12 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap');
     body {
-      font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: #f8fafc;
       color: #0f172a;
+      font-size: 15px;
     }
     @media print {
       body * { visibility: hidden; }
@@ -25,377 +26,467 @@
 <body class="min-h-screen flex flex-col antialiased selection:bg-sky-100 selection:text-sky-900">
 
   <!-- 頂部豪大雨警報列 (僅在特報時顯示) -->
-  <div id="cwa-top-alert-banner" class="hidden bg-rose-600 text-white px-4 py-2 text-xs font-medium flex items-center justify-between shadow-sm">
-    <div class="max-w-6xl mx-auto w-full flex items-center justify-between">
+  <div id="cwa-top-alert-banner" class="hidden bg-rose-600 text-white px-4 py-2.5 text-sm font-semibold shadow-md">
+    <div class="max-w-6xl mx-auto w-full flex items-center justify-between gap-2">
       <span class="flex items-center space-x-2">
-        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-300 flex-shrink-0"></i>
+        <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-300 flex-shrink-0"></i>
         <span id="cwa-banner-text">中央氣象署發布台北市豪大雨特報！已自動推播一級防汛警戒至管委會與管理員。</span>
       </span>
       <div class="flex items-center space-x-3">
-        <button onclick="switchTab('flood')" class="underline hover:text-rose-100">查看現場應變</button>
-        <button onclick="dismissBanner()" class="hover:text-rose-200"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+        <button onclick="switchTab('flood')" class="underline hover:text-rose-100 text-sm font-bold">查看防汛應變</button>
+        <button onclick="dismissBanner()" class="hover:text-rose-200"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
     </div>
   </div>
 
-  <!-- 頂部極簡導覽列 -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-      <!-- Logo 與站名 -->
-      <div class="flex items-center space-x-2.5">
-        <div class="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center text-white font-bold text-xs">
+  <!-- 頂部導覽列 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Logo 與站名 (加大字體) -->
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold text-sm shadow-xs">
           天朵
         </div>
-        <span class="font-bold text-sm tracking-tight text-slate-900">大清天朵二期</span>
-        <span class="text-[11px] text-slate-400 font-normal">AI 社區助手</span>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-bold text-lg sm:text-xl tracking-tight text-slate-900">大清天朵二期</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold border border-slate-200">AI 助手</span>
+          </div>
+        </div>
       </div>
 
-      <!-- 右側：身分切換 -->
-      <div class="flex items-center space-x-2 text-xs">
-        <!-- 身分切換 (極簡 Segmented Control) -->
-        <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200/80 font-medium">
-          <button id="btn-role-resident" onclick="switchRole('resident')" class="px-2.5 py-1 rounded-md transition-all text-xs bg-white text-slate-900 shadow-sm font-semibold">住戶</button>
-          <button id="btn-role-property" onclick="switchRole('property')" class="px-2.5 py-1 rounded-md transition-all text-xs text-slate-500 hover:text-slate-800">物業</button>
-          <button id="btn-role-committee" onclick="switchRole('committee')" class="px-2.5 py-1 rounded-md transition-all text-xs text-slate-500 hover:text-slate-800">委員</button>
-        </div>
+      <!-- 右側：身分切換按鈕組 (加大字體、獨立外框、彩色按鈕質感) -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-400 hidden sm:inline">切換身分：</span>
+        <button id="btn-role-resident" onclick="switchRole('resident')" class="px-3.5 py-1.5 rounded-xl border-2 text-sm font-bold transition-all shadow-xs flex items-center space-x-1.5 bg-emerald-600 text-white border-emerald-600">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>住戶</span>
+        </button>
+        <button id="btn-role-property" onclick="switchRole('property')" class="px-3.5 py-1.5 rounded-xl border-2 text-sm font-bold transition-all shadow-xs flex items-center space-x-1.5 bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100">
+          <i data-lucide="briefcase" class="w-4 h-4"></i>
+          <span>物業</span>
+        </button>
+        <button id="btn-role-committee" onclick="switchRole('committee')" class="px-3.5 py-1.5 rounded-xl border-2 text-sm font-bold transition-all shadow-xs flex items-center space-x-1.5 bg-purple-50 text-purple-800 border-purple-200 hover:bg-purple-100">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+          <span>委員</span>
+        </button>
       </div>
     </div>
 
-    <!-- 頁籤導覽 (極簡單行) -->
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 flex space-x-6 text-xs font-medium border-t border-slate-100 overflow-x-auto">
-      <button onclick="switchTab('chat')" id="tab-chat" class="tab-btn py-2.5 border-b-2 border-slate-900 text-slate-900 whitespace-nowrap">智能交談</button>
-      <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap">規約檢核</button>
-      <button onclick="switchTab('flood')" id="tab-flood" class="tab-btn py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap relative">
-        <span>防汛氣象</span>
-        <span id="tab-flood-badge" class="w-1.5 h-1.5 rounded-full bg-rose-500 absolute top-2 right-[-6px] hidden"></span>
-      </button>
-      <button onclick="switchTab('vision')" id="tab-vision" class="tab-btn py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap">異常通報</button>
-      <button onclick="switchTab('finance')" id="tab-finance" class="tab-btn py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap">管理費對帳</button>
-      <button onclick="switchTab('petty')" id="tab-petty" class="tab-btn py-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 whitespace-nowrap">零用金簽核</button>
+    <!-- 頁籤功能按鈕群 (字大、多行自適應換行、每個功能都有獨立外框按鈕色系) -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 border-t border-slate-100">
+      <div class="flex flex-wrap gap-2 sm:gap-3">
+        <!-- 1. 智能交談 (Sky 藍色系) -->
+        <button onclick="switchTab('chat')" id="tab-chat" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-sky-600 text-white border-sky-600">
+          <i data-lucide="bot" class="w-4 h-4"></i>
+          <span>智能交談</span>
+        </button>
+
+        <!-- 2. 規約檢核 (Indigo 紫藍色系) -->
+        <button onclick="switchTab('rules')" id="tab-rules" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100">
+          <i data-lucide="file-check" class="w-4 h-4"></i>
+          <span>規約檢核</span>
+        </button>
+
+        <!-- 3. 防汛氣象 (Amber 暖橘色系) -->
+        <button onclick="switchTab('flood')" id="tab-flood" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 relative">
+          <i data-lucide="shield-alert" class="w-4 h-4"></i>
+          <span>防汛氣象</span>
+          <span id="tab-flood-badge" class="w-2 h-2 rounded-full bg-rose-500 absolute top-1.5 right-1.5 hidden"></span>
+        </button>
+
+        <!-- 4. 異常通報 (Rose 玫瑰紅色系) -->
+        <button onclick="switchTab('vision')" id="tab-vision" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-rose-50 text-rose-800 border-rose-200 hover:bg-rose-100">
+          <i data-lucide="camera" class="w-4 h-4"></i>
+          <span>異常通報</span>
+        </button>
+
+        <!-- 5. 管理費對帳 (Emerald 翡翠綠色系) -->
+        <button onclick="switchTab('finance')" id="tab-finance" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100">
+          <i data-lucide="receipt" class="w-4 h-4"></i>
+          <span>管理費對帳</span>
+        </button>
+
+        <!-- 6. 零用金簽核 (Teal 藍綠石青色系) -->
+        <button onclick="switchTab('petty')" id="tab-petty" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-teal-50 text-teal-800 border-teal-200 hover:bg-teal-100">
+          <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+          <span>零用金簽核</span>
+        </button>
+      </div>
     </div>
   </header>
 
   <!-- 主內容容器 -->
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-4">
 
-    <!-- 單行身分提示 -->
-    <div class="flex items-center justify-between text-xs text-slate-500 pb-3 mb-3 border-b border-slate-200">
+    <!-- 單行身分提示條 (加大字體) -->
+    <div class="flex items-center justify-between text-sm sm:text-base text-slate-700 pb-3 mb-4 border-b border-slate-200 font-medium">
       <span id="role-desc">當前登入：<strong>住戶（A棟8樓之1 · 饒先生）</strong></span>
-      <span class="text-slate-400 font-mono" id="runtime-badge-text">雲端免伺服器模式</span>
+      <span class="text-xs text-slate-400 font-mono" id="runtime-badge-text">雲端免伺服器模式</span>
     </div>
 
     <!-- ============================================== -->
-    <!-- TAB 1: 智能交談 (極簡清爽對話) -->
+    <!-- TAB 1: 智能交談 (字體清晰、快捷提問按鈕化) -->
     <!-- ============================================== -->
-    <section id="view-chat" class="flex flex-col bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-[620px]">
+    <section id="view-chat" class="flex flex-col bg-white rounded-2xl border-2 border-slate-200 shadow-sm overflow-hidden h-[640px]">
       <!-- 對話流 -->
-      <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs leading-relaxed">
-        <div class="flex items-start space-x-2.5">
-          <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px] flex-shrink-0">AI</div>
-          <div class="bg-slate-100 rounded-xl rounded-tl-none p-3 max-w-[80%] text-slate-700">
-            您好，我是大清天朵二期 AI 社區助手。請直接輸入問題，或點選下方快捷提問。
+      <div id="chat-messages" class="flex-1 p-5 overflow-y-auto space-y-4 text-sm sm:text-base leading-relaxed">
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-xs">AI</div>
+          <div class="bg-slate-100 rounded-2xl rounded-tl-none p-3.5 max-w-[85%] text-slate-800 border border-slate-200/60">
+            您好，我是<strong>大清天朵二期 AI 社區助手</strong>。請直接在下方輸入問題，或點選推薦按鈕快速詢問。
           </div>
         </div>
       </div>
 
-      <!-- 快捷提問晶片 (單行橫向滾動) -->
-      <div class="px-4 py-2 border-t border-slate-100 bg-slate-50 flex items-center space-x-2 overflow-x-auto text-[11px]" id="quick-prompts">
-        <!-- 動態注入快捷標籤 -->
+      <!-- 快捷提問按鈕群 (字大、外框實體按鈕、自動換行) -->
+      <div class="px-4 py-3 border-t-2 border-slate-100 bg-slate-50">
+        <div class="text-xs font-bold text-slate-400 mb-2">點擊常見問題快速查詢：</div>
+        <div class="flex flex-wrap gap-2" id="quick-prompts">
+          <!-- 動態注入快捷標籤 -->
+        </div>
       </div>
 
       <!-- 輸入框 -->
-      <form onsubmit="handleChatSubmit(event)" class="p-3 border-t border-slate-200 bg-white flex items-center space-x-2">
-        <input type="text" id="chat-input" placeholder="輸入問題（例如：防水閘門何時演練？走廊能放鞋櫃嗎？）..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-900 focus:bg-white">
-        <button type="submit" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg text-xs flex items-center space-x-1">
+      <form onsubmit="handleChatSubmit(event)" class="p-3.5 border-t-2 border-slate-200 bg-white flex items-center space-x-2">
+        <input type="text" id="chat-input" placeholder="請輸入您的問題（如：防水閘門何時演練？走廊能放鞋櫃嗎？）..." class="flex-1 px-4 py-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all">
+        <button type="submit" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-sm sm:text-base flex items-center space-x-1.5 shadow-xs transition-all">
           <span>發送</span>
-          <i data-lucide="send" class="w-3 h-3"></i>
+          <i data-lucide="send" class="w-4 h-4"></i>
         </button>
       </form>
     </section>
 
     <!-- ============================================== -->
-    <!-- TAB 2: 規約檢核 (單行輸入 + 漸進式展開) -->
+    <!-- TAB 2: 規約檢核 (字大、按鈕化、點擊展開) -->
     <!-- ============================================== -->
     <section id="view-rules" class="hidden space-y-4">
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row gap-2">
-          <input type="text" id="rule-query-input" placeholder="輸入擬檢核的提案或問題（例如：走廊能放鞋櫃嗎？）" class="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-slate-900 focus:bg-white">
-          <button onclick="executeRuleCheck()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium">執行檢核</button>
+      <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <input type="text" id="rule-query-input" placeholder="請輸入擬檢核的提案或問題（例如：走廊能放鞋櫃嗎？）" class="flex-1 px-4 py-2.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white">
+          <button onclick="executeRuleCheck()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm sm:text-base font-bold shadow-xs">執行檢核</button>
         </div>
 
-        <!-- 單行常見範例標籤 -->
-        <div class="flex flex-wrap items-center gap-1.5 text-xs">
-          <span class="text-slate-400">熱門：</span>
-          <button onclick="fillRuleQuery('地下室車道防水閘門檢測及每年5月實際操演與防汛規定？')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">🛡️ 防水閘門操演</button>
-          <button onclick="fillRuleQuery('管委會委員提議放寬走廊放置薄型鞋櫃，是否合規？')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">🚪 走廊放鞋櫃</button>
-          <button onclick="fillRuleQuery('住戶擬於地下停車場私人車位加裝電動車充電樁之規定？')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">⚡ 私人充電樁</button>
-          <button onclick="fillRuleQuery('冷氣室外機懸掛於外牆陽台立面之合規性？')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">❄️ 冷氣主機外牆</button>
+        <!-- 常見範例按鈕 (字體大、按鈕外框鮮明) -->
+        <div>
+          <div class="text-xs font-bold text-slate-400 mb-2">點擊常見檢核範例：</div>
+          <div class="flex flex-wrap gap-2.5">
+            <button onclick="fillRuleQuery('地下室車道防水閘門檢測及每年5月實際操演與防汛規定？')" class="px-3.5 py-2 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold text-sm transition-all">
+              🛡️ 防水閘門操演規定
+            </button>
+            <button onclick="fillRuleQuery('管委會委員提議放寬走廊放置薄型鞋櫃，是否合規？')" class="px-3.5 py-2 rounded-xl border-2 border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-sm transition-all">
+              🚪 走廊放鞋櫃合規性
+            </button>
+            <button onclick="fillRuleQuery('住戶擬於地下停車場私人車位加裝電動車充電樁之規定？')" class="px-3.5 py-2 rounded-xl border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold text-sm transition-all">
+              ⚡ 私人車位裝充電樁
+            </button>
+            <button onclick="fillRuleQuery('冷氣室外機懸掛於外牆陽台立面之合規性？')" class="px-3.5 py-2 rounded-xl border-2 border-sky-300 bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold text-sm transition-all">
+              ❄️ 冷氣主機外牆懸掛
+            </button>
+          </div>
         </div>
 
-        <!-- 檢核四區塊結果 (查驗後出現) -->
-        <div id="rule-result-container" class="hidden border-t border-slate-100 pt-4 space-y-3 text-xs">
-          <div class="font-bold text-slate-900 text-sm">檢核結果分析</div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-              <span class="font-bold text-slate-800 block mb-1">1. 相關規約條文</span>
-              <div id="res-rules" class="text-slate-600 space-y-1"></div>
+        <!-- 檢核四區塊結果 (查驗後呈現，字大好讀) -->
+        <div id="rule-result-container" class="hidden border-t-2 border-slate-100 pt-5 space-y-4">
+          <div class="font-bold text-slate-900 text-base sm:text-lg flex items-center space-x-2">
+            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600"></i>
+            <span>規約邏輯檢核報告書</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 bg-slate-50 rounded-xl border-2 border-slate-200 text-sm leading-relaxed">
+              <span class="font-bold text-slate-900 block mb-1.5 text-sm sm:text-base">1. 相關規約條文</span>
+              <div id="res-rules" class="text-slate-700 space-y-1.5"></div>
             </div>
-            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-              <span class="font-bold text-slate-800 block mb-1">2. 歷史決策慣例</span>
-              <p id="res-history" class="text-slate-600"></p>
+            <div class="p-4 bg-slate-50 rounded-xl border-2 border-slate-200 text-sm leading-relaxed">
+              <span class="font-bold text-slate-900 block mb-1.5 text-sm sm:text-base">2. 歷史決策慣例</span>
+              <p id="res-history" class="text-slate-700"></p>
             </div>
-            <div class="p-3 bg-amber-50/60 rounded-lg border border-amber-200">
-              <span class="font-bold text-amber-900 block mb-1">3. 潛在衝突與矛盾</span>
-              <p id="res-conflicts" class="text-amber-800"></p>
+            <div class="p-4 bg-amber-50 rounded-xl border-2 border-amber-300 text-sm leading-relaxed">
+              <span class="font-bold text-amber-950 block mb-1.5 text-sm sm:text-base">3. 潛在衝突與矛盾 (AI 邏輯比對)</span>
+              <p id="res-conflicts" class="text-amber-900 font-medium"></p>
             </div>
-            <div class="p-3 bg-sky-50/60 rounded-lg border border-sky-200">
-              <span class="font-bold text-sky-900 block mb-1">4. 建議處理方式 (客觀中立)</span>
-              <div id="res-recommendations" class="text-sky-900 whitespace-pre-line"></div>
+            <div class="p-4 bg-indigo-50 rounded-xl border-2 border-indigo-300 text-sm leading-relaxed">
+              <span class="font-bold text-indigo-950 block mb-1.5 text-sm sm:text-base">4. 建議處理方式 (客觀中立)</span>
+              <div id="res-recommendations" class="text-indigo-950 font-medium whitespace-pre-line"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 規約庫摺疊展開按鈕 (不佔主畫面空間，點擊才顯示) -->
-      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-        <button onclick="toggleElement('bylaws-accordion')" class="w-full px-5 py-3 text-xs font-semibold text-slate-700 flex items-center justify-between hover:bg-slate-50">
-          <span>📚 查看完整社區規約與會議決議庫 (共 7 條)</span>
-          <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+      <!-- 規約庫摺疊展開按鈕 (長輩點擊才展開，不眼花) -->
+      <div class="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-xs">
+        <button onclick="toggleElement('bylaws-accordion')" class="w-full px-5 py-3.5 text-sm sm:text-base font-bold text-slate-800 flex items-center justify-between hover:bg-slate-50 transition-colors">
+          <span class="flex items-center space-x-2">
+            <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i>
+            <span>查看完整社區規約與會議決議庫 (共 7 條)</span>
+          </span>
+          <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
         </button>
-        <div id="bylaws-accordion" class="hidden p-4 border-t border-slate-100 bg-slate-50/50">
-          <div id="bylaw-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
+        <div id="bylaws-accordion" class="hidden p-5 border-t-2 border-slate-100 bg-slate-50">
+          <div id="bylaw-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"></div>
         </div>
       </div>
     </section>
 
     <!-- ============================================== -->
-    <!-- TAB 3: 防汛氣象 (極簡卡片 + 漸進展開) -->
+    <!-- TAB 3: 防汛氣象 (大字、鮮明按鈕、點擊展開) -->
     <!-- ============================================== -->
     <section id="view-flood" class="hidden space-y-4">
-      <!-- 兩大核心卡片 (單行重點) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
         <!-- 卡片 1: 每年 5 月防汛操演 -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-900 text-sm">📅 每年 5 月例行防汛操演</span>
-            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium">系統已排程</span>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-amber-200 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-amber-100">
+              <span class="font-bold text-slate-900 text-base sm:text-lg flex items-center space-x-2">
+                <i data-lucide="calendar" class="w-5 h-5 text-amber-600"></i>
+                <span>每年 5 月防汛防水閘門操演</span>
+              </span>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs">系統已排程</span>
+            </div>
+            <div class="text-slate-700 space-y-2 mt-3 text-sm sm:text-base">
+              <div>・演練期限：<strong>每年 5 月 20 日前</strong>完成</div>
+              <div>・閉合標準：<strong>15 分鐘內</strong>完成閉合（上次耗時: 11分35秒 合格）</div>
+              <div>・沙包儲備：<strong>60 包</strong>現貨備妥（法定標準 ≥ 50 包）</div>
+            </div>
           </div>
-          <div class="text-slate-600 space-y-1">
-            <div>・操演截止：每年 5 月 20 日前</div>
-            <div>・閉合標準：<strong>15 分鐘以內</strong>（上次實測: 11分35秒 合格）</div>
-            <div>・沙包儲備：<strong>60 包</strong>（法定標準 ≥ 50 包）</div>
-          </div>
-          <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
-            <button onclick="triggerMayScheduledReminder()" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md font-medium">模擬發布 5月提醒</button>
-            <button onclick="toggleElement('flood-sop-drawer')" class="py-1.5 px-3 border border-slate-200 rounded-md text-slate-500 hover:text-slate-800">檢視紀錄 ▾</button>
+          <div class="flex flex-wrap gap-2 pt-3 border-t border-slate-100">
+            <button onclick="triggerMayScheduledReminder()" class="flex-1 min-w-[140px] py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl font-bold text-sm shadow-xs transition-all">
+              🔔 模擬 5月演練提醒
+            </button>
+            <button onclick="toggleElement('flood-sop-drawer')" class="py-2.5 px-4 border-2 border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-sm">
+              檢視紀錄 ▾
+            </button>
           </div>
         </div>
 
         <!-- 卡片 2: 中央氣象局豪大雨連線 -->
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3 text-xs">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-900 text-sm">🌧️ 中央氣象局 (CWA) 水情連線</span>
-            <span id="cwa-status-tag" class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium">水情正常</span>
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span class="font-bold text-slate-900 text-base sm:text-lg flex items-center space-x-2">
+                <i data-lucide="cloud-rain" class="w-5 h-5 text-sky-600"></i>
+                <span>中央氣象局 (CWA) 豪雨特報連線</span>
+              </span>
+              <span id="cwa-status-tag" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs">水情正常</span>
+            </div>
+            <div class="text-slate-700 space-y-1.5 mt-3 text-sm sm:text-base">
+              <div id="cwa-alert-title" class="font-bold text-slate-900">目前狀況：台北市水情正常</div>
+              <div id="cwa-forecast-text" class="text-slate-500">降雨機率 10%，氣象穩定。</div>
+            </div>
           </div>
-          <div class="text-slate-600 space-y-1">
-            <div id="cwa-alert-title">目前狀況：台北市天氣正常，無豪大雨特報。</div>
-            <div id="cwa-forecast-text" class="text-slate-400">降雨機率 10%，氣象穩定。</div>
-          </div>
-          <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
-            <button onclick="toggleCwaAlert('heavy_rain')" class="flex-1 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-md font-medium">模擬發布豪大雨特報</button>
-            <button onclick="toggleCwaAlert('normal')" class="py-1.5 px-3 border border-slate-200 rounded-md text-slate-500 hover:text-slate-800">解除</button>
-            <button onclick="toggleElement('cwa-log-drawer')" class="py-1.5 px-3 border border-slate-200 rounded-md text-slate-500 hover:text-slate-800">推播紀錄 ▾</button>
+          <div class="flex flex-wrap gap-2 pt-3 border-t border-slate-100">
+            <button onclick="toggleCwaAlert('heavy_rain')" class="flex-1 min-w-[150px] py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm shadow-xs transition-all">
+              🚨 模擬豪大雨特報
+            </button>
+            <button onclick="toggleCwaAlert('normal')" class="py-2.5 px-3 border-2 border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-sm">
+              解除
+            </button>
+            <button onclick="toggleElement('cwa-log-drawer')" class="py-2.5 px-3 border-2 border-slate-300 hover:bg-slate-100 text-slate-700 rounded-xl font-bold text-sm">
+              推播日誌 ▾
+            </button>
           </div>
         </div>
       </div>
 
       <!-- 點擊才展開：5月防汛四大檢測與紀錄 -->
-      <div id="flood-sop-drawer" class="hidden bg-white p-4 rounded-xl border border-slate-200 text-xs space-y-3">
-        <div class="font-bold text-slate-800">防汛操演四大必檢項目：</div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-slate-600 text-[11px]">
-          <div class="p-2 bg-slate-50 rounded border">1. 車道軌道防鏽潤滑</div>
-          <div class="p-2 bg-slate-50 rounded border">2. 橡膠止水條密封性</div>
-          <div class="p-2 bg-slate-50 rounded border">3. 50包沙包盤點</div>
-          <div class="p-2 bg-slate-50 rounded border">4. 15分鐘閉合實兵計時</div>
+      <div id="flood-sop-drawer" class="hidden bg-white p-5 rounded-2xl border-2 border-slate-200 text-sm space-y-3 shadow-xs">
+        <div class="font-bold text-slate-900 text-base">每年 5 月防汛操演必檢四大項目：</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 text-slate-700 font-medium">
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">1. 車道軌道防鏽潤滑</div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">2. 橡膠止水條密封性</div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">3. 60包沙包盤點</div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">4. 15分鐘閉合實兵計時</div>
         </div>
-        <div class="font-bold text-slate-800 pt-2">排程通知推播紀錄：</div>
-        <div id="may-reminder-log" class="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded"></div>
+        <div class="font-bold text-slate-900 pt-2">排程提醒推播紀錄：</div>
+        <div id="may-reminder-log" class="space-y-1.5 text-slate-600 bg-slate-50 p-3 rounded-xl border font-mono text-xs sm:text-sm"></div>
       </div>
 
       <!-- 點擊才展開：氣象局推播紀錄與SOP -->
-      <div id="cwa-log-drawer" class="hidden bg-white p-4 rounded-xl border border-slate-200 text-xs space-y-3">
-        <div class="font-bold text-slate-800">豪大雨緊急應變清單 (SOP)：</div>
-        <div class="text-[11px] text-slate-600 space-y-1">
-          <div>① 管理員車道防水閘門擋板就位</div>
-          <div>② 沉水抽水泵強制運轉測試</div>
-          <div>③ 迎水面佈設 60 包沙包</div>
-          <div>④ 住戶群組推播提醒地下停車場移車</div>
+      <div id="cwa-log-drawer" class="hidden bg-white p-5 rounded-2xl border-2 border-slate-200 text-sm space-y-3 shadow-xs">
+        <div class="font-bold text-slate-900 text-base">豪大雨緊急應變標準作業流程 (SOP)：</div>
+        <div class="text-slate-700 space-y-2 font-medium">
+          <div>① 現場管理員立即將車道防水閘門擋板與迫緊工具就定位</div>
+          <div>② 測試截水溝三組沉水抽水泵強制運轉</div>
+          <div>③ 車道迎水面與地下室機房前佈設 60 包防汛沙包</div>
+          <div>④ 住戶群組推播提醒地下停車場車主留意水情與移車</div>
         </div>
-        <div class="font-bold text-slate-800 pt-2">警特報推播日誌：</div>
-        <div id="cwa-push-log" class="space-y-1 text-[11px] text-slate-600 bg-slate-50 p-2 rounded"></div>
+        <div class="font-bold text-slate-900 pt-2">特報推播日誌：</div>
+        <div id="cwa-push-log" class="space-y-1.5 text-slate-600 bg-slate-50 p-3 rounded-xl border font-mono text-xs sm:text-sm"></div>
       </div>
     </section>
 
     <!-- ============================================== -->
-    <!-- TAB 4: 異常通報 (單行選項 + 清爽列表) -->
+    <!-- TAB 4: 異常通報 (情境按鈕鮮明、字體大) -->
     <!-- ============================================== -->
     <section id="view-vision" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- 快速通報卡 -->
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3 text-xs">
-        <span class="font-bold text-slate-900 text-sm block">快速拍照通報</span>
+      <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-rose-200 shadow-sm space-y-3.5">
+        <span class="font-bold text-slate-900 text-base sm:text-lg block">拍照通報異常</span>
         
-        <!-- 單行選擇情境 -->
-        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
-          <button onclick="selectDemoVision('trash')" class="p-2 rounded border border-slate-200 hover:bg-slate-50 text-left font-medium">🗑️ 走廊垃圾</button>
-          <button onclick="selectDemoVision('lost')" class="p-2 rounded border border-slate-200 hover:bg-slate-50 text-left font-medium">🎒 大廳遺失物</button>
-          <button onclick="selectDemoVision('damage')" class="p-2 rounded border border-slate-200 hover:bg-slate-50 text-left font-medium">⚠️ 梯廳破損</button>
-          <button onclick="selectDemoVision('cctv')" class="p-2 rounded border border-slate-200 hover:bg-slate-50 text-left font-medium">📹 CCTV 違規</button>
+        <!-- 四大情境按鈕 (按鈕外框色彩鮮明) -->
+        <div class="grid grid-cols-2 gap-2 text-sm font-bold">
+          <button onclick="selectDemoVision('trash')" class="p-2.5 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-950 text-left transition-all">
+            🗑️ 走廊垃圾
+          </button>
+          <button onclick="selectDemoVision('lost')" class="p-2.5 rounded-xl border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-950 text-left transition-all">
+            🎒 大廳遺失物
+          </button>
+          <button onclick="selectDemoVision('damage')" class="p-2.5 rounded-xl border-2 border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-950 text-left transition-all">
+            ⚠️ 設施破損
+          </button>
+          <button onclick="selectDemoVision('cctv')" class="p-2.5 rounded-xl border-2 border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-950 text-left transition-all">
+            📹 CCTV 違規
+          </button>
         </div>
 
-        <div class="relative w-full h-28 bg-slate-100 rounded-lg overflow-hidden border">
+        <div class="relative w-full h-36 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200">
           <img id="vision-preview-img" src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60" class="w-full h-full object-cover">
-          <span id="vision-tag-badge" class="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-900 text-white">垃圾棄置</span>
+          <span id="vision-tag-badge" class="absolute top-2 left-2 px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-900 text-white shadow-xs">垃圾棄置</span>
         </div>
 
-        <input type="text" id="vision-location" value="B1 資源回收室旁走道" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded text-xs" placeholder="地點">
-        <input type="text" id="vision-desc" value="走道堆積大型紙箱與保麗龍" class="w-full px-2.5 py-1.5 bg-slate-50 border rounded text-xs" placeholder="描述">
+        <input type="text" id="vision-location" value="B1 資源回收室旁走道" class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-medium" placeholder="通報地點">
+        <input type="text" id="vision-desc" value="走道堆積大型紙箱與保麗龍" class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-medium" placeholder="狀況描述">
 
-        <button onclick="submitVisionDispatch()" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-medium">送出派單</button>
+        <button onclick="submitVisionDispatch()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm sm:text-base font-bold shadow-xs transition-all">
+          送出自動派單
+        </button>
       </div>
 
-      <!-- 工單列表 -->
-      <div class="md:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
-        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 text-xs">
-          <span class="font-bold text-slate-900 text-sm">派單處理清單</span>
-          <span class="text-slate-400" id="dispatch-count-text">共 2 筆</span>
+      <!-- 派單處理列表 -->
+      <div class="md:col-span-2 bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b-2 border-slate-100">
+          <span class="font-bold text-slate-900 text-base sm:text-lg">即時派單工單清單</span>
+          <span class="text-sm font-bold text-slate-500" id="dispatch-count-text">共 2 筆</span>
         </div>
-        <div id="dispatch-list" class="space-y-2 flex-1 overflow-y-auto max-h-[460px] text-xs"></div>
+        <div id="dispatch-list" class="space-y-2.5 flex-1 overflow-y-auto max-h-[480px]"></div>
       </div>
     </section>
 
     <!-- ============================================== -->
-    <!-- TAB 5: 管理費對帳 (簡潔表格 + 彈跳銷帳工具) -->
+    <!-- TAB 5: 管理費對帳 (字體大、名冊清晰好讀) -->
     <!-- ============================================== -->
     <section id="view-finance" class="hidden space-y-4">
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+      <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-emerald-200 shadow-sm">
         <!-- 頂部概況與銷帳按鈕 -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 text-xs">
-          <div class="flex items-center space-x-3">
-            <span class="font-bold text-slate-900 text-sm">管理費繳納清單</span>
-            <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium" id="paid-count-badge">已繳: 3 戶</span>
-            <span class="text-rose-700 bg-rose-50 px-2 py-0.5 rounded font-medium" id="unpaid-count-badge">未繳: 2 戶</span>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b-2 border-slate-100">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="font-bold text-slate-900 text-base sm:text-lg">管理費繳納名冊</span>
+            <span class="text-emerald-800 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-xl text-sm font-bold" id="paid-count-badge">已繳: 3 戶</span>
+            <span class="text-rose-800 bg-rose-100 border border-rose-300 px-3 py-1 rounded-xl text-sm font-bold" id="unpaid-count-badge">未繳: 2 戶</span>
           </div>
-          <button onclick="toggleElement('bank-modal')" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium">
-            + 模擬銀行匯款銷帳
+          <button onclick="toggleElement('bank-modal')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm sm:text-base shadow-xs transition-all">
+            + 模擬銀行入帳銷帳
           </button>
         </div>
 
-        <!-- 繳費表格 -->
-        <div class="overflow-x-auto mt-3">
-          <table class="w-full text-xs text-left">
-            <thead class="text-slate-400 border-b border-slate-100">
+        <!-- 繳費表格 (字大、列高適中) -->
+        <div class="overflow-x-auto mt-4">
+          <table class="w-full text-sm sm:text-base text-left">
+            <thead class="text-slate-400 border-b-2 border-slate-100 font-bold">
               <tr>
-                <th class="py-2.5 px-2">戶別</th>
-                <th class="py-2.5 px-2">所有權人</th>
-                <th class="py-2.5 px-2 text-right">應繳金額</th>
-                <th class="py-2.5 px-2 text-center">帳號末5碼</th>
-                <th class="py-2.5 px-2 text-center">狀態</th>
-                <th class="py-2.5 px-2 text-right">銷帳日期</th>
+                <th class="py-3 px-3">戶別</th>
+                <th class="py-3 px-3">所有權人</th>
+                <th class="py-3 px-3 text-right">應繳金額</th>
+                <th class="py-3 px-3 text-center">扣款末5碼</th>
+                <th class="py-3 px-3 text-center">繳費狀態</th>
+                <th class="py-3 px-3 text-right">銷帳日期</th>
               </tr>
             </thead>
-            <tbody id="resident-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            <tbody id="resident-table-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- 彈出對帳小視窗 (預設隱藏，點擊才出現) -->
-      <div id="bank-modal" class="hidden bg-slate-50 border border-slate-200 p-4 rounded-xl text-xs space-y-3">
-        <div class="flex items-center justify-between font-bold text-slate-900">
-          <span>模擬銀行通知銷帳</span>
-          <button onclick="toggleElement('bank-modal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+      <!-- 彈出對帳操作卡片 (點擊才展開) -->
+      <div id="bank-modal" class="hidden bg-emerald-50/70 border-2 border-emerald-300 p-5 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between font-bold text-emerald-950 text-base">
+          <span>模擬銀行通知電子銷帳</span>
+          <button onclick="toggleElement('bank-modal')" class="text-slate-400 hover:text-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
           <span>金額：</span>
-          <input type="number" id="bank-input-amount" value="3850" class="w-24 px-2 py-1 bg-white border rounded text-right font-mono">
-          <span>末5碼：</span>
-          <input type="text" id="bank-input-suffix" value="68821" class="w-24 px-2 py-1 bg-white border rounded font-mono">
-          <button onclick="fillBankSample('68821', 3850)" class="px-2 py-1 bg-white border rounded text-slate-600">A-8F-1 (3850)</button>
-          <button onclick="fillBankSample('98765', 3500)" class="px-2 py-1 bg-white border rounded text-slate-600">B-5F-2 (3500)</button>
-          <button onclick="submitBankReconciliation()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-medium">執行銷帳</button>
+          <input type="number" id="bank-input-amount" value="3850" class="w-32 px-3 py-1.5 bg-white border-2 border-slate-300 rounded-xl text-right font-mono font-bold text-base">
+          <span>扣款末5碼：</span>
+          <input type="text" id="bank-input-suffix" value="68821" class="w-28 px-3 py-1.5 bg-white border-2 border-slate-300 rounded-xl font-mono font-bold text-base text-center">
+          <button onclick="fillBankSample('68821', 3850)" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:bg-slate-100 rounded-xl font-bold">A-8F-1 (3850)</button>
+          <button onclick="fillBankSample('98765', 3500)" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:bg-slate-100 rounded-xl font-bold">B-5F-2 (3500)</button>
+          <button onclick="submitBankReconciliation()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-xs">執行銷帳</button>
         </div>
-        <div id="receipt-preview-box" class="hidden p-3 bg-white border border-emerald-300 rounded font-mono text-slate-700" id="receipt-details"></div>
       </div>
     </section>
 
     <!-- ============================================== -->
-    <!-- TAB 6: 零用金簽核 (極簡卡片 + 核准證明) -->
+    <!-- TAB 6: 零用金簽核 (大字、三委員清晰卡片) -->
     <!-- ============================================== -->
     <section id="view-petty" class="hidden space-y-4">
-      <!-- 單行摘要資訊列 -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div class="flex flex-wrap items-center gap-4">
-          <span class="font-bold text-slate-900 text-sm">2026年09月 零用金結算</span>
-          <span>申報總額：<strong class="font-mono text-slate-900" id="stat-total-spent">NT$ 37,700</strong></span>
-          <span>剩餘額度：<strong class="font-mono text-emerald-700" id="stat-remaining">NT$ 62,300</strong></span>
-          <span id="petty-final-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">已全額核准</span>
+      <!-- 摘要資訊列 -->
+      <div class="bg-white p-5 rounded-2xl border-2 border-teal-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-4 text-sm sm:text-base font-medium text-slate-700">
+          <span class="font-bold text-slate-900 text-lg">2026年09月 零用金結算</span>
+          <span>申報總額：<strong class="font-mono font-bold text-slate-900 text-lg" id="stat-total-spent">NT$ 37,700</strong></span>
+          <span>剩餘額度：<strong class="font-mono font-bold text-emerald-700 text-lg" id="stat-remaining">NT$ 62,300</strong></span>
+          <span id="petty-final-badge" class="px-3 py-1 rounded-xl text-xs sm:text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已全額核准</span>
         </div>
-        <button onclick="openApprovalPdfModal()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-medium text-xs">
+        <button onclick="openApprovalPdfModal()" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-sm sm:text-base shadow-xs transition-all">
           預覽 / 列印核准書
         </button>
       </div>
 
-      <!-- 三位委員簽核狀態列 (超簡潔 3 卡片) -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
+      <!-- 三位委員簽核狀態列 (大字體、外框鮮明) -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 flex items-center justify-between">
           <div>
-            <div class="font-bold text-slate-900">主任委員：陳建宏</div>
-            <div class="text-[11px] text-slate-400 mt-0.5" id="time-director">2026-09-17 10:15</div>
+            <div class="text-xs text-slate-400 font-bold">主任委員</div>
+            <div class="font-bold text-slate-900 text-base mt-0.5">陳建宏</div>
+            <div class="text-xs text-slate-400 mt-1" id="time-director">2026-09-17 10:15</div>
           </div>
-          <div class="flex items-center space-x-1.5">
-            <span id="badge-director" class="px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800 font-semibold">已同意</span>
-            <button onclick="approvePettyCash('director', 'rejected')" class="text-slate-400 hover:text-rose-600 text-[11px]">退回</button>
+          <div class="flex items-center space-x-2">
+            <span id="badge-director" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">已同意</span>
+            <button onclick="approvePettyCash('director', 'rejected')" class="text-xs font-bold text-slate-400 hover:text-rose-600">退回</button>
           </div>
         </div>
 
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 flex items-center justify-between">
           <div>
-            <div class="font-bold text-slate-900">財務委員：林秀玲</div>
-            <div class="text-[11px] text-slate-400 mt-0.5" id="time-finance">2026-09-17 11:30</div>
+            <div class="text-xs text-slate-400 font-bold">財務委員</div>
+            <div class="font-bold text-slate-900 text-base mt-0.5">林秀玲</div>
+            <div class="text-xs text-slate-400 mt-1" id="time-finance">2026-09-17 11:30</div>
           </div>
-          <div class="flex items-center space-x-1.5">
-            <span id="badge-finance" class="px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800 font-semibold">已同意</span>
-            <button onclick="approvePettyCash('finance', 'rejected')" class="text-slate-400 hover:text-rose-600 text-[11px]">退回</button>
+          <div class="flex items-center space-x-2">
+            <span id="badge-finance" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">已同意</span>
+            <button onclick="approvePettyCash('finance', 'rejected')" class="text-xs font-bold text-slate-400 hover:text-rose-600">退回</button>
           </div>
         </div>
 
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
+        <div class="bg-white p-4 rounded-2xl border-2 border-slate-200 flex items-center justify-between">
           <div>
-            <div class="font-bold text-slate-900">監察委員：王國華</div>
-            <div class="text-[11px] text-slate-400 mt-0.5" id="time-supervisor">2026-09-17 18:15</div>
+            <div class="text-xs text-slate-400 font-bold">監察委員</div>
+            <div class="font-bold text-slate-900 text-base mt-0.5">王國華</div>
+            <div class="text-xs text-slate-400 mt-1" id="time-supervisor">2026-09-17 18:15</div>
           </div>
-          <div class="flex items-center space-x-1.5">
-            <span id="badge-supervisor" class="px-2 py-0.5 rounded text-[11px] bg-emerald-100 text-emerald-800 font-semibold">已同意</span>
-            <button onclick="promptReject('supervisor')" class="text-slate-400 hover:text-rose-600 text-[11px]">退回</button>
+          <div class="flex items-center space-x-2">
+            <span id="badge-supervisor" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">已同意</span>
+            <button onclick="promptReject('supervisor')" class="text-xs font-bold text-slate-400 hover:text-rose-600">退回</button>
           </div>
         </div>
       </div>
 
-      <!-- 支出單據列表 -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-xs">
-        <span class="font-bold text-slate-800 mb-2 block">本月份 5 筆支出單據明細</span>
+      <!-- 支出單據列表 (大字清晰) -->
+      <div class="bg-white p-5 rounded-2xl border-2 border-slate-200 shadow-sm text-sm">
+        <span class="font-bold text-slate-900 text-base mb-3 block">本月份支出憑證清單</span>
         <div class="overflow-x-auto">
-          <table class="w-full text-left">
-            <thead class="text-slate-400 border-b border-slate-100">
+          <table class="w-full text-left text-sm sm:text-base">
+            <thead class="text-slate-400 border-b-2 border-slate-100 font-bold">
               <tr>
-                <th class="py-2 px-2">日期</th>
-                <th class="py-2 px-2">類別</th>
-                <th class="py-2 px-2">項目名稱</th>
-                <th class="py-2 px-2">憑證號碼</th>
-                <th class="py-2 px-2 text-right">金額 (NT$)</th>
+                <th class="py-2.5 px-3">日期</th>
+                <th class="py-2.5 px-3">類別</th>
+                <th class="py-2.5 px-3">項目名稱</th>
+                <th class="py-2.5 px-3">憑證號碼</th>
+                <th class="py-2.5 px-3 text-right">金額 (NT$)</th>
               </tr>
             </thead>
-            <tbody id="petty-table-body" class="divide-y divide-slate-100 text-slate-700"></tbody>
+            <tbody id="petty-table-body" class="divide-y divide-slate-100 text-slate-800"></tbody>
           </table>
         </div>
       </div>
@@ -405,37 +496,37 @@
   <!-- ============================================== -->
   <!-- MODAL: 零用金結算核准書 (列印預覽) -->
   <!-- ============================================== -->
-  <div id="pdf-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-xl max-w-xl w-full flex flex-col overflow-hidden border border-slate-200 text-xs">
-      <div class="p-3 border-b flex items-center justify-between bg-slate-50">
-        <span class="font-bold text-slate-900">零用金結算核准證明書</span>
-        <button onclick="closeApprovalPdfModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+  <div id="pdf-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full flex flex-col overflow-hidden border-2 border-slate-300 text-sm">
+      <div class="p-4 border-b flex items-center justify-between bg-slate-50 font-bold text-base text-slate-900">
+        <span>零用金結算核准證明書</span>
+        <button onclick="closeApprovalPdfModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <div class="p-5 space-y-4" id="printableArea">
+      <div class="p-6 space-y-4" id="printableArea">
         <div class="text-center border-b pb-3">
-          <div class="font-bold text-base text-slate-900">大清天朵二期社區公寓大廈管理委員會</div>
-          <div class="text-slate-500 mt-0.5">2026年09月份 零用金結算核准書</div>
+          <div class="font-bold text-lg text-slate-900">大清天朵二期社區公寓大廈管理委員會</div>
+          <div class="text-slate-500 mt-1 font-medium">2026年09月份 零用金結算核准書</div>
         </div>
-        <div class="grid grid-cols-2 gap-2 text-slate-600">
+        <div class="grid grid-cols-2 gap-2 text-slate-700 text-sm sm:text-base font-medium">
           <div>核准字號：<span class="font-mono">APP-202609-PETTY</span></div>
-          <div>核銷金額：<strong class="text-slate-900 font-mono">NT$ 37,700</strong></div>
+          <div>核銷金額：<strong class="text-slate-900 font-mono text-lg">NT$ 37,700</strong></div>
         </div>
-        <div id="pdf-items-summary" class="bg-slate-50 p-2.5 rounded border space-y-1 font-mono text-[11px]"></div>
-        <div class="border-t pt-3 flex justify-between text-center text-slate-700">
+        <div id="pdf-items-summary" class="bg-slate-50 p-3 rounded-xl border space-y-1.5 font-mono text-xs sm:text-sm"></div>
+        <div class="border-t pt-3 flex justify-between text-center font-bold text-slate-800 text-sm sm:text-base">
           <div>主委：陳建宏 (已核准)</div>
           <div>財委：林秀玲 (已核准)</div>
           <div>監委：王國華 (已核准)</div>
         </div>
       </div>
-      <div class="p-3 border-t bg-slate-50 flex justify-end space-x-2">
-        <button onclick="window.print()" class="px-3 py-1.5 bg-slate-900 text-white rounded font-medium">列印 / 存為 PDF</button>
-        <button onclick="closeApprovalPdfModal()" class="px-3 py-1.5 border rounded text-slate-600">關閉</button>
+      <div class="p-4 border-t bg-slate-50 flex justify-end space-x-3">
+        <button onclick="window.print()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm">列印 / 存為 PDF</button>
+        <button onclick="closeApprovalPdfModal()" class="px-5 py-2.5 border-2 border-slate-300 hover:bg-slate-100 rounded-xl font-bold text-slate-700 text-sm">關閉</button>
       </div>
     </div>
   </div>
 
   <!-- 頁尾 -->
-  <footer class="py-3 text-center text-[11px] text-slate-400 border-t border-slate-200">
+  <footer class="py-4 text-center text-xs sm:text-sm text-slate-400 border-t border-slate-200">
     大清天朵二期 AI 社區管理助手 · 固德物業管理中心
   </footer>
 
@@ -500,18 +591,62 @@
     let currentTab = 'chat';
     let appData = null;
 
+    // 每個頁籤按鈕的專業專屬色系 (Active 與 Inactive)
+    const tabColorThemes = {
+      chat: {
+        active: "bg-sky-600 text-white border-sky-600 shadow-xs",
+        inactive: "bg-sky-50 text-sky-900 border-sky-200 hover:bg-sky-100"
+      },
+      rules: {
+        active: "bg-indigo-600 text-white border-indigo-600 shadow-xs",
+        inactive: "bg-indigo-50 text-indigo-900 border-indigo-200 hover:bg-indigo-100"
+      },
+      flood: {
+        active: "bg-amber-600 text-white border-amber-600 shadow-xs",
+        inactive: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-100"
+      },
+      vision: {
+        active: "bg-rose-600 text-white border-rose-600 shadow-xs",
+        inactive: "bg-rose-50 text-rose-900 border-rose-200 hover:bg-rose-100"
+      },
+      finance: {
+        active: "bg-emerald-600 text-white border-emerald-600 shadow-xs",
+        inactive: "bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100"
+      },
+      petty: {
+        active: "bg-teal-600 text-white border-teal-600 shadow-xs",
+        inactive: "bg-teal-50 text-teal-900 border-teal-200 hover:bg-teal-100"
+      }
+    };
+
+    // 身分配置
     const roleConfigs = {
       resident: {
         desc: '當前登入：<strong>住戶（A棟8樓之1 · 饒先生）</strong>',
-        prompts: ['我這個月管理費繳了嗎？', '走廊可以放鞋櫃嗎？', '防水閘門每年何時演練？', '社區可以帶寵物進電梯嗎？']
+        prompts: [
+          { text: '我這個月管理費繳了嗎？', theme: 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100' },
+          { text: '走廊可以放鞋櫃嗎？', theme: 'border-indigo-300 bg-indigo-50 text-indigo-900 hover:bg-indigo-100' },
+          { text: '防水閘門每年何時演練？', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' },
+          { text: '社區可以帶寵物進電梯嗎？', theme: 'border-sky-300 bg-sky-50 text-sky-900 hover:bg-sky-100' }
+        ]
       },
       property: {
         desc: '當前登入：<strong>固德物業（案場總幹事）</strong>',
-        prompts: ['本月零用金支出報表審核進度', '查詢本月未繳管理費名單', '模擬中央氣象局豪大雨特報', '防水閘門實兵操演規約要求']
+        prompts: [
+          { text: '本月零用金支出報表審核進度', theme: 'border-teal-300 bg-teal-50 text-teal-900 hover:bg-teal-100' },
+          { text: '查詢本月未繳管理費名單', theme: 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100' },
+          { text: '模擬中央氣象局豪大雨特報', theme: 'border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100' },
+          { text: '防水閘門實兵操演規約要求', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' }
+        ]
       },
       committee: {
         desc: '當前登入：<strong>管委會委員（審核監督）</strong>',
-        prompts: ['走廊放鞋櫃是否違反歷史決議？', '本月零用金支出與最大筆開銷', '防水閘門未演練有何法律責任？', '地下室安裝充電樁之規定']
+        prompts: [
+          { text: '走廊放鞋櫃是否違反歷史決議？', theme: 'border-indigo-300 bg-indigo-50 text-indigo-900 hover:bg-indigo-100' },
+          { text: '本月零用金支出與最大筆開銷', theme: 'border-teal-300 bg-teal-50 text-teal-900 hover:bg-teal-100' },
+          { text: '防水閘門未演練有何法律責任？', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' },
+          { text: '地下室安裝充電樁之規定', theme: 'border-blue-300 bg-blue-50 text-blue-900 hover:bg-blue-100' }
+        ]
       }
     };
 
@@ -526,7 +661,6 @@
       renderFloodSystem();
     });
 
-    // 展開/收合輔助
     function toggleElement(id) {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('hidden');
@@ -556,7 +690,6 @@
         }
       } catch (e) {}
 
-      // Standalone 引擎
       isStandalone = true;
       const local = localStorage.getItem('daqing_community_data');
       appData = local ? JSON.parse(local) : JSON.parse(JSON.stringify(SEED_DATA));
@@ -575,14 +708,13 @@
         const el = document.getElementById(`view-${t}`);
         const btn = document.getElementById(`tab-${t}`);
         if (el && btn) {
+          const theme = tabColorThemes[t];
           if (t === tabId) {
             el.classList.remove('hidden');
-            btn.classList.add('border-slate-900', 'text-slate-900');
-            btn.classList.remove('border-transparent', 'text-slate-500');
+            btn.className = `tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 ${theme.active}`;
           } else {
             el.classList.add('hidden');
-            btn.classList.remove('border-slate-900', 'text-slate-900');
-            btn.classList.add('border-transparent', 'text-slate-500');
+            btn.className = `tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 ${theme.inactive}`;
           }
         }
       });
@@ -597,23 +729,39 @@
     }
 
     function renderRoleUI() {
+      const roleBtnThemes = {
+        resident: {
+          active: 'bg-emerald-600 text-white border-emerald-600 shadow-xs',
+          inactive: 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+        },
+        property: {
+          active: 'bg-blue-600 text-white border-blue-600 shadow-xs',
+          inactive: 'bg-blue-50 text-blue-800 border-blue-300 hover:bg-blue-100'
+        },
+        committee: {
+          active: 'bg-purple-600 text-white border-purple-600 shadow-xs',
+          inactive: 'bg-purple-50 text-purple-800 border-purple-300 hover:bg-purple-100'
+        }
+      };
+
       ['resident', 'property', 'committee'].forEach(r => {
         const btn = document.getElementById(`btn-role-${r}`);
+        const theme = roleBtnThemes[r];
         if (r === currentRole) {
-          btn.className = "px-2.5 py-1 rounded-md text-xs bg-white text-slate-900 shadow-sm font-semibold";
+          btn.className = `px-3.5 py-1.5 rounded-xl border-2 text-sm font-bold transition-all shadow-xs flex items-center space-x-1.5 ${theme.active}`;
         } else {
-          btn.className = "px-2.5 py-1 rounded-md text-xs text-slate-500 hover:text-slate-800";
+          btn.className = `px-3.5 py-1.5 rounded-xl border-2 text-sm font-bold transition-all shadow-xs flex items-center space-x-1.5 ${theme.inactive}`;
         }
       });
 
       const config = roleConfigs[currentRole];
       document.getElementById('role-desc').innerHTML = config.desc;
 
-      // 快捷提問晶片 (單行)
+      // 快捷提問按鈕 (字大、外框實體按鈕、彩色配置)
       const container = document.getElementById('quick-prompts');
       container.innerHTML = config.prompts.map(p => `
-        <button onclick="sendQuickPrompt('${p}')" class="px-2.5 py-1 rounded-full bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 whitespace-nowrap transition-colors">
-          ${p}
+        <button onclick="sendQuickPrompt('${p.text}')" class="px-3.5 py-1.5 rounded-xl border-2 text-xs sm:text-sm font-bold transition-all ${p.theme}">
+          ${p.text}
         </button>
       `).join('');
     }
@@ -648,7 +796,6 @@
         } catch (err) {}
       }
 
-      // Standalone 離線生成
       const reply = generateLocalReply(text, currentRole, currentUnit);
       appendChatMessage('ai', reply);
     }
@@ -675,29 +822,24 @@
         const spent = appData.petty_cash.items.reduce((s, i) => s + i.amount, 0);
         return `9月份零用金申報總支出 NT$ ${spent.toLocaleString()} 元（上限 10 萬），剩餘 NT$ ${(appData.petty_cash.limit - spent).toLocaleString()} 元，目前狀態：${appData.petty_cash.final_status === 'approved' ? '已全額核准' : '審核中'}。`;
       }
-      return `收到提問。您可在上方分頁快速執行規約比對、氣象警特報模擬、異常拍照派單或管理費對帳！`;
+      return `收到提問。您可在上方功能按鈕快速執行規約比對、氣象警特報模擬、異常拍照派單或管理費對帳！`;
     }
 
     function appendChatMessage(sender, text) {
       const box = document.getElementById('chat-messages');
       const div = document.createElement('div');
-      div.className = sender === 'user' ? "flex items-start justify-end space-x-2" : "flex items-start space-x-2";
+      div.className = sender === 'user' ? "flex items-start justify-end space-x-2.5" : "flex items-start space-x-3";
       const formatted = text.replace(/\n/g, '<br>');
       if (sender === 'user') {
-        div.innerHTML = `<div class="bg-slate-900 text-white rounded-xl rounded-tr-none p-2.5 max-w-[80%]">${formatted}</div>`;
+        div.innerHTML = `<div class="bg-slate-900 text-white rounded-2xl rounded-tr-none p-3.5 max-w-[85%] text-sm sm:text-base leading-relaxed font-medium shadow-xs">${formatted}</div>`;
       } else {
         div.innerHTML = `
-          <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px] flex-shrink-0">AI</div>
-          <div class="bg-slate-100 rounded-xl rounded-tl-none p-2.5 max-w-[80%] text-slate-700 font-sans">${formatted}</div>
+          <div class="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-xs">AI</div>
+          <div class="bg-slate-100 rounded-2xl rounded-tl-none p-3.5 max-w-[85%] text-slate-800 text-sm sm:text-base leading-relaxed border border-slate-200/60">${formatted}</div>
         `;
       }
       box.appendChild(div);
       box.scrollTop = box.scrollHeight;
-    }
-
-    function clearChatHistory() {
-      const box = document.getElementById('chat-messages');
-      box.innerHTML = `<div class="flex items-start space-x-2"><div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[10px]">AI</div><div class="bg-slate-100 rounded-xl rounded-tl-none p-2.5 text-slate-700">對話已重置。請輸入提問或點擊上方快捷標籤。</div></div>`;
     }
 
     // Skill 1: 規約邏輯檢核
@@ -762,9 +904,9 @@
       if (!appData || !appData.bylaws) return;
       const list = document.getElementById('bylaw-list');
       list.innerHTML = appData.bylaws.map(b => `
-        <div class="p-2.5 bg-white rounded border border-slate-200">
-          <div class="font-bold text-slate-800">${b.title} <span class="font-normal text-slate-400 text-[10px]">(${b.source})</span></div>
-          <p class="text-slate-600 mt-1">${b.content}</p>
+        <div class="p-3.5 bg-white rounded-xl border-2 border-slate-200 shadow-xs">
+          <div class="font-bold text-slate-900 text-sm sm:text-base">${b.title} <span class="font-semibold text-slate-400 text-xs">(${b.source})</span></div>
+          <p class="text-slate-700 mt-1.5 text-xs sm:text-sm leading-relaxed">${b.content}</p>
         </div>
       `).join('');
     }
@@ -783,25 +925,24 @@
         banner.classList.remove('hidden');
         badge.classList.remove('hidden');
         statusTag.textContent = "🚨 一級防汛警戒";
-        statusTag.className = "px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold";
+        statusTag.className = "px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 font-bold text-xs";
         document.getElementById('cwa-alert-title').textContent = "中央氣象署發布【豪大雨特報】";
         document.getElementById('cwa-forecast-text').textContent = "預估24小時累積雨量達 200mm 以上，現場管理員防汛SOP已啟動。";
       } else {
         banner.classList.add('hidden');
         badge.classList.add('hidden');
         statusTag.textContent = "水情正常";
-        statusTag.className = "px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium";
+        statusTag.className = "px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs";
         document.getElementById('cwa-alert-title').textContent = "目前狀況：台北市天氣正常，無豪大雨特報。";
         document.getElementById('cwa-forecast-text').textContent = "降雨機率 10%，氣象穩定。";
       }
 
-      // 紀錄清單
       document.getElementById('may-reminder-log').innerHTML = flood.annual_drill.reminder_history.map(item => `
-        <div>[${item.time}] ${item.title} -> ${item.recipients}</div>
+        <div class="py-1 border-b border-slate-200/50">[${item.time}] ${item.title} -> ${item.recipients}</div>
       `).join('');
 
       document.getElementById('cwa-push-log').innerHTML = cwa.broadcast_logs.length > 0 ? cwa.broadcast_logs.map(log => `
-        <div>[${log.time}] ${log.level}：${log.status}</div>
+        <div class="py-1 border-b border-slate-200/50">[${log.time}] ${log.level}：${log.status}</div>
       `).join('') : '<div class="text-slate-400 italic">無警戒事件</div>';
     }
 
@@ -819,7 +960,7 @@
           if (res.ok) {
             await fetchStatusAndData();
             renderFloodSystem();
-            alert('已觸發 5 月排程提醒！');
+            alert('已觸發 5 月防汛演練提醒！');
             return;
           }
         } catch (e) {}
@@ -923,17 +1064,17 @@
       if (!appData || !appData.dispatches) return;
       document.getElementById('dispatch-count-text').textContent = `共 ${appData.dispatches.length} 筆`;
       document.getElementById('dispatch-list').innerHTML = appData.dispatches.map(d => `
-        <div class="p-2.5 rounded-lg border border-slate-200 bg-white flex items-center justify-between">
-          <div class="flex items-center space-x-2.5">
-            <img src="${d.image_url}" class="w-10 h-10 rounded object-cover border flex-shrink-0">
+        <div class="p-3 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-between shadow-xs">
+          <div class="flex items-center space-x-3">
+            <img src="${d.image_url}" class="w-12 h-12 rounded-lg object-cover border flex-shrink-0">
             <div>
-              <div class="font-bold text-slate-800">${d.category_name} · ${d.location}</div>
-              <div class="text-[11px] text-slate-500 line-clamp-1">${d.description} (${d.time})</div>
+              <div class="font-bold text-slate-900 text-sm sm:text-base">${d.category_name} · ${d.location}</div>
+              <div class="text-xs text-slate-500 line-clamp-1 mt-0.5">${d.description} (${d.time})</div>
             </div>
           </div>
           <div class="text-right flex-shrink-0">
-            <span class="px-2 py-0.5 rounded bg-slate-100 font-medium text-[11px]">${d.status}</span>
-            <div class="text-[10px] text-slate-400 mt-0.5">${d.target_team}</div>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-100 font-bold text-xs text-slate-800">${d.status}</span>
+            <div class="text-xs text-slate-500 font-medium mt-1">${d.target_team}</div>
           </div>
         </div>
       `).join('');
@@ -961,7 +1102,7 @@
             if (data.success && data.matched) {
               await fetchStatusAndData();
               renderResidentsTable();
-              alert(`戶別【${data.receipt.unit}】管理費 NT$ ${amount} 已完成銷帳！`);
+              alert(`戶別【${data.receipt.unit}】管理費 NT$ ${amount.toLocaleString()} 已完成銷帳！`);
               return;
             }
           }
@@ -974,7 +1115,7 @@
         matched.payment_date = new Date().toISOString().substring(0, 10);
         saveLocal();
         renderResidentsTable();
-        alert(`戶別【${matched.unit}】管理費 NT$ ${amount} 已完成自動銷帳！`);
+        alert(`戶別【${matched.unit}】管理費 NT$ ${amount.toLocaleString()} 已完成自動銷帳！`);
       } else {
         alert('未找到吻合的待繳戶別。');
       }
@@ -988,17 +1129,17 @@
 
       const list = currentRole === 'resident' ? appData.residents.filter(r => r.unit === currentUnit) : appData.residents;
       document.getElementById('resident-table-body').innerHTML = list.map(r => `
-        <tr class="hover:bg-slate-50">
-          <td class="py-2 px-2 font-medium">${r.unit}</td>
-          <td class="py-2 px-2">${currentRole === 'resident' ? r.name[0] + '〇' : r.name}</td>
-          <td class="py-2 px-2 text-right font-mono font-bold">NT$ ${r.fee.toLocaleString()}</td>
-          <td class="py-2 px-2 text-center font-mono">${currentRole === 'resident' ? '***' + r.account_suffix.slice(-2) : r.account_suffix}</td>
-          <td class="py-2 px-2 text-center">
-            <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${r.paid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="py-3 px-3 font-bold text-slate-900">${r.unit}</td>
+          <td class="py-3 px-3 font-medium">${currentRole === 'resident' ? r.name[0] + '〇' : r.name}</td>
+          <td class="py-3 px-3 text-right font-mono font-bold text-base text-slate-900">NT$ ${r.fee.toLocaleString()}</td>
+          <td class="py-3 px-3 text-center font-mono text-slate-500">${currentRole === 'resident' ? '***' + r.account_suffix.slice(-2) : r.account_suffix}</td>
+          <td class="py-3 px-3 text-center">
+            <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${r.paid ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-rose-100 text-rose-800 border border-rose-300'}">
               ${r.paid ? '已繳費' : '未繳費'}
             </span>
           </td>
-          <td class="py-2 px-2 text-right font-mono text-slate-400">${r.payment_date || '--'}</td>
+          <td class="py-3 px-3 text-right font-mono text-slate-500">${r.payment_date || '--'}</td>
         </tr>
       `).join('');
     }
@@ -1014,12 +1155,12 @@
       document.getElementById('petty-final-badge').textContent = petty.final_status === 'approved' ? '已全額核准' : '審核中';
 
       document.getElementById('petty-table-body').innerHTML = petty.items.map(i => `
-        <tr class="hover:bg-slate-50">
-          <td class="py-2 px-2 font-mono text-slate-400">${i.date}</td>
-          <td class="py-2 px-2">${i.category}</td>
-          <td class="py-2 px-2 font-medium">${i.title}</td>
-          <td class="py-2 px-2 font-mono text-slate-400">${i.invoice}</td>
-          <td class="py-2 px-2 text-right font-mono font-bold">NT$ ${i.amount.toLocaleString()}</td>
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="py-2.5 px-3 font-mono text-slate-500">${i.date}</td>
+          <td class="py-2.5 px-3"><span class="px-2 py-0.5 rounded-md bg-slate-100 font-bold text-xs text-slate-700">${i.category}</span></td>
+          <td class="py-2.5 px-3 font-bold text-slate-900">${i.title}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-500">${i.invoice}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900 text-base">NT$ ${i.amount.toLocaleString()}</td>
         </tr>
       `).join('');
     }
@@ -1057,7 +1198,7 @@
       if (!appData || !appData.petty_cash) return;
       const petty = appData.petty_cash;
       document.getElementById('pdf-items-summary').innerHTML = petty.items.map((i, idx) => `
-        <div class="flex justify-between">${idx+1}. ${i.title} <span>NT$ ${i.amount.toLocaleString()}</span></div>
+        <div class="flex justify-between py-1 border-b border-slate-200/50">${idx+1}. ${i.title} <span class="font-bold">NT$ ${i.amount.toLocaleString()}</span></div>
       `).join('');
       document.getElementById('pdf-modal').classList.remove('hidden');
       lucide.createIcons();
