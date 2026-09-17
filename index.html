@@ -50,14 +50,8 @@
         <span class="text-[11px] text-slate-400 font-normal">AI 社區助手</span>
       </div>
 
-      <!-- 右側：身分切換與狀態 -->
+      <!-- 右側：身分切換 -->
       <div class="flex items-center space-x-2 text-xs">
-        <!-- 氣象連線狀態膠囊 (極簡單行) -->
-        <button onclick="switchTab('flood')" id="cwa-pill" class="hidden md:flex items-center space-x-1.5 px-2.5 py-1 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors text-slate-600">
-          <span class="w-2 h-2 rounded-full bg-emerald-500" id="cwa-dot"></span>
-          <span id="cwa-pill-text">水情正常</span>
-        </button>
-
         <!-- 身分切換 (極簡 Segmented Control) -->
         <div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200/80 font-medium">
           <button id="btn-role-resident" onclick="switchRole('resident')" class="px-2.5 py-1 rounded-md transition-all text-xs bg-white text-slate-900 shadow-sm font-semibold">住戶</button>
@@ -782,17 +776,11 @@
       const cwa = flood.cwa_weather;
 
       const banner = document.getElementById('cwa-top-alert-banner');
-      const pill = document.getElementById('cwa-pill');
-      const dot = document.getElementById('cwa-dot');
-      const pillText = document.getElementById('cwa-pill-text');
       const badge = document.getElementById('tab-flood-badge');
       const statusTag = document.getElementById('cwa-status-tag');
 
       if (cwa.alert_level === 'heavy_rain') {
         banner.classList.remove('hidden');
-        pill.className = "flex items-center space-x-1.5 px-2.5 py-1 rounded-full border border-rose-300 bg-rose-50 text-rose-800 font-semibold";
-        dot.className = "w-2 h-2 rounded-full bg-rose-500 animate-ping";
-        pillText.textContent = "豪大雨警戒中";
         badge.classList.remove('hidden');
         statusTag.textContent = "🚨 一級防汛警戒";
         statusTag.className = "px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-bold";
@@ -800,9 +788,6 @@
         document.getElementById('cwa-forecast-text').textContent = "預估24小時累積雨量達 200mm 以上，現場管理員防汛SOP已啟動。";
       } else {
         banner.classList.add('hidden');
-        pill.className = "hidden md:flex items-center space-x-1.5 px-2.5 py-1 rounded-full border border-slate-200 text-slate-600";
-        dot.className = "w-2 h-2 rounded-full bg-emerald-500";
-        pillText.textContent = "水情正常";
         badge.classList.add('hidden');
         statusTag.textContent = "水情正常";
         statusTag.className = "px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium";
