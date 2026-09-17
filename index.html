@@ -71,8 +71,14 @@
         </div>
       </div>
 
-      <!-- 中央氣象局連線狀態指示與身分切換 -->
+      <!-- 中央氣象局連線狀態指示、運行模式徽章與身分切換 -->
       <div class="flex flex-wrap items-center gap-2">
+        <!-- 運行模式指示徽章 (本地伺服器 / GitHub Pages 雲端靜態) -->
+        <div id="runtime-badge" class="hidden sm:inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+          <i data-lucide="globe" class="w-3.5 h-3.5 text-sky-600"></i>
+          <span id="runtime-badge-text">連線檢測中...</span>
+        </div>
+
         <!-- 氣象局連線即時膠囊 -->
         <button onclick="switchTab('flood')" id="cwa-pill" class="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -160,7 +166,7 @@
               <div class="font-semibold text-slate-900 text-sm">大清天朵二期 AI 社區管理助手</div>
               <div class="text-xs text-emerald-600 flex items-center space-x-1">
                 <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>系統連線正常 · 向量規約知識庫 & 氣象局即時介接就緒</span>
+                <span id="ai-status-text">系統運行中 · 向量規約知識庫 & 氣象局連線就緒</span>
               </div>
             </div>
           </div>
@@ -517,7 +523,7 @@
             </div>
           </div>
 
-            <!-- 推播日誌 -->
+          <!-- 推播日誌 -->
           <div class="border-t border-slate-100 pt-3">
             <span class="text-xs font-bold text-slate-700 block mb-2">緊急推播歷史稽核日誌：</span>
             <div id="cwa-push-log" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 max-h-36 overflow-y-auto">
@@ -918,9 +924,146 @@
     大清天朵二期社區 AI 管理助手 · 固德物業管理中心 × 第五屆管理委員會
   </footer>
 
-  <!-- 應用邏輯與互動指令 Script -->
+  <!-- 應用邏輯與互動指令 Script (含雙模式：本地伺服器 / GitHub Pages 獨立引擎) -->
   <script>
-    // 全域狀態
+    // 預設社區種子資料 (供 GitHub Pages 雲端免後端模式開箱即用)
+    const SEED_DATA = {
+      "community_name": "大清天朵二期社區",
+      "committee_term": "第五屆管委會",
+      "residents": [
+        {"unit": "A-8F-1", "name": "饒先生", "line_id": "U_RES_001", "fee": 3850, "account_suffix": "68821", "paid": true, "payment_date": "2026-09-17"},
+        {"unit": "A-8F-2", "name": "李小姐", "line_id": "U_RES_002", "fee": 4200, "account_suffix": "12345", "paid": true, "payment_date": "2026-09-05"},
+        {"unit": "A-9F-1", "name": "張先生", "line_id": "U_RES_003", "fee": 3850, "account_suffix": "54321", "paid": true, "payment_date": "2026-09-08"},
+        {"unit": "B-5F-2", "name": "王太太", "line_id": "U_RES_004", "fee": 3500, "account_suffix": "98765", "paid": false, "payment_date": null},
+        {"unit": "B-10F-1", "name": "黃先生", "line_id": "U_RES_005", "fee": 4500, "account_suffix": "77889", "paid": false, "payment_date": null}
+      ],
+      "dispatches": [
+        {
+          "id": "DISP-20260917-001",
+          "time": "2026-09-17 14:20",
+          "category": "Trash",
+          "category_name": "垃圾棄置",
+          "location": "B1 資源回收室旁走道",
+          "reporter": "住戶通報 (A-8F-1)",
+          "description": "走道堆積未依規定分類的大型紙箱與保麗龍",
+          "status": "處理中",
+          "target_team": "清潔人員/物業群組",
+          "image_url": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60"
+        },
+        {
+          "id": "DISP-20260916-002",
+          "time": "2026-09-16 18:45",
+          "category": "Lost Item",
+          "category_name": "遺失物",
+          "location": "A棟1F大廳休息沙發",
+          "reporter": "物業巡檢 (固德物業)",
+          "description": "黑色保溫水瓶一只，外觀有恐龍貼紙",
+          "status": "等待認領",
+          "target_team": "管理中心",
+          "image_url": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&auto=format&fit=crop&q=60"
+        }
+      ],
+      "petty_cash": {
+        "month": "2026年09月份",
+        "limit": 100000,
+        "items": [
+          {"id": 1, "title": "中庭景觀植栽修剪與枯枝清運", "amount": 15000, "category": "公設維護", "invoice": "INV-202609-0821", "date": "2026-09-10"},
+          {"id": 2, "title": "地下室水塔清洗前置濾心更換", "amount": 8500, "category": "機電保養", "invoice": "INV-202609-0914", "date": "2026-09-12"},
+          {"id": 3, "title": "各棟逃生梯緊急照明燈電池檢修更新", "amount": 6200, "category": "消防安全", "invoice": "INV-202609-1102", "date": "2026-09-14"},
+          {"id": 4, "title": "社區管理室門禁卡與防磁貼片批次採購", "amount": 4800, "category": "事務消耗", "invoice": "INV-202609-1198", "date": "2026-09-15"},
+          {"id": 5, "title": "A/B棟公共梯廳節能感應LED燈管補料", "amount": 3200, "category": "修繕五金", "invoice": "INV-202609-1240", "date": "2026-09-16"}
+        ],
+        "approvals": {
+          "director": {"role": "主任委員", "name": "陳建宏", "status": "approved", "comment": "各項費用單據核對無誤，同意核銷撥款。", "time": "2026-09-17 10:15"},
+          "finance": {"role": "財務委員", "name": "林秀玲", "status": "approved", "comment": "單據齊全，未逾零用金10萬元上限，同意。", "time": "2026-09-17 11:30"},
+          "supervisor": {"role": "監察委員", "name": "王國華", "status": "approved", "comment": "已完成五項單據審核無誤，全額核准。", "time": "2026-09-17 18:15"}
+        },
+        "final_status": "approved"
+      },
+      "flood_system": {
+        "annual_drill": {
+          "schedule_month": "每年 5 月",
+          "last_drill_date": "2026-05-12",
+          "next_drill_deadline": "2027-05-20",
+          "last_duration_min": "11 分 35 秒 (合格標準: 15分鐘內)",
+          "sandbag_count": 60,
+          "status": "已完成本年度演練",
+          "auto_reminder_enabled": true,
+          "reminder_history": [
+            {
+              "time": "2026-05-01 09:00",
+              "title": "【系統自動年度排程提醒】汛期防水閘門檢測與防汛實兵操演通知",
+              "recipients": "固德物業總幹事、管委會全體委員",
+              "content": "提醒：汛期將至！依社區規約第4條，請物業於5月20日前完成地下室車道防水閘門機械軌道防銹潤滑、橡膠止水條密封檢驗、60包沙包盤點，並召集全體管理員實兵組裝演練拍照存檔備查。"
+            }
+          ]
+        },
+        "cwa_weather": {
+          "connected": true,
+          "source": "交通部中央氣象署 (CWA) 氣象警特報 API",
+          "location": "台北市",
+          "alert_level": "normal",
+          "alert_name": "天氣正常 (無豪雨特報)",
+          "rainfall_forecast": "各區多雲到晴，午後短暫雷陣雨機率 20%",
+          "updated_at": "2026-09-17 18:20",
+          "broadcast_logs": []
+        }
+      },
+      "bylaws": [
+        {
+          "id": "LAW-07",
+          "title": "社區防汛與地下室防水閘門定期檢測及實兵操演規約",
+          "source": "第四屆區分所有權人會議決議暨防汛作業標準手冊 (SOP)",
+          "content": "本社區地下停車場出入口車道設有組合式防汛防水閘門。管委會與固德物業服務中心應恪遵以下規範：1. 每年汛期前（每年5月份）排定完成防水閘門機械結構保養、軌道泥沙清理與防鏽潤滑。2. 檢驗橡膠止水條之密封彈性，若有硬化、龜裂破損應立即編列修繕預算更換。3. 盤點備用防汛沙包（數量不得少於50包）及沉水抽水泵測試運轉。4. 召集全體物業日夜班管理人員與機電廠商，舉行『防水閘門實兵組裝與閉合操演』，組裝閉合時間不得逾15分鐘。操演成果與照片應造冊公告住戶備查。未依期落實檢測操演致水患損害者，管委會與受託物業管理公司應負民法善良管理人責任。",
+          "keywords": ["防水閘門", "防汛", "演練", "操演", "5月", "地下室", "抽水泵", "沙包", "淹水", "氣象局", "豪大雨", "暴雨"]
+        },
+        {
+          "id": "LAW-01",
+          "title": "社區規約第十六條：公共空間與走廊通道管理規範",
+          "source": "大清天朵二期規約 (第三屆區權會修訂全文)",
+          "content": "各樓層梯廳、走廊、樓梯間、排煙室及地下防空避難室等全體共用部分，住戶不得私自堆置任何個人物品（包含鞋櫃、雨傘架、腳踏車、嬰兒車、垃圾袋及各類雜物），以確保消防避難安全及公共環境整潔。違者物業管理中心得開立限期改善通知單（限24小時內移除），逾期未改善者，由管委會移請主管機關依法裁處新臺幣四萬元以上二十萬元以下罰鍰。",
+          "keywords": ["鞋櫃", "走廊", "梯廳", "雜物", "公共空間", "消防通道", "樓梯間"]
+        },
+        {
+          "id": "LAW-02",
+          "title": "第三屆區分所有權人會議決議案（案由五）",
+          "source": "113年度區權會會議紀錄",
+          "content": "【案由】住戶提議開放於各層走廊梯廳靠牆處放置薄型鞋櫃案。【決議】經大會討論與全體出席權數投票，出席權數 82% 表決反對，維持嚴格走廊全面淨空政策。任何形式之薄型鞋櫃、置物架皆嚴禁擺放於共用走廊。",
+          "keywords": ["鞋櫃", "薄型鞋櫃", "第三屆", "走廊", "決議"]
+        },
+        {
+          "id": "LAW-03",
+          "title": "社區規約第十九條：外牆立面與冷氣主機安裝管理",
+          "source": "大清天朵二期規約 (第一屆區權會訂定)",
+          "content": "冷氣室外機之安裝，必須統一配置於建商原規劃預留之冷氣專屬基座樑位，嚴禁懸掛於建築物立面外緣或私自穿透外牆結構打孔，以維護大樓外觀一致性與防墜落結構安全。",
+          "keywords": ["冷氣", "室外機", "外牆", "滴水", "外觀", "主機"]
+        },
+        {
+          "id": "LAW-04",
+          "title": "第四屆管委會第五次常會決議：電動車充電設備安裝準則",
+          "source": "114年管委會會議紀錄",
+          "content": "地下停車場住戶私人車位擬裝設電動車充電樁（EMS系統），應先填具申請書並檢附台電核可文件與甲級電匠施工圖說，經管委會機電顧問審查通過後方得施工。工程不得破壞既有公共管道結構，費用由申請人自行全額負擔，嚴禁擅自私接公共照明電源。",
+          "keywords": ["充電樁", "電動車", "停車位", "台電", "EMS", "地下室"]
+        },
+        {
+          "id": "LAW-05",
+          "title": "社區寵物飼養及通行管理辦法",
+          "source": "第二屆管委會第七次常會通過",
+          "content": "住戶攜帶寵物進出社區大廳、電梯、中庭及梯廳時，應裝入寵物箱、推車或確實繫上牽繩並抱持。寵物若於共用部分排泄，飼主應立即清潔消毒，違者依違規計點處理並公告其戶別。",
+          "keywords": ["寵物", "狗", "貓", "牽繩", "排泄物", "電梯"]
+        },
+        {
+          "id": "LAW-06",
+          "title": "住戶夜間寧靜與生活安寧公約",
+          "source": "社區規約第二十二條",
+          "content": "每日夜間 22:00 至翌日清晨 08:00 為社區安寧時段。此時段內嚴禁進行室內裝修施工、大聲喧嘩、彈奏樂器或重物敲擊地板。違反者經管理室勸導兩次無效後，管委會得報請警政主管機關依社會秩序維護法裁罰。",
+          "keywords": ["噪音", "裝修", "夜間", "安寧", "音樂", "小孩跑步"]
+        }
+      ]
+    };
+
+    // 全域變數
+    let isStandalone = false; // true: GitHub Pages / 離線模式; false: 本機伺服器
     let currentRole = 'resident';
     let currentUnit = 'A-8F-1';
     let currentTab = 'chat';
@@ -978,28 +1121,72 @@
       renderFloodSystem();
     });
 
-    // 取得後端資料
+    // 取得資料 (自動偵測 本地後端 API 或 GitHub Pages 本地儲存引擎)
     async function fetchStatusAndData() {
       try {
-        const [resStatus, resDispatches, resPetty, resBylaws, resResidents, resFlood] = await Promise.all([
-          fetch('/api/status').then(r => r.json()),
-          fetch('/api/dispatches').then(r => r.json()),
-          fetch('/api/petty_cash').then(r => r.json()),
-          fetch('/api/bylaws').then(r => r.json()),
-          fetch(`/api/residents?role=${currentRole}&unit=${currentUnit}`).then(r => r.json()),
-          fetch('/api/flood_system').then(r => r.json())
-        ]);
-        appData = {
-          status: resStatus,
-          dispatches: resDispatches.dispatches,
-          petty_cash: resPetty.petty_cash,
-          bylaws: resBylaws.bylaws,
-          residents: resResidents.residents || [resResidents.resident],
-          flood_system: resFlood.flood_system
-        };
+        // 先測試本地 API 是否存在
+        const testRes = await fetch('/api/status', { method: 'GET' });
+        if (testRes.ok) {
+          isStandalone = false;
+          const [resStatus, resDispatches, resPetty, resBylaws, resResidents, resFlood] = await Promise.all([
+            testRes.json(),
+            fetch('/api/dispatches').then(r => r.json()),
+            fetch('/api/petty_cash').then(r => r.json()),
+            fetch('/api/bylaws').then(r => r.json()),
+            fetch(`/api/residents?role=${currentRole}&unit=${currentUnit}`).then(r => r.json()),
+            fetch('/api/flood_system').then(r => r.json())
+          ]);
+          appData = {
+            status: resStatus,
+            dispatches: resDispatches.dispatches,
+            petty_cash: resPetty.petty_cash,
+            bylaws: resBylaws.bylaws,
+            residents: resResidents.residents || [resResidents.resident],
+            flood_system: resFlood.flood_system
+          };
+          updateRuntimeBadge(false);
+          return;
+        }
       } catch (err) {
-        console.error("無法連線至本地後端", err);
+        // 進入 Standalone 雲端免伺服器模式
       }
+
+      // Standalone 引擎：讀取 localStorage 或預設種子資料
+      isStandalone = true;
+      let localData = localStorage.getItem('daqing_community_data');
+      if (!localData) {
+        appData = JSON.parse(JSON.stringify(SEED_DATA));
+        saveLocalData();
+      } else {
+        try {
+          appData = JSON.parse(localData);
+        } catch (e) {
+          appData = JSON.parse(JSON.stringify(SEED_DATA));
+        }
+      }
+      updateRuntimeBadge(true);
+    }
+
+    function saveLocalData() {
+      if (isStandalone && appData) {
+        localStorage.setItem('daqing_community_data', JSON.stringify(appData));
+      }
+    }
+
+    function updateRuntimeBadge(isCloud) {
+      const badge = document.getElementById('runtime-badge');
+      const text = document.getElementById('runtime-badge-text');
+      const aiStatus = document.getElementById('ai-status-text');
+      if (isCloud) {
+        badge.className = "hidden sm:inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200";
+        text.textContent = "🌐 GitHub Pages 雲端免伺服器模式";
+        if (aiStatus) aiStatus.textContent = "雲端即開即用引擎已就緒 · 向量規約知識庫 & 氣象局連線中";
+      } else {
+        badge.className = "hidden sm:inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200";
+        text.textContent = "💻 本地後端伺服器模式 (Port: 8080)";
+        if (aiStatus) aiStatus.textContent = "本地後端連線正常 · 向量規約知識庫 & 氣象局即時介接就緒";
+      }
+      lucide.createIcons();
     }
 
     // 切換分頁
@@ -1071,7 +1258,6 @@
       const flood = appData.flood_system;
       const cwa = flood.cwa_weather;
 
-      // 頂部橫幅與膠囊
       const banner = document.getElementById('cwa-top-alert-banner');
       const pill = document.getElementById('cwa-pill');
       const pillText = document.getElementById('cwa-pill-text');
@@ -1084,7 +1270,6 @@
         pillText.textContent = "🌧️ 中央氣象署：台北市【豪大雨特報】";
         floodBadge.classList.remove('hidden');
 
-        // 氣象卡片樣式更新
         document.getElementById('cwa-weather-card').className = "my-4 p-4 rounded-xl border border-rose-300 bg-rose-50/70";
         document.getElementById('cwa-alert-title').textContent = cwa.alert_name;
         document.getElementById('cwa-alert-title').className = "text-sm font-bold text-rose-900";
@@ -1105,7 +1290,6 @@
         document.getElementById('cwa-status-tag').className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
       }
 
-      // 5月排程提醒歷史記錄
       const reminderLog = document.getElementById('may-reminder-log');
       reminderLog.innerHTML = flood.annual_drill.reminder_history.map(item => `
         <div class="p-2 bg-white rounded-lg border border-slate-200">
@@ -1118,7 +1302,6 @@
         </div>
       `).join('');
 
-      // CWA 緊急推播日誌
       const cwaLog = document.getElementById('cwa-push-log');
       cwaLog.innerHTML = cwa.broadcast_logs.length > 0 ? cwa.broadcast_logs.map(log => `
         <div class="p-2.5 bg-white rounded-lg border border-slate-200">
@@ -1138,45 +1321,99 @@
       document.getElementById('cwa-top-alert-banner').classList.add('hidden');
     }
 
-    // 觸發每年5月例行排程提醒
+    // 觸發每年5月例行排程提醒 (支援本地伺服器與 GitHub Pages 獨立引擎)
     async function triggerMayScheduledReminder() {
-      try {
-        const res = await fetch('/api/trigger_may_reminder', { method: 'POST' });
-        const data = await res.json();
-        if (data.success) {
-          await fetchStatusAndData();
-          renderFloodSystem();
-          alert('🔔【系統每年5月排程提醒已觸發】\n已主動推播防汛演練通知至「固德物業總幹事」與「管委會全體委員」LINE 群組！');
-        }
-      } catch (err) {
-        alert('觸發失敗');
-      }
-    }
+      const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+      const newLog = {
+        time: nowStr,
+        title: "【系統排程提醒 - 每年5月例行防汛演練】",
+        recipients: "固德物業總幹事、全體管委會委員（主任委員、機電委員）",
+        content: "⚠️【防汛重點通知】：依社區防汛規約，汛期即將來臨！請固德物業於 5 月 20 日前排定『地下室車道防水閘門實兵組裝閉合操演』，並落實機械軌道清潔防銹潤滑、止水膠條密封性檢驗、60包備用沙包盤點及沉水泵排水測試。操演紀錄與驗收照片需陳報管委會核備並公告住戶！"
+      };
 
-    // 切換中央氣象局豪大雨特報
-    async function toggleCwaAlert(level) {
-      try {
-        const res = await fetch('/api/cwa_weather_alert', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ level })
-        });
-        const data = await res.json();
-        if (data.success) {
-          await fetchStatusAndData();
-          renderFloodSystem();
-          if (level === 'heavy_rain') {
-            alert('🚨【中央氣象局豪大雨特報已發布】\n系統已於 1.2 秒內主動推播緊急防汛警報至「管委會全體委員」及「固德物業管理員」，現場一級防汛 SOP 已啟動！');
-          } else {
-            alert('☀️ 豪大雨特報已解除，已向管委會與物業推播水情趨緩通知。');
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/trigger_may_reminder', { method: 'POST' });
+          if (res.ok) {
+            await fetchStatusAndData();
+            renderFloodSystem();
+            alert('🔔【系統每年5月排程提醒已觸發】\n已主動推播防汛演練通知至「固德物業總幹事」與「管委會全體委員」LINE 群組！');
+            return;
           }
-        }
-      } catch (err) {
-        alert('操作失敗');
+        } catch (e) {}
+      }
+
+      // Standalone 邏輯
+      appData.flood_system.annual_drill.reminder_history.unshift(newLog);
+      saveLocalData();
+      renderFloodSystem();
+      alert('🔔【系統每年5月排程提醒已觸發】\n已主動推播防汛演練通知至「固德物業總幹事」與「管委會全體委員」LINE 群組！');
+    }
+
+    // 切換中央氣象局豪大雨特報 (支援本地與雲端免後端模式)
+    async function toggleCwaAlert(level) {
+      const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/cwa_weather_alert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ level })
+          });
+          if (res.ok) {
+            await fetchStatusAndData();
+            renderFloodSystem();
+            if (level === 'heavy_rain') {
+              alert('🚨【中央氣象局豪大雨特報已發布】\n系統已於 1.2 秒內主動推播緊急防汛警報至「管委會全體委員」及「固德物業管理員」，現場一級防汛 SOP 已啟動！');
+            } else {
+              alert('☀️ 豪大雨特報已解除，已向管委會與物業推播水情趨緩通知。');
+            }
+            return;
+          }
+        } catch (e) {}
+      }
+
+      // Standalone 邏輯
+      const weather = appData.flood_system.cwa_weather;
+      if (level === 'heavy_rain') {
+        weather.alert_level = 'heavy_rain';
+        weather.alert_name = '🌧️ 中央氣象署發布【豪大雨特報】';
+        weather.rainfall_forecast = '受鋒面與低壓影響，台北市預估24小時累積雨量達 200mm 以上，請加強防汛戒備。';
+        weather.updated_at = nowStr;
+
+        weather.broadcast_logs.unshift({
+          time: nowStr,
+          level: '豪大雨特報 (緊急一級防汛)',
+          source: '交通部中央氣象署 Webhook 自動觸發',
+          push_targets: ['管委會全體委員群組', '固德物業現場管理中心', '日間/夜班保全管理員'],
+          message: '🚨【中央氣象署豪大雨緊急警報推播】\n氣象署已針對台北市發布豪大雨特報，預估時雨量高達 60mm 以上！\n⚡ 系統已自動啟動大清天朵二期【一級防汛應變標準作業流程 (SOP)】：\n1. 請現場管理員立即至地下室車道確認防汛防水閘門擋板與支架就定位。\n2. 檢查車道截水溝柵欄泥沙雜物，測試三組沉水抽水泵強制運轉。\n3. 備妥 60 包防汛沙包並放置於車道迎水面及地下室發電機房門口。\n4. 透過官方 LINE 頻道推播提醒地下停車場住戶車主注意水情！',
+          status: '已推播至委員與管理員 LINE 群組 (延遲 1.2s)'
+        });
+        saveLocalData();
+        renderFloodSystem();
+        alert('🚨【中央氣象局豪大雨特報已發布】\n系統已於 1.2 秒內主動推播緊急防汛警報至「管委會全體委員」及「固德物業管理員」，現場一級防汛 SOP 已啟動！');
+      } else {
+        weather.alert_level = 'normal';
+        weather.alert_name = '☀️ 天氣正常 (無豪雨警報)';
+        weather.rainfall_forecast = '台北市降雨機率 10%，氣象穩定。';
+        weather.updated_at = nowStr;
+
+        weather.broadcast_logs.unshift({
+          time: nowStr,
+          level: '解除豪大雨警報',
+          source: '系統手動/氣象署解除特報',
+          push_targets: ['管委會委員', '現場管理員'],
+          message: '中央氣象署已解除台北市豪大雨特報，水情趨緩，恢復常態防災巡檢。',
+          status: '已推播解除通知'
+        });
+        saveLocalData();
+        renderFloodSystem();
+        alert('☀️ 豪大雨特報已解除，已向管委會與物業推播水情趨緩通知。');
       }
     }
 
-    // 對話處理
+    // 對話處理 (支援線上直接計算)
     async function handleChatSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('chat-input');
@@ -1186,17 +1423,63 @@
       appendChatMessage('user', text);
       input.value = '';
 
-      try {
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text, role: currentRole, unit: currentUnit })
-        });
-        const data = await res.json();
-        appendChatMessage('ai', data.reply);
-      } catch (err) {
-        appendChatMessage('ai', '系統連線異常，正在重新嘗試...');
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text, role: currentRole, unit: currentUnit })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            appendChatMessage('ai', data.reply);
+            return;
+          }
+        } catch (err) {}
       }
+
+      // Standalone 離線/雲端 AI 生成邏輯
+      const reply = generateLocalAiResponse(text, currentRole, currentUnit);
+      appendChatMessage('ai', reply);
+    }
+
+    function generateLocalAiResponse(msg, role, unit) {
+      if (/防水閘門|防汛|演練|操演|氣象局|氣象署|豪大雨|淹水|沙包|5月|五月/.test(msg)) {
+        return "【大清天朵二期 AI 防汛與規約檢核助手】\n" +
+          "針對「防水閘門檢測保養、實兵操演及氣象局連線推播機制」說明如下：\n\n" +
+          "🛡️【規約要求】：\n依防汛手冊規約，車道防水閘門每年汛期前須清理潤滑軌道、檢測止水膠條密封度，並常備至少50包沙包。\n\n" +
+          "📅【每年 5 月系統主動提醒演練】：\n系統每年 5 月 1 日自動發送推播通知至固德物業總幹事與管委會委員，要求於 5 月 20 日前完成「地下室車道防水閘門實兵組裝閉合操演（限時15分鐘內）」與抽水沉水泵測試。\n\n" +
+          "🚨【中央氣象局即時連線與主動推播】：\n即時介接中央氣象署預報，當發布豪大雨特報時，60秒內推播給管委會與管理員，自動派發 4 項防汛應變 SOP！";
+      }
+      if (/管理費|繳費|帳單/.test(msg)) {
+        if (role === 'resident') {
+          const res = appData.residents.find(r => r.unit === unit);
+          if (res && res.paid) {
+            return `【大清天朵二期 AI 財務助手】\n您好，您綁定的戶別為【${unit}】。\n✅ 查詢結果：本月份管理費（NT$ ${res.fee.toLocaleString()} 元）已順利入帳銷帳完畢，感謝您的配合！`;
+          } else if (res) {
+            return `【大清天朵二期 AI 財務助手】\n您好，您綁定的戶別為【${unit}】。\n⚠️ 查詢結果：本月份管理費應繳金額為 NT$ ${res.fee.toLocaleString()} 元，目前顯示「尚未入帳」。`;
+          }
+        } else {
+          const paidC = appData.residents.filter(r => r.paid).length;
+          return `【固德物業／管委會 財務概況】\n本月社區管理費繳納進度：已入帳 ${paidC} 戶，待繳 ${appData.residents.length - paidC} 戶。`;
+        }
+      }
+      if (/鞋櫃|走廊/.test(msg)) {
+        return "【大清天朵二期 AI 規約檢核分析】\n" +
+          "📌 規約條文：規約第十六條嚴格禁止走廊梯廳擺放鞋櫃、雜物。\n" +
+          "🏛️ 歷史慣例：第三屆區權會 82% 出席權數表決否決薄型鞋櫃案，維持全面淨空。\n" +
+          "⚠️ 衝突點：任何放寬決策將牴觸區權會法定決議及消防法，管委會無權擅自推翻。\n" +
+          "💡 建議：維持走道淨空；若欲重議須提下屆區權會大會正式表決。";
+      }
+      if (/零用金|審核|報表/.test(msg)) {
+        const spent = appData.petty_cash.items.reduce((s, i) => s + i.amount, 0);
+        return `【大清天朵二期 零用金審核精煉摘要】\n` +
+          `📅 月份：${appData.petty_cash.month}\n` +
+          `💰 申報總支出：NT$ ${spent.toLocaleString()} 元 (額度上限 10 萬元)\n` +
+          `💵 剩餘零用金：NT$ ${(appData.petty_cash.limit - spent).toLocaleString()} 元\n` +
+          `📝 狀態：${appData.petty_cash.final_status === 'approved' ? '已全數核准結算' : '審核中'}`;
+      }
+      return `您好！我是大清天朵二期社區 AI 管理助手（當前身分：${role}）。我能協助您處理規約檢核、防汛演練排程、氣象局豪雨推播、影像派單、管理費對帳及零用金多重簽核！`;
     }
 
     function appendChatMessage(sender, text) {
@@ -1246,27 +1529,63 @@
       const query = document.getElementById('rule-query-input').value.trim();
       if (!query) return;
 
-      try {
-        const res = await fetch('/api/verify_rule', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query })
-        });
-        const data = await res.json();
-
-        document.getElementById('rule-result-container').classList.remove('hidden');
-
-        const rulesEl = document.getElementById('res-rules');
-        rulesEl.innerHTML = data.related_rules.map(r => `<div class="p-2 bg-white rounded border border-slate-200">${r}</div>`).join('');
-
-        document.getElementById('res-history').textContent = data.historical_practice;
-        document.getElementById('res-conflicts').textContent = data.conflicts;
-        document.getElementById('res-recommendations').textContent = data.recommendations;
-
-        lucide.createIcons();
-      } catch (err) {
-        alert('檢核服務呼叫失敗');
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/verify_rule', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            renderRuleResult(data);
+            return;
+          }
+        } catch (err) {}
       }
+
+      // Standalone 比對邏輯
+      let result = null;
+      if (/防水閘門|防汛|演練|操演|淹水|氣象局|豪大雨|暴雨|沙包|閘門/.test(query)) {
+        result = {
+          related_rules: [
+            "社區防汛與地下室防水閘門定期檢測及實兵操演規約（第四屆區分所有權人會議決議暨防汛作業標準手冊）。",
+            "公寓大廈管理條例第十條：共用部分、約定共用部分之修繕、管理、維護，由管理負責人或管理委員會為之。",
+            "年度例行防汛排程條款：每年汛期前（每年5月份）應召集固德物業管理員完成閉合操演與沙包盤點。"
+          ],
+          historical_practice: "大清天朵二期每年固定於 5 月中旬由固德物業總幹事會同管委會機電委員，召集全體日夜班保全及清潔人員實施地下室車道防水閘門實兵組裝測時演練（上年度演練實測耗時 11 分 35 秒，符合 15 分鐘標準），並實地通電測試截水溝三組沉水抽水泵。",
+          conflicts: "若管委會或物業僅做書面形式檢驗而未落實『實兵操演組裝』，或因疏失未於每年 5 月汛期前完成檢測，一旦遭遇極端豪大雨導致車道倒灌致使地下室車輛受損，受託之固德物業與管委會委員將直接面臨未盡『善良管理人注意義務』之法律過失責任，衍生鉅額民事損害賠償風險；若橡膠止水條硬化破損未及時編列預算更換，亦違反公設維護常規。",
+          recommendations: "1. 恪遵規約嚴格執行每年 5 月年度實兵操演，落實四大項目檢驗：軌道潤滑、止水膠條密封、沉水泵測試、50包沙包盤點。\n2. 操演日前 3 天由物業發布車道管制公告，操演時拍照存證並計時填報檢核表。\n3. 當中央氣象局發布豪大雨特報時，系統自動啟動緊急防汛推播，物業管理員應立即至車道就位備妥閘門擋板。\n4. 本助手維持客觀中立，決策權與核銷權保留予管委會。"
+        };
+      } else if (/鞋櫃|走廊|梯廳/.test(query)) {
+        result = {
+          related_rules: [
+            "社區規約第十六條：各樓層梯廳、走廊全面禁止私自堆置任何個人物品（含鞋櫃、雨傘架、雜物等）。",
+            "第三屆區權會決議案（案由五）：出席權數 82% 投票否決放寬薄型鞋櫃提議，維持嚴格全面淨空。"
+          ],
+          historical_practice: "管委會與固德物業歷來均依規約執行拍照、張貼 24 小時限期改善單，逾期即依公寓大廈管理條例報請主管機關裁罰。",
+          conflicts: "若本次管委會或住戶研議『開放放置特定規格之薄型鞋櫃』，將直接牴觸【第三屆區分所有權人大會之法定決議】及【公寓大廈管理條例第十六條第二項】規定。依公寓大廈管理條例，管委會無權以常會決議推翻區權會決議。",
+          recommendations: "1. 依現行規約與法令，走廊屬避難通道，管委會應維持走道淨空，不宜私自放寬。\n2. 若委員欲重議此案，法定程序須於下屆區分所有權人會議提出規約修正案，並達法定出席與同意門檻方具法律效力。\n3. 本助手維持客觀中立，最終管理決策權保留給全體區權會與管委會。"
+        };
+      } else {
+        result = {
+          related_rules: ["社區規約一般管理辦法 (第一屆區權會制定)"],
+          historical_practice: "依例由固德物業巡檢並提請每月管委會例會決議。",
+          conflicts: "目前未發現明顯牴觸現行法令，但仍需維持全體住戶共有權益與消防避難順暢。",
+          recommendations: "建議提請下次管委會常會討論，或由固德物業先行進行意見彙整。"
+        };
+      }
+      renderRuleResult(result);
+    }
+
+    function renderRuleResult(data) {
+      document.getElementById('rule-result-container').classList.remove('hidden');
+      const rulesEl = document.getElementById('res-rules');
+      rulesEl.innerHTML = data.related_rules.map(r => `<div class="p-2 bg-white rounded border border-slate-200">${r}</div>`).join('');
+      document.getElementById('res-history').textContent = data.historical_practice;
+      document.getElementById('res-conflicts').textContent = data.conflicts;
+      document.getElementById('res-recommendations').textContent = data.recommendations;
+      lucide.createIcons();
     }
 
     function renderBylaws() {
@@ -1332,28 +1651,51 @@
     async function submitVisionDispatch() {
       const loc = document.getElementById('vision-location').value;
       const desc = document.getElementById('vision-desc').value;
+      const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+      const dispId = `DISP-${new Date().getFullYear()}${(new Date().getMonth()+1).toString().padStart(2,'0')}${new Date().getDate().toString().padStart(2,'0')}-${(appData.dispatches.length + 1).toString().padStart(3,'0')}`;
 
-      try {
-        const res = await fetch('/api/vision_dispatch', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            category: selectedScenario.category,
-            location: loc,
-            description: desc,
-            reporter: currentRole === 'resident' ? '住戶通報 (A-8F-1)' : '巡檢通報 (固德物業)',
-            image_url: selectedScenario.img
-          })
-        });
-        const data = await res.json();
-        if (data.success) {
-          await fetchStatusAndData();
-          renderDispatches();
-          alert(`✅ Vision AI 派單成功！\n工單編號：${data.dispatch.id}\n派發目標：${data.dispatch.target_team}`);
-        }
-      } catch (err) {
-        alert('派單連線錯誤');
+      const catMap = {
+        "Trash": ["垃圾棄置", "清潔人員/物業群組"],
+        "Lost Item": ["遺失物", "管理中心"],
+        "Damage": ["設施損壞", "物業機電/修繕組"],
+        "Other": ["其他/違規行為", "物業主管與管委會"]
+      };
+      const [catName, targetTeam] = catMap[selectedScenario.category] || ["一般通報", "管理中心"];
+
+      const newDisp = {
+        id: dispId,
+        time: nowStr,
+        category: selectedScenario.category,
+        category_name: catName,
+        location: loc,
+        reporter: currentRole === 'resident' ? '住戶通報 (A-8F-1)' : '巡檢通報 (固德物業)',
+        description: desc,
+        status: (selectedScenario.category === 'Trash' || selectedScenario.category === 'Damage') ? '處理中' : '已登記等待認領',
+        target_team: targetTeam,
+        image_url: selectedScenario.img
+      };
+
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/vision_dispatch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newDisp)
+          });
+          if (res.ok) {
+            await fetchStatusAndData();
+            renderDispatches();
+            alert(`✅ Vision AI 派單成功！\n工單編號：${newDisp.id}\n派發目標：${newDisp.target_team}`);
+            return;
+          }
+        } catch (err) {}
       }
+
+      // Standalone 處理
+      appData.dispatches.unshift(newDisp);
+      saveLocalData();
+      renderDispatches();
+      alert(`✅ Vision AI 派單成功！\n工單編號：${newDisp.id}\n派發目標：${newDisp.target_team}`);
     }
 
     function renderDispatches() {
@@ -1396,37 +1738,67 @@
     }
 
     async function submitBankReconciliation() {
-      const amount = document.getElementById('bank-input-amount').value;
-      const suffix = document.getElementById('bank-input-suffix').value;
+      const amount = parseFloat(document.getElementById('bank-input-amount').value);
+      const suffix = document.getElementById('bank-input-suffix').value.trim();
 
-      try {
-        const res = await fetch('/api/reconcile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount, account_suffix: suffix })
-        });
-        const data = await res.json();
-        if (data.success && data.matched) {
-          const rec = data.receipt;
-          const box = document.getElementById('receipt-preview-box');
-          box.classList.remove('hidden');
-          document.getElementById('receipt-details').innerHTML = `
-            <div>收據單號：${rec.receipt_no}</div>
-            <div>繳費戶別：${rec.unit} (${rec.resident_name})</div>
-            <div>實收金額：NT$ ${rec.amount.toLocaleString()}</div>
-            <div>轉入帳號：玉山銀行 (扣款帳號末5碼 ${rec.account_masked})</div>
-            <div>繳納項目：${rec.item}</div>
-            <div>銷帳時間：${rec.date}</div>
-          `;
-          await fetchStatusAndData();
-          renderResidentsTable();
-          alert(`🎉 自動對帳成功！\n戶別【${rec.unit}】管理費 NT$ ${rec.amount} 元 已自動完成銷帳，並推播電子收據給住戶！`);
-        } else {
-          alert(`⚠️ 對帳提醒：\n${data.message}`);
-        }
-      } catch (err) {
-        alert('對帳服務錯誤');
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/reconcile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount, account_suffix: suffix })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.matched) {
+              showReceiptBox(data.receipt);
+              await fetchStatusAndData();
+              renderResidentsTable();
+              alert(`🎉 自動對帳成功！\n戶別【${data.receipt.unit}】管理費已順利完成銷帳！`);
+              return;
+            } else {
+              alert(`⚠️ 對帳提醒：\n${data.message}`);
+              return;
+            }
+          }
+        } catch (err) {}
       }
+
+      // Standalone 對帳
+      const matched = appData.residents.find(r => r.account_suffix === suffix && r.fee === amount);
+      if (matched) {
+        matched.paid = true;
+        matched.payment_date = new Date().toISOString().substring(0, 10);
+        saveLocalData();
+        renderResidentsTable();
+        const receipt = {
+          receipt_no: `REC-202609-${matched.unit.replace(/-/g, '')}`,
+          unit: matched.unit,
+          resident_name: matched.name[0] + "〇" + (matched.name.length > 2 ? matched.name.slice(2) : ""),
+          amount: matched.fee,
+          account_masked: "***" + suffix.slice(-2),
+          date: matched.payment_date,
+          item: "大清天朵二期 2026年09月份 管理維護費",
+          status: "已入帳核銷完畢"
+        };
+        showReceiptBox(receipt);
+        alert(`🎉 自動對帳成功！\n戶別【${receipt.unit}】管理費 NT$ ${receipt.amount.toLocaleString()} 元已自動完成銷帳！`);
+      } else {
+        alert(`⚠️ 對帳提醒：未找到金額 NT$ ${amount.toLocaleString()} 與末五碼 【${suffix}】 吻合之待繳戶別。`);
+      }
+    }
+
+    function showReceiptBox(rec) {
+      const box = document.getElementById('receipt-preview-box');
+      box.classList.remove('hidden');
+      document.getElementById('receipt-details').innerHTML = `
+        <div>收據單號：${rec.receipt_no}</div>
+        <div>繳費戶別：${rec.unit} (${rec.resident_name})</div>
+        <div>實收金額：NT$ ${rec.amount.toLocaleString()}</div>
+        <div>轉入帳號：玉山銀行 (扣款帳號末5碼 ${rec.account_masked})</div>
+        <div>繳納項目：${rec.item}</div>
+        <div>銷帳時間：${rec.date}</div>
+      `;
     }
 
     function renderResidentsTable() {
@@ -1444,12 +1816,14 @@
         '住戶隱私模式：依公寓大廈管理規範與個資法，僅顯示您授權綁定之戶別' : 
         '管委會 / 物業 視角：全社區住戶繳費清單與欠繳名冊';
 
-      tbody.innerHTML = appData.residents.map(r => `
+      const displayList = isResident ? appData.residents.filter(r => r.unit === currentUnit) : appData.residents;
+
+      tbody.innerHTML = displayList.map(r => `
         <tr class="hover:bg-slate-50/80 transition-colors">
           <td class="py-3 px-3 font-semibold text-slate-800">${r.unit}</td>
-          <td class="py-3 px-3">${r.name}</td>
+          <td class="py-3 px-3">${isResident ? (r.name[0] + "〇" + (r.name.length > 2 ? r.name.slice(2) : "")) : r.name}</td>
           <td class="py-3 px-3 text-right font-mono font-bold text-slate-800">NT$ ${r.fee.toLocaleString()}</td>
-          <td class="py-3 px-3 text-center font-mono text-slate-500">${r.account_suffix}</td>
+          <td class="py-3 px-3 text-center font-mono text-slate-500">${isResident ? ("***" + r.account_suffix.slice(-2)) : r.account_suffix}</td>
           <td class="py-3 px-3 text-center">
             ${r.paid ? 
               '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">已繳費</span>' : 
@@ -1527,22 +1901,50 @@
     }
 
     async function approvePettyCash(officer, decision, comment = '') {
-      try {
-        const res = await fetch('/api/petty_cash/approve', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ officer, decision, comment })
-        });
-        const data = await res.json();
-        if (data.success) {
-          appData.petty_cash = data.petty_cash;
-          renderPettyCash();
-          if (data.petty_cash.final_status === 'approved') {
-            alert('🎉 恭喜！全體 3 位委員已同意簽核，系統已自動生成「零用金結算核准書」PDF！');
+      const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/petty_cash/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ officer, decision, comment })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+              appData.petty_cash = data.petty_cash;
+              renderPettyCash();
+              if (data.petty_cash.final_status === 'approved') {
+                alert('🎉 恭喜！全體 3 位委員已同意簽核，系統已自動生成「零用金結算核准書」PDF！');
+              }
+              return;
+            }
           }
-        }
-      } catch (err) {
-        alert('簽核操作失敗');
+        } catch (err) {}
+      }
+
+      // Standalone 處理
+      const off = appData.petty_cash.approvals[officer];
+      off.status = decision;
+      off.comment = comment || (decision === 'approved' ? '已同意通過' : '退回請物業補正說明');
+      off.time = nowStr;
+
+      const allApproved = Object.values(appData.petty_cash.approvals).every(v => v.status === 'approved');
+      const anyRejected = Object.values(appData.petty_cash.approvals).some(v => v.status === 'rejected');
+
+      if (anyRejected) {
+        appData.petty_cash.final_status = 'rejected';
+      } else if (allApproved) {
+        appData.petty_cash.final_status = 'approved';
+      } else {
+        appData.petty_cash.final_status = 'in_review';
+      }
+
+      saveLocalData();
+      renderPettyCash();
+      if (appData.petty_cash.final_status === 'approved') {
+        alert('🎉 恭喜！全體 3 位委員已同意簽核，系統已自動生成「零用金結算核准書」PDF！');
       }
     }
 
