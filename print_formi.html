@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>大清天朵二期社區一一五年八月份財務收支表 (財I表)</title>
+  <style>
+    /* ========================================================= */
+    /* 標準會計公文天地排版規範 (精準單頁 A4 1-Page Perfect Fit)   */
+    /* 天地各留白 10mm，左右各留白 12mm，單頁一次性完整呈現       */
+    /* ========================================================= */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 12mm 10mm 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      color: #111827;
+      background: #f1f5f9;
+      font-size: 11px;
+      line-height: 1.35;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .sheet-page {
+      width: 210mm;
+      min-height: 297mm;
+      max-height: 297mm;
+      padding: 10mm 12mm 10mm 12mm;
+      margin: 20px auto;
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .sheet-page {
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+        min-height: 100% !important;
+        max-height: 100% !important;
+        padding: 0 !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+    }
+
+    /* 頂部操作按鈕 */
+    .toolbar-bar {
+      width: 210mm;
+      margin: 15px auto 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .btn-action {
+      cursor: pointer;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 8px;
+      border: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-primary {
+      background: #059669;
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #047857;
+    }
+    .btn-secondary {
+      background: #334155;
+      color: #f1f5f9;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    /* 報表主體版面樣式 */
+    .header-institution {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: #64748b;
+      letter-spacing: 0.5px;
+      border-bottom: 1px dashed #cbd5e1;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+    }
+    .doc-main-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #0f172a;
+      margin: 4px 0 2px 0;
+    }
+    .doc-subtitle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #334155;
+      font-weight: bold;
+      margin-bottom: 6px;
+      padding: 0 4px;
+    }
+    .badge-pill {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
+    /* 區塊框框 */
+    .sec-box {
+      border: 1px solid #0f172a;
+      margin-bottom: 6px;
+      background: #ffffff;
+    }
+    .sec-header {
+      background: #e2e8f0;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-bottom: 1px solid #0f172a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 收入明細網格 */
+    .income-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid #0f172a;
+      font-size: 10.5px;
+    }
+    .income-cell {
+      padding: 3px 8px;
+      display: flex;
+      justify-content: space-between;
+      border-right: 1px solid #e2e8f0;
+    }
+    .income-cell:nth-child(3n) {
+      border-right: none;
+    }
+
+    /* 表格樣式 */
+    .fin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+    }
+    .fin-table th {
+      background: #f8fafc;
+      border-bottom: 1px solid #0f172a;
+      border-right: 1px solid #e2e8f0;
+      padding: 3px 6px;
+      font-weight: 800;
+      text-align: center;
+    }
+    .fin-table td {
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+      padding: 3px 6px;
+    }
+    .fin-table tr:last-child td {
+      border-bottom: none;
+    }
+    .fin-table td:last-child, .fin-table th:last-child {
+      border-right: none;
+    }
+
+    /* 匯總條 */
+    .summary-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border-top: 1px solid #0f172a;
+      padding: 3px 8px;
+      font-weight: 800;
+      font-size: 11px;
+    }
+
+    /* 收支彙算大條 */
+    .calc-row-container {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .calc-block {
+      flex: 1;
+      border: 1.5px solid #0f172a;
+      padding: 4px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      background: #ffffff;
+    }
+    .calc-block-primary {
+      background: #f0fdf4;
+      border-color: #059669;
+      color: #065f46;
+    }
+
+    /* 存款與資產調節表 */
+    .assets-box {
+      border: 1px solid #0f172a;
+      margin-bottom: 6px;
+      background: #ffffff;
+    }
+    .assets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      font-size: 10px;
+    }
+    .asset-cell {
+      padding: 3px 8px;
+      display: flex;
+      justify-content: space-between;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .asset-cell:nth-child(3n) {
+      border-right: none;
+    }
+
+    /* 簽核區塊 */
+    .sign-section {
+      border: 1.5px solid #0f172a;
+      background: #ffffff;
+      margin-bottom: 4px;
+    }
+    .sign-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 110px;
+    }
+    .sign-col {
+      border-right: 1px solid #cbd5e1;
+      padding: 5px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 86px;
+      position: relative;
+    }
+    .sign-col:last-child {
+      border-right: none;
+    }
+    .sign-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 2px;
+      margin-bottom: 2px;
+    }
+    .sign-opinion {
+      font-size: 9px;
+      color: #334155;
+      line-height: 1.25;
+      background: #f8fafc;
+      padding: 2px 4px;
+      border-radius: 4px;
+      min-height: 28px;
+    }
+    .stamp-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 3px;
+    }
+
+    /* 委員圓形紅印章 */
+    .comm-stamp-red {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid #dc2626;
+      background: rgba(254, 242, 242, 0.6);
+      color: #dc2626;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 800;
+      line-height: 1.1;
+      transform: rotate(-3deg);
+      user-select: none;
+    }
+    .comm-stamp-red .st-name {
+      font-size: 9.5px;
+      font-weight: 900;
+      margin: 0.5px 0;
+    }
+    .comm-stamp-red .st-date {
+      font-size: 7px;
+      font-family: monospace;
+    }
+
+    /* 承辦人專用印章 (依真實藍色圓戳) */
+    .agent-stamp-blue {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2px solid #1d4ed8;
+      background: rgba(239, 246, 255, 0.7);
+      color: #1d4ed8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 8.5px;
+      font-weight: 800;
+      line-height: 1.1;
+      transform: rotate(-4deg);
+      user-select: none;
+    }
+    .agent-stamp-blue .st-date {
+      font-size: 7.5px;
+      font-family: monospace;
+      margin: 1px 0;
+    }
+
+    .doc-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9px;
+      color: #64748b;
+      border-top: 1px dashed #cbd5e1;
+      padding-top: 4px;
+      margin-top: 4px;
+    }
+  </style>
+
+  <script>
+    const DEFAULT_FORM_I = {
+      month_code: "11508",
+      month_title: "一一五年八月份",
+      doc_title: "大清天朵二期社區一一五年八月份財務收支表（Ｉ）",
+      date: "115年9月3日",
+      submitter: "高瑞彣",
+      submitter_stamp_date: "115. 9. 03",
+      previous_balance: 1266550,
+      incomes: {
+        management_fee: 35634,
+        parking_rent: 0,
+        temp_parking: 0,
+        public_phone: 0,
+        bank_interest: 0,
+        other_income: 0
+      },
+      expenses: [
+        { no: 15, title: "環境清潔", amount: 3000, desc: "本月份服務費" },
+        { no: 16, title: "管理服務", amount: 18000, desc: "七月份、八月份服務費" },
+        { no: 17, title: "門口門禁鎖故障", amount: 1500, desc: "8/3維修完成" },
+        { no: 18, title: "安全系統檢測", amount: 2000, desc: "8/20出勤工資" }
+      ],
+      assets: {
+        petty_cash: 0,
+        pending_cash: 0,
+        pending_check_in: 0,
+        pending_check_out: 0,
+        bank_deposit: 99347,
+        post_deposit: 1178337
+      },
+      approvals: {
+        director: { role: "主任委員", name: "陳建宏", status: "approved", comment: "財務收支表勾稽正確，結餘款核算無誤，同意簽核備查。", time: "2026-08-25 09:30" },
+        finance: { role: "財務委員", name: "林秀玲", status: "approved", comment: "收支金額與銀行及郵局存簿結餘吻合，符合會計規範，同意簽核。", time: "2026-08-25 10:15" },
+        supervisor: { role: "行政委員", name: "王國華", status: "approved", comment: "各項請款核銷與出勤維護內容核對無誤，同意簽核。", time: "2026-08-25 14:00" }
+      },
+      final_status: "approved"
+    };
+
+    function renderFormI(data) {
+      const fi = data || DEFAULT_FORM_I;
+
+      // 標題與月份
+      document.getElementById('p-doc-title').textContent = fi.doc_title || '大清天朵二期社區一一五年八月份財務收支表（Ｉ）';
+      document.getElementById('p-month-code').textContent = fi.month_code || '11508';
+
+      // 前月結餘(1)
+      const prevBal = parseInt(fi.previous_balance) || 1266550;
+      document.getElementById('p-prev-balance').textContent = prevBal.toLocaleString();
+
+      // 本月收入各項
+      const inc = fi.incomes || {};
+      const fee = parseInt(inc.management_fee) || 0;
+      const park = parseInt(inc.parking_rent) || 0;
+      const tmpPark = parseInt(inc.temp_parking) || 0;
+      const pubTel = parseInt(inc.public_phone) || 0;
+      const bInt = parseInt(inc.bank_interest) || 0;
+      const othInc = parseInt(inc.other_income) || 0;
+
+      document.getElementById('p-inc-fee').textContent = fee.toLocaleString();
+      document.getElementById('p-inc-park').textContent = park.toLocaleString();
+      document.getElementById('p-inc-tmp').textContent = tmpPark.toLocaleString();
+      document.getElementById('p-inc-tel').textContent = pubTel.toLocaleString();
+      document.getElementById('p-inc-int').textContent = bInt.toLocaleString();
+      document.getElementById('p-inc-oth').textContent = othInc.toLocaleString();
+
+      const totalIncome = fee + park + tmpPark + pubTel + bInt + othInc;
+      document.getElementById('p-total-income').textContent = totalIncome.toLocaleString();
+
+      // 本月支出各項
+      const expList = Array.isArray(fi.expenses) ? fi.expenses : DEFAULT_FORM_I.expenses;
+      const tbody = document.getElementById('p-exp-tbody');
+      let totalExpense = 0;
+
+      tbody.innerHTML = expList.map(item => {
+        const amt = parseInt(item.amount) || 0;
+        totalExpense += amt;
+        return `
+          <tr>
+            <td style="text-align: center; font-weight: bold; font-family: monospace;">${item.no || ''}</td>
+            <td style="font-weight: 600;">${item.title || ''}</td>
+            <td style="text-align: right; font-weight: bold; font-family: monospace;">${amt.toLocaleString()}</td>
+            <td style="color: #475569;">${item.desc || ''}</td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('p-exp-count').textContent = expList.length;
+      document.getElementById('p-exp-sum-text').textContent = totalExpense.toLocaleString();
+      document.getElementById('p-total-expense').textContent = totalExpense.toLocaleString();
+
+      // 收支小計(2)-(3) 與 本月結餘(1)+(2)-(3)
+      const subtotal = totalIncome - totalExpense;
+      const finalBalance = prevBal + subtotal;
+      document.getElementById('p-subtotal').textContent = (subtotal >= 0 ? '+' : '') + subtotal.toLocaleString();
+      document.getElementById('p-final-balance').textContent = finalBalance.toLocaleString();
+
+      // 資產調節表
+      const ast = fi.assets || {};
+      const petty = parseInt(ast.petty_cash) || 0;
+      const pendCash = parseInt(ast.pending_cash) || 0;
+      const pendChkIn = parseInt(ast.pending_check_in) || 0;
+      const pendChkOut = parseInt(ast.pending_check_out) || 0;
+      const bankDep = parseInt(ast.bank_deposit) || 99347;
+      const postDep = parseInt(ast.post_deposit) || 1178337;
+
+      document.getElementById('p-ast-petty').textContent = petty.toLocaleString();
+      document.getElementById('p-ast-pendcash').textContent = pendCash.toLocaleString();
+      document.getElementById('p-ast-chkin').textContent = pendChkIn.toLocaleString();
+      document.getElementById('p-ast-chkout').textContent = pendChkOut.toLocaleString();
+      document.getElementById('p-ast-bank').textContent = bankDep.toLocaleString();
+      document.getElementById('p-ast-post').textContent = postDep.toLocaleString();
+
+      const totalAssets = petty + pendCash + pendChkIn - pendChkOut + bankDep + postDep;
+      document.getElementById('p-total-assets').textContent = totalAssets.toLocaleString();
+
+      // 承辦人印章
+      document.getElementById('p-agent-stamp-date').textContent = fi.submitter_stamp_date || '115. 9. 03';
+      document.getElementById('p-agent-name').textContent = fi.submitter || '高瑞彣';
+
+      // 3 位委員簽核
+      const officers = [
+        { key: 'director', role: '主任委員', colId: 'p-comm-dir', opinId: 'p-opin-dir', stampId: 'p-stamp-dir' },
+        { key: 'finance', role: '財務委員', colId: 'p-comm-fin', opinId: 'p-opin-fin', stampId: 'p-stamp-fin' },
+        { key: 'supervisor', role: '行政委員', colId: 'p-comm-sup', opinId: 'p-opin-sup', stampId: 'p-stamp-sup' }
+      ];
+
+      const apps = fi.approvals || {};
+      officers.forEach(off => {
+        const app = apps[off.key] || {};
+        const opinEl = document.getElementById(off.opinId);
+        const stampEl = document.getElementById(off.stampId);
+
+        if (opinEl) {
+          opinEl.textContent = app.comment || (app.status === 'approved' ? '核算無誤，同意簽核。' : '待簽核');
+        }
+
+        if (stampEl) {
+          if (app.status === 'approved') {
+            const dateStr = (app.time || '2026-08-25').split(' ')[0];
+            stampEl.innerHTML = `
+              <div class="comm-stamp-red">
+                <span>${off.role}</span>
+                <span class="st-name">${app.name || ''}</span>
+                <span class="st-date">${dateStr}</span>
+              </div>
+            `;
+          } else if (app.status === 'rejected') {
+            stampEl.innerHTML = `
+              <div style="border: 2px solid #dc2626; color: #dc2626; background: #fef2f2; font-size: 9px; font-weight: bold; padding: 4px 6px; border-radius: 4px;">
+                退回修正
+              </div>
+            `;
+          } else {
+            stampEl.innerHTML = `
+              <div style="border: 1px dashed #94a3b8; color: #94a3b8; font-size: 8px; padding: 4px; border-radius: 4px;">
+                待簽核
+              </div>
+            `;
+          }
+        }
+      });
+    }
+
+    async function loadFormIData() {
+      let fiData = null;
+
+      // 1. 優先由 window.opener appData 取得
+      try {
+        if (window.opener && window.opener.appData && window.opener.appData.financial_statement_i) {
+          fiData = JSON.parse(JSON.stringify(window.opener.appData.financial_statement_i));
+        }
+      } catch (e) {}
+
+      // 2. 嘗試由 localStorage 讀取
+      if (!fiData) {
+        try {
+          const direct = localStorage.getItem('daqing_community_financial_i');
+          if (direct) fiData = JSON.parse(direct);
+        } catch (e) {}
+      }
+
+      if (!fiData) {
+        try {
+          const local = localStorage.getItem('daqing_community_data');
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (parsed && parsed.financial_statement_i) fiData = parsed.financial_statement_i;
+          }
+        } catch (e) {}
+      }
+
+      // 3. 嘗試由後端 API 取得
+      if (!fiData) {
+        try {
+          const resp = await fetch('/api/financial_statement_i');
+          if (resp.ok) {
+            const resJson = await resp.json();
+            if (resJson && resJson.financial_statement_i) fiData = resJson.financial_statement_i;
+          }
+        } catch (e) {}
+      }
+
+      renderFormI(fiData || DEFAULT_FORM_I);
+    }
+
+    window.addEventListener('DOMContentLoaded', loadFormIData);
+    window.addEventListener('beforeprint', loadFormIData);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'daqing_community_financial_i' || e.key === 'daqing_community_data') {
+        loadFormIData();
+      }
+    });
+  </script>
+</head>
+<body>
+
+  <!-- 頂部操作列 (螢幕檢視時使用，列印時自動隱藏) -->
+  <div class="toolbar-bar no-print">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 15px; font-weight: 800; letter-spacing: 0.5px;">📄 大清天朵二期社區 財務收支公文系統 (財I表)</span>
+      <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #065f46; color: #a7f3d0; font-weight: bold;">✅ A4 標準公文天地單頁版</span>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button onclick="loadFormIData().then(() => window.print())" class="btn-action btn-primary">
+        <span>🖨️ 立即列印 / 存為 PDF</span>
+      </button>
+      <button onclick="window.close()" class="btn-action btn-secondary">
+        <span>關閉視窗</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- A4 單頁公文主容器 (鎖定單頁絕不跨頁) -->
+  <div class="sheet-page">
+    <div>
+      <!-- 1. 天頭：公文表頭 -->
+      <div class="header-institution">
+        <span>固德建築物管理維護有限公司 · 寓廈管理服務</span>
+        <span>大清天朵二期社區管理委員會 存查聯</span>
+      </div>
+
+      <!-- 2. 主標題 -->
+      <h1 class="doc-main-title" id="p-doc-title">大清天朵二期社區一一五年八月份財務收支表（Ｉ）</h1>
+
+      <!-- 3. 副資訊列 -->
+      <div class="doc-subtitle-row">
+        <div>
+          <span>月份代號：</span>
+          <span class="badge-pill" id="p-month-code">11508</span>
+        </div>
+        <div style="font-size: 10px; color: #64748b;">
+          編製單位：固德管理維護 · 報表代號：財I表 · 頁 1 之 1
+        </div>
+      </div>
+
+      <!-- 4. 前月結餘(1) -->
+      <div class="sec-box">
+        <div class="sec-header">
+          <span>【前月結餘(1)】 公共基金</span>
+          <span style="font-family: monospace; font-size: 12px;" id="p-prev-balance">1,266,550</span>
+        </div>
+      </div>
+
+      <!-- 5. 本月收入 -->
+      <div class="sec-box">
+        <div class="sec-header">
+          <span>【本月收入】</span>
+          <span style="font-size: 10px; color: #64748b;">各項社區應收與實收項目</span>
+        </div>
+        <div class="income-grid">
+          <div class="income-cell">
+            <span>房屋管理費收入:</span>
+            <strong style="font-family: monospace;" id="p-inc-fee">35,634</strong>
+          </div>
+          <div class="income-cell">
+            <span>停車位租金收入:</span>
+            <strong style="font-family: monospace;" id="p-inc-park">0</strong>
+          </div>
+          <div class="income-cell">
+            <span>臨時停車收入:</span>
+            <strong style="font-family: monospace;" id="p-inc-tmp">0</strong>
+          </div>
+          <div class="income-cell">
+            <span>公共電話收入:</span>
+            <strong style="font-family: monospace;" id="p-inc-tel">0</strong>
+          </div>
+          <div class="income-cell">
+            <span>銀行利息收入:</span>
+            <strong style="font-family: monospace;" id="p-inc-int">0</strong>
+          </div>
+          <div class="income-cell">
+            <span>其他收入:</span>
+            <strong style="font-family: monospace;" id="p-inc-oth">0</strong>
+          </div>
+        </div>
+        <div class="summary-bar">
+          <span>【本期收入合計(2)】</span>
+          <span style="font-family: monospace; font-size: 12px; color: #047857;" id="p-total-income">35,634</span>
+        </div>
+      </div>
+
+      <!-- 6. 本月支出明細表格 -->
+      <div class="sec-box">
+        <div class="sec-header">
+          <span>【本月支出】</span>
+          <span style="font-size: 10px; color: #64748b;">依各項一般費用報支單提報核銷</span>
+        </div>
+        <table class="fin-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">申請單編號</th>
+              <th style="width: 140px; text-align: left;">支出項目</th>
+              <th style="width: 90px; text-align: right;">支出金額 (元)</th>
+              <th style="text-align: left;">說明</th>
+            </tr>
+          </thead>
+          <tbody id="p-exp-tbody">
+            <!-- 動態注入 -->
+          </tbody>
+        </table>
+        <div class="summary-bar">
+          <span>一般支出合計 <span id="p-exp-count" style="color: #0369a1;">4</span> 筆：<strong id="p-exp-sum-text">24,500</strong> 元</span>
+          <span>【本期支出合計(3)】 <strong style="font-family: monospace; font-size: 12px; color: #b91c1c;" id="p-total-expense">24,500</strong></span>
+        </div>
+      </div>
+
+      <!-- 7. 收支小計與本月結餘 -->
+      <div class="calc-row-container">
+        <div class="calc-block">
+          <span>【本期收支小計(2)-(3)】</span>
+          <span style="font-family: monospace; font-size: 13px;" id="p-subtotal">+11,134</span>
+        </div>
+        <div class="calc-block calc-block-primary">
+          <span>【本月結餘(1)+(2)-(3)】</span>
+          <span style="font-family: monospace; font-size: 13px; font-weight: 900;" id="p-final-balance">1,277,684</span>
+        </div>
+      </div>
+
+      <!-- 8. 資產與存款調節表 -->
+      <div class="assets-box">
+        <div class="sec-header" style="background: #f1f5f9;">
+          <span>資產與存款核對調節表</span>
+          <span style="font-size: 9.5px; color: #64748b;">※管理費未繳金額請參考管理費未繳明細表</span>
+        </div>
+        <div class="assets-grid">
+          <div class="asset-cell">
+            <span>零用金:</span>
+            <strong style="font-family: monospace;" id="p-ast-petty">0</strong>
+          </div>
+          <div class="asset-cell">
+            <span>待存支票:</span>
+            <strong style="font-family: monospace;" id="p-ast-chkin">0</strong>
+          </div>
+          <div class="asset-cell">
+            <span>銀行存款 (華南):</span>
+            <strong style="font-family: monospace;" id="p-ast-bank">99,347</strong>
+          </div>
+          <div class="asset-cell">
+            <span>待存現金:</span>
+            <strong style="font-family: monospace;" id="p-ast-pendcash">0</strong>
+          </div>
+          <div class="asset-cell">
+            <span>待兌支票:</span>
+            <strong style="font-family: monospace;" id="p-ast-chkout">0</strong>
+          </div>
+          <div class="asset-cell">
+            <span>郵局存款 (專戶):</span>
+            <strong style="font-family: monospace;" id="p-ast-post">1,178,337</strong>
+          </div>
+        </div>
+        <div class="summary-bar" style="background: #ffffff; border-top: 1px dashed #cbd5e1;">
+          <span style="font-size: 10.5px; color: #475569;">存款與現金合計 (勾稽驗算)</span>
+          <span>合計：<strong style="font-family: monospace; font-size: 12px; color: #0f172a;" id="p-total-assets">1,277,684</strong> 元</span>
+        </div>
+      </div>
+
+      <!-- 9. 底部簽核欄 (4 欄：主任委員、財務委員、行政委員、承辦人) -->
+      <div class="sign-section">
+        <div class="sign-grid">
+          <!-- 1. 主任委員 -->
+          <div class="sign-col" id="p-comm-dir">
+            <div>
+              <div class="sign-title">
+                <span>主任委員</span>
+                <span style="font-size: 10px;">陳建宏</span>
+              </div>
+              <div class="sign-opinion" id="p-opin-dir">
+                財務收支表勾稽正確，結餘款核算無誤，同意簽核備查。
+              </div>
+            </div>
+            <div class="stamp-container" id="p-stamp-dir">
+              <!-- 動態注入委員印章 -->
+            </div>
+          </div>
+
+          <!-- 2. 財務委員 -->
+          <div class="sign-col" id="p-comm-fin">
+            <div>
+              <div class="sign-title">
+                <span>財務委員</span>
+                <span style="font-size: 10px;">林秀玲</span>
+              </div>
+              <div class="sign-opinion" id="p-opin-fin">
+                收支金額與銀行及郵局存簿結餘吻合，符合會計規範，同意簽核。
+              </div>
+            </div>
+            <div class="stamp-container" id="p-stamp-fin">
+              <!-- 動態注入委員印章 -->
+            </div>
+          </div>
+
+          <!-- 3. 行政委員 -->
+          <div class="sign-col" id="p-comm-sup">
+            <div>
+              <div class="sign-title">
+                <span>行政委員</span>
+                <span style="font-size: 10px;">王國華</span>
+              </div>
+              <div class="sign-opinion" id="p-opin-sup">
+                各項請款核銷與出勤維護內容核對無誤，同意簽核。
+              </div>
+            </div>
+            <div class="stamp-container" id="p-stamp-sup">
+              <!-- 動態注入委員印章 -->
+            </div>
+          </div>
+
+          <!-- 4. 承辦人 (實體公文藍色圓形戳章) -->
+          <div class="sign-col" style="background: #fafafa;">
+            <div>
+              <div class="sign-title">
+                <span>作業承辦人</span>
+                <span style="font-size: 10px;" id="p-agent-name">高瑞彣</span>
+              </div>
+              <div style="font-size: 8px; color: #64748b; text-align: center; margin-top: 2px;">
+                固德物業編製核章
+              </div>
+            </div>
+            <div class="stamp-container">
+              <div class="agent-stamp-blue">
+                <span>承辦人</span>
+                <span class="st-date" id="p-agent-stamp-date">115. 9. 03</span>
+                <span>高瑞彣</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. 地腳天地頁尾 -->
+    <div class="doc-footer-row">
+      <span>[ 財務悍將會計系統 ] \ [ 月份財務收支表(I) ]</span>
+      <span style="font-weight: 700; color: #0f172a;">— 頁 1 之 1 — (全一頁標準會計版)</span>
+      <span>GOOD 固德寓廈管理服務 · 大清天朵二期社區管理委員會 存查聯</span>
+    </div>
+  </div>
+
+</body>
+</html>

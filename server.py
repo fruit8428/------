@@ -192,6 +192,61 @@ DEFAULT_DATA = {
             { "id": "att-15", "title": "固德公司財務通知函 (LINE推播稿)", "type": "pdf", "file": "財務通知.pdf", "category": "推播公文", "desc": "固德高瑞彣向3位委員提報簽核之文字公文" }
         ]
     },
+    "financial_statement_i": {
+        "month_code": "11508",
+        "month_title": "一一五年八月份",
+        "doc_title": "大清天朵二期社區一一五年八月份財務收支表（Ｉ）",
+        "date": "115年9月3日",
+        "submitter": "高瑞彣",
+        "submitter_stamp_date": "115. 9. 03",
+        "previous_balance": 1266550,
+        "incomes": {
+            "management_fee": 35634,
+            "parking_rent": 0,
+            "temp_parking": 0,
+            "public_phone": 0,
+            "bank_interest": 0,
+            "other_income": 0
+        },
+        "expenses": [
+            { "no": 15, "title": "環境清潔", "amount": 3000, "desc": "本月份服務費" },
+            { "no": 16, "title": "管理服務", "amount": 18000, "desc": "七月份、八月份服務費" },
+            { "no": 17, "title": "門口門禁鎖故障", "amount": 1500, "desc": "8/3維修完成" },
+            { "no": 18, "title": "安全系統檢測", "amount": 2000, "desc": "8/20出勤工資" }
+        ],
+        "assets": {
+            "petty_cash": 0,
+            "pending_cash": 0,
+            "pending_check_in": 0,
+            "pending_check_out": 0,
+            "bank_deposit": 99347,
+            "post_deposit": 1178337
+        },
+        "approvals": {
+            "director": {
+                "role": "主任委員",
+                "name": "陳建宏",
+                "status": "approved",
+                "comment": "財務收支表勾稽正確，結餘款核算無誤，同意簽核備查。",
+                "time": "2026-08-25 09:30"
+            },
+            "finance": {
+                "role": "財務委員",
+                "name": "林秀玲",
+                "status": "approved",
+                "comment": "收支金額與銀行及郵局存簿結餘吻合，符合會計規範，同意簽核。",
+                "time": "2026-08-25 10:15"
+            },
+            "supervisor": {
+                "role": "行政委員",
+                "name": "王國華",
+                "status": "approved",
+                "comment": "各項請款核銷與出勤維護內容核對無誤，同意簽核。",
+                "time": "2026-08-25 14:00"
+            }
+        },
+        "final_status": "approved"
+    },
     "flood_system": {
         "annual_drill": {
             "schedule_month": "每年 5 月",
@@ -373,6 +428,10 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             self.send_json({"dispatches": data["dispatches"]})
         elif path == "/api/petty_cash":
             self.send_json({"petty_cash": data["petty_cash"]})
+        elif path == "/api/financial_statement_i":
+            if "financial_statement_i" not in data:
+                data["financial_statement_i"] = json.loads(json.dumps(DEFAULT_DATA["financial_statement_i"]))
+            self.send_json({"financial_statement_i": data["financial_statement_i"]})
         elif path == "/api/bylaws":
             self.send_json({"bylaws": data["bylaws"]})
         elif path == "/api/flood_system":
@@ -631,6 +690,47 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             data["petty_cash"] = json.loads(json.dumps(DEFAULT_DATA["petty_cash"]))
             save_data(data)
             self.send_json({"success": True, "petty_cash": data["petty_cash"]})
+
+        elif path == "/api/financial_statement_i/update":
+            form_data = body.get("financial_statement_i")
+            if form_data:
+                data["financial_statement_i"] = form_data
+                save_data(data)
+                self.send_json({"success": True, "financial_statement_i": data["financial_statement_i"]})
+            else:
+                self.send_json({"error": "No data provided"}, 400)
+
+        elif path == "/api/financial_statement_i/approve":
+            officer = body.get("officer")
+            decision = body.get("decision")
+            comment = body.get("comment", "")
+            if "financial_statement_i" not in data:
+                data["financial_statement_i"] = json.loads(json.dumps(DEFAULT_DATA.get("financial_statement_i", {})))
+            approvals = data["financial_statement_i"]["approvals"]
+            if officer in approvals:
+                approvals[officer]["status"] = decision
+                approvals[officer]["comment"] = comment or ("已同意通過" if decision == "approved" else "退回請物業補正說明")
+                approvals[officer]["time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+                all_approved = all(v["status"] == "approved" for v in approvals.values())
+                any_rejected = any(v["status"] == "rejected" for v in approvals.values())
+
+                if any_rejected:
+                    data["financial_statement_i"]["final_status"] = "rejected"
+                elif all_approved:
+                    data["financial_statement_i"]["final_status"] = "approved"
+                else:
+                    data["financial_statement_i"]["final_status"] = "in_review"
+
+                save_data(data)
+                self.send_json({"success": True, "financial_statement_i": data["financial_statement_i"]})
+            else:
+                self.send_json({"error": "Invalid officer"}, 400)
+
+        elif path == "/api/financial_statement_i/reset":
+            data["financial_statement_i"] = json.loads(json.dumps(DEFAULT_DATA["financial_statement_i"]))
+            save_data(data)
+            self.send_json({"success": True, "financial_statement_i": data["financial_statement_i"]})
 
         elif path == "/api/petty_cash/upload_receipt":
             import base64

@@ -447,6 +447,10 @@
               <i data-lucide="file-edit" class="w-4 h-4"></i>
               <span>待支付明細 (財Q表) 線上填單與簽核</span>
             </button>
+            <button onclick="openFormIModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white border-2 border-emerald-700 rounded-xl font-bold text-sm flex items-center space-x-1.5 transition-all shadow-xs">
+              <i data-lucide="pie-chart" class="w-4 h-4"></i>
+              <span>財務收支表 (財I表) 線上填單與簽核</span>
+            </button>
             <button onclick="sendLineNotificationDemo()" class="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-2 border-emerald-300 rounded-xl font-bold text-sm flex items-center space-x-1.5 transition-all shadow-xs">
               <i data-lucide="bell" class="w-4 h-4"></i>
               <span>推播 LINE 簽核通知</span>
@@ -576,18 +580,21 @@
             <span class="px-2.5 py-1 rounded bg-indigo-700 text-white text-xs font-bold shadow-2xs group-hover:bg-indigo-800">開啟表單</span>
           </div>
 
-          <!-- 2. 財務收支表 (已左移至第 2 位) -->
-          <div onclick="openAttachmentModal('八月份財務收支表.jpg', '一一五年八月份財務收支表 (財I表)', '收支報表', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
+          <!-- 2. 八月份財務收支表 (財I表) 電子表單與簽核 (填入式) -->
+          <div onclick="openFormIModal()" class="p-3.5 rounded-xl border-2 border-emerald-300 bg-emerald-50/50 hover:border-emerald-600 hover:bg-emerald-50 cursor-pointer transition-all flex items-center justify-between group shadow-xs">
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-900 flex items-center justify-center font-bold text-sm">
+              <div class="w-10 h-10 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
                 <i data-lucide="pie-chart" class="w-5 h-5"></i>
               </div>
               <div>
-                <div class="font-bold text-slate-900 text-sm group-hover:text-teal-900">八月份財務收支表 (財I表)</div>
-                <div class="text-xs text-slate-500">收入$35,634 · 結餘$1,277,684</div>
+                <div class="font-bold text-emerald-950 text-sm group-hover:text-emerald-900 flex items-center space-x-1.5 flex-wrap">
+                  <span>八月份財務收支表 (財I表)</span>
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-900 text-[10px] font-bold">可鍵入選取 · 三委員簽核</span>
+                </div>
+                <div class="text-xs text-emerald-700 font-medium">高瑞彣線上填報 · 3位委員線上多重審查簽核</div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
+            <span class="px-2.5 py-1 rounded bg-emerald-700 text-white text-xs font-bold shadow-2xs group-hover:bg-emerald-800">開啟表單</span>
           </div>
 
           <!-- 3. 待支付明細表-存摺補登核銷版 (已右移至第 3 位) -->
@@ -1168,6 +1175,488 @@
   </div>
 
   <!-- ============================================== -->
+  <!-- MODAL 3.5: 八月份財務收支表 (財I表) 電子填單與三委員簽核 -->
+  <div id="form-i-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" style="z-index: 7000;">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm">
+      
+      <!-- 頂部標題列 -->
+      <div class="p-3.5 sm:p-4 border-b bg-slate-900 text-white flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500 text-slate-900 flex items-center justify-center font-bold">
+            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="font-bold text-base sm:text-lg flex items-center space-x-2">
+              <span>八月份財務收支表 (財I表)</span>
+              <span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-800 text-emerald-200 border border-emerald-600">電子互動表單</span>
+            </div>
+            <div class="text-xs text-slate-300">大清天朵二期社區 · 月份代號 11508 · 承辦人：高瑞彣</div>
+          </div>
+        </div>
+        
+        <!-- 頂部操作：電子填單與簽核標籤 + 關閉按鈕 -->
+        <div class="flex items-center space-x-2">
+          <span class="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 shadow-xs flex items-center space-x-1">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            <span>電子填單與簽核</span>
+          </span>
+          <button onclick="closeFormIModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors" title="關閉視窗">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 滾動內容主體 -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 bg-slate-50">
+        
+        <!-- 電子化可點選鍵入表單與三委員簽核 -->
+        <div id="formi-view-form" class="space-y-5">
+          
+          <!-- 表單公文主區 (支援列印) -->
+          <div id="formi-printable" class="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xs space-y-4">
+            <div class="text-center border-b pb-4">
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-wide">大清天朵二期社區一一五年八月份財務收支表（Ｉ）</h2>
+              <div class="flex items-center justify-center space-x-4 text-xs text-slate-500 mt-1 font-mono">
+                <span>月份代號：<strong class="text-slate-800" id="formi-meta-code">11508</strong></span>
+                <span>·</span>
+                <span>報表代號：財I表</span>
+                <span>·</span>
+                <span>編製日期：<span id="formi-meta-date">115年9月3日</span></span>
+                <span>·</span>
+                <span>頁 1 之 1</span>
+              </div>
+            </div>
+
+            <!-- 身分與審核狀態提示列 -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl text-xs">
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded bg-emerald-600 text-white font-bold">填報人</span>
+                <span class="font-bold text-emerald-950">固德物業作業承辦人：高瑞彣 (115.9.03 核章)</span>
+                <span class="text-emerald-700 hidden sm:inline">· 支援文字與各項金額鍵入</span>
+              </div>
+              <div id="formi-status-badge">
+                <!-- 動態注入簽核狀態 -->
+              </div>
+            </div>
+
+            <!-- 1. 前月結餘(1) 公共基金 -->
+            <div class="p-4 bg-slate-50 border-2 border-slate-200 rounded-xl">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                  <i data-lucide="wallet" class="w-4 h-4 text-emerald-600"></i>
+                  <span>【前月結餘(1)】 公共基金：</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs text-slate-500 font-bold">NT$</span>
+                  <input type="number" id="formi-inp-prev-balance" value="1266550" oninput="recalcFormITotal()" class="w-40 px-3 py-1.5 border border-slate-300 rounded-lg text-sm font-mono font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 text-right">
+                  <span class="text-xs text-slate-500 font-bold">元</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. 本月收入 (可點選鍵入各項收入金額) -->
+            <div class="p-4 bg-slate-50 border-2 border-slate-200 rounded-xl space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                <div class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
+                  <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
+                  <span>【本月收入】各項目明細 (可直接鍵入調整)：</span>
+                </div>
+                <div class="text-xs text-slate-500">單位：新臺幣 (元)</div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                <!-- 房屋管理費收入 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block font-bold text-slate-700 mb-1">房屋管理費收入：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-inc-fee" value="35634" oninput="recalcFormITotal()" class="w-full px-2.5 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-slate-900 text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 停車位租金收入 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block font-bold text-slate-700 mb-1">停車位租金收入：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-inc-park" value="0" oninput="recalcFormITotal()" class="w-full px-2.5 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-slate-900 text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 臨時停車收入 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block font-bold text-slate-700 mb-1">臨時停車收入：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-inc-tmp" value="0" oninput="recalcFormITotal()" class="w-full px-2.5 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-slate-900 text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 公共電話收入 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block font-bold text-slate-700 mb-1">公共電話收入：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-inc-tel" value="0" oninput="recalcFormITotal()" class="w-full px-2.5 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-slate-900 text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 銀行利息收入 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block font-bold text-slate-700 mb-1">銀行利息收入：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-inc-int" value="0" oninput="recalcFormITotal()" class="w-full px-2.5 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-slate-900 text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 其他收入 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block font-bold text-slate-700 mb-1">其他收入：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-inc-oth" value="0" oninput="recalcFormITotal()" class="w-full px-2.5 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-slate-900 text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 收入合計顯示 -->
+              <div class="flex items-center justify-between p-2.5 bg-emerald-50 rounded-lg border border-emerald-200">
+                <span class="font-bold text-emerald-950 text-sm">【本期收入合計(2)】</span>
+                <div class="text-right">
+                  <span class="font-mono text-base font-black text-emerald-800" id="formi-total-income-text">35,634</span>
+                  <span class="text-xs text-emerald-700 font-bold ml-1">元</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. 本月支出明細表格 (可編輯、增刪列) -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
+                  <i data-lucide="list-ordered" class="w-4 h-4 text-emerald-600"></i>
+                  <span>【本月支出】明細項目清單 (可直接在各欄位鍵入修改)：</span>
+                </div>
+                <button type="button" onclick="addFormIExpenseItem()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition-all flex items-center space-x-1 shadow-2xs">
+                  <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                  <span>新增一筆支出項目</span>
+                </button>
+              </div>
+
+              <div class="overflow-x-auto border-2 border-slate-200 rounded-xl">
+                <table class="w-full text-left text-xs sm:text-sm">
+                  <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3 w-20 text-center">申請單編號</th>
+                      <th class="py-2.5 px-3 w-48">支出項目</th>
+                      <th class="py-2.5 px-3 w-32 text-right">支出金額(元)</th>
+                      <th class="py-2.5 px-3">說明</th>
+                      <th class="py-2.5 px-3 w-16 text-center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="formi-expenses-tbody" class="divide-y divide-slate-200 bg-white">
+                    <!-- 動態渲染各列 -->
+                  </tbody>
+                  <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300">
+                    <tr>
+                      <td colspan="2" class="py-3 px-3 text-slate-800">
+                        一般支出合計 <span id="formi-exp-count-text" class="text-emerald-700 font-mono text-base">4</span> 筆
+                      </td>
+                      <td class="py-3 px-3 text-right font-mono text-base text-rose-700" id="formi-total-expense-text">
+                        24,500 元
+                      </td>
+                      <td colspan="2" class="py-3 px-3 text-slate-500 font-normal text-xs text-right">
+                        【本期支出合計(3)】
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <!-- 4. 收支彙算與結餘 (電腦自動即時核算) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- 本期收支小計(2)-(3) -->
+              <div class="p-4 bg-slate-50 border-2 border-slate-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-bold text-slate-500">收入扣除支出差額</div>
+                  <div class="text-sm font-bold text-slate-800 mt-0.5">【本期收支小計(2)-(3)】</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-xl sm:text-2xl font-bold font-mono text-slate-900" id="formi-subtotal-text">+11,134</span>
+                  <span class="text-xs text-slate-500 font-bold ml-1">元</span>
+                </div>
+              </div>
+
+              <!-- 本月結餘(1)+(2)-(3) -->
+              <div class="p-4 bg-emerald-50/80 border-2 border-emerald-300 rounded-xl flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-bold text-emerald-800">前月結餘 + 本期收支</div>
+                  <div class="text-sm font-bold text-emerald-950 mt-0.5">【本月結餘(1)+(2)-(3)】</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-xl sm:text-2xl font-black font-mono text-emerald-800" id="formi-final-balance-text">1,277,684</span>
+                  <span class="text-xs text-emerald-700 font-bold ml-1">元</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. 資產與存款核算調節表 (鍵入存簿與零用金金額) -->
+            <div class="p-4 bg-slate-50 border-2 border-slate-200 rounded-xl space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                <div class="font-bold text-slate-800 text-xs sm:text-sm flex items-center space-x-1.5">
+                  <i data-lucide="landmark" class="w-4 h-4 text-emerald-600"></i>
+                  <span>資產與存款核算調節表 (點選與金額鍵入)：</span>
+                </div>
+                <div class="text-xs text-slate-500">※管理費未繳金額請參考管理費未繳明細表</div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+                <!-- 零用金 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">零用金：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-ast-petty" value="0" oninput="recalcFormITotal()" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-xs text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 待存支票 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">待存支票：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-ast-chkin" value="0" oninput="recalcFormITotal()" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-xs text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 銀行存款 (華南) -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">銀行存款 (華南銀行)：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-ast-bank" value="99347" oninput="recalcFormITotal()" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-xs text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 待存現金 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">待存現金：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-ast-pendcash" value="0" oninput="recalcFormITotal()" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-xs text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 待兌支票 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">待兌支票：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-ast-chkout" value="0" oninput="recalcFormITotal()" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-xs text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+
+                <!-- 郵局存款 -->
+                <div class="p-2.5 bg-white rounded-lg border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-600 mb-1">郵局存款 (專戶)：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formi-inp-ast-post" value="1178337" oninput="recalcFormITotal()" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono font-bold text-right focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-xs text-slate-400 font-bold">元</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 存款合計與平衡驗算提示 -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-white rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-bold text-slate-600">存款現金合計：</span>
+                  <span class="font-mono text-base font-bold text-slate-900" id="formi-total-assets-text">1,277,684</span>
+                  <span class="text-xs text-slate-500 font-bold">元</span>
+                </div>
+                <div id="formi-assets-check-badge">
+                  <!-- 動態注入平衡驗證狀態 -->
+                </div>
+              </div>
+            </div>
+
+            <!-- 6. 作業承辦人印戳 & 管委會 3 位委員線上多重簽核專屬區 -->
+            <div class="border-2 border-emerald-200 rounded-2xl p-4 sm:p-5 bg-gradient-to-b from-emerald-50/40 to-white space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-emerald-100 pb-3">
+                <div>
+                  <div class="font-bold text-slate-900 text-base flex items-center space-x-2">
+                    <i data-lucide="stamp" class="w-5 h-5 text-emerald-600"></i>
+                    <span>管委會 3 位法定委員線上多重簽核專區 (線上批閱、簽署意見與蓋章)</span>
+                  </div>
+                  <div class="text-xs text-slate-500 mt-0.5">本收支表經承辦人核算後，由 3 位委員直接於下方審閱、批覆並蓋章</div>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-900 self-start sm:self-auto">法定多重簽核權限</span>
+              </div>
+
+              <!-- 承辦人印戳條 -->
+              <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-bold text-slate-500">作業承辦人：</span>
+                  <strong class="text-slate-800 text-sm" id="formi-submitter-name">高瑞彣</strong>
+                  <span class="text-xs text-slate-400">· 固德建築物管理維護有限公司</span>
+                </div>
+                <!-- 承辦人藍色印章 -->
+                <div class="w-16 h-16 rounded-full border-2 border-blue-600 bg-blue-50/50 text-blue-700 flex flex-col items-center justify-center font-bold text-[10px] leading-tight rotate-[-4deg] shadow-xs select-none">
+                  <span>承辦人</span>
+                  <span class="font-mono text-[9px]" id="formi-stamp-agent-date">115. 9. 03</span>
+                  <span>高瑞彣</span>
+                </div>
+              </div>
+
+              <!-- 3 位委員簽核卡片 (主任委員、財務委員、行政委員) -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="formi-committee-approval-grid">
+                <!-- 1. 主任委員 -->
+                <div class="bg-white p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 transition-all flex flex-col justify-between space-y-3 shadow-xs">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-400">法定職掌 · 主任委員</span>
+                      <span id="formi-badge-director" class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                      <div class="text-base font-bold text-slate-900">陳建宏</div>
+                      <div class="text-xs text-slate-400 font-mono" id="formi-time-director">2026-08-25 09:30</div>
+                    </div>
+
+                    <!-- 主任委員印戳展示區 -->
+                    <div class="flex justify-center my-2.5" id="formi-stamp-box-director">
+                      <!-- 動態注入委員印章 -->
+                    </div>
+
+                    <!-- 審核意見輸入框 (可文字鍵入) -->
+                    <label class="block text-xs font-bold text-slate-500 mb-1">主委簽核意見：</label>
+                    <textarea id="formi-comment-director" rows="2" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500" placeholder="鍵入審核意見...">財務收支表勾稽正確，結餘款核算無誤，同意簽核備查。</textarea>
+                  </div>
+
+                  <!-- 簽核按鈕 -->
+                  <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="signFormI('director', 'approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center space-x-1 shadow-2xs">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>主委同意</span>
+                    </button>
+                    <button type="button" onclick="signFormI('director', 'rejected')" class="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition-colors">
+                      退回
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2. 財務委員 -->
+                <div class="bg-white p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 transition-all flex flex-col justify-between space-y-3 shadow-xs">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-400">法定職掌 · 財務委員</span>
+                      <span id="formi-badge-finance" class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                      <div class="text-base font-bold text-slate-900">林秀玲</div>
+                      <div class="text-xs text-slate-400 font-mono" id="formi-time-finance">2026-08-25 10:15</div>
+                    </div>
+
+                    <!-- 財務委員印戳展示區 -->
+                    <div class="flex justify-center my-2.5" id="formi-stamp-box-finance">
+                      <!-- 動態注入委員印章 -->
+                    </div>
+
+                    <!-- 審核意見輸入框 (可文字鍵入) -->
+                    <label class="block text-xs font-bold text-slate-500 mb-1">財委簽核意見：</label>
+                    <textarea id="formi-comment-finance" rows="2" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500" placeholder="鍵入審核意見...">收支金額與銀行及郵局存簿結餘吻合，符合會計規範，同意簽核。</textarea>
+                  </div>
+
+                  <!-- 簽核按鈕 -->
+                  <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="signFormI('finance', 'approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center space-x-1 shadow-2xs">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>財委同意</span>
+                    </button>
+                    <button type="button" onclick="signFormI('finance', 'rejected')" class="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition-colors">
+                      退回
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 3. 行政委員 -->
+                <div class="bg-white p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 transition-all flex flex-col justify-between space-y-3 shadow-xs">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-400">法定職掌 · 行政委員</span>
+                      <span id="formi-badge-supervisor" class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                      <div class="text-base font-bold text-slate-900">王國華</div>
+                      <div class="text-xs text-slate-400 font-mono" id="formi-time-supervisor">2026-08-25 14:00</div>
+                    </div>
+
+                    <!-- 行政委員印戳展示區 -->
+                    <div class="flex justify-center my-2.5" id="formi-stamp-box-supervisor">
+                      <!-- 動態注入委員印章 -->
+                    </div>
+
+                    <!-- 審核意見輸入框 (可文字鍵入) -->
+                    <label class="block text-xs font-bold text-slate-500 mb-1">行委簽核意見：</label>
+                    <textarea id="formi-comment-supervisor" rows="2" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500" placeholder="鍵入審核意見...">各項請款核銷與出勤維護內容核對無誤，同意簽核。</textarea>
+                  </div>
+
+                  <!-- 簽核按鈕 -->
+                  <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="signFormI('supervisor', 'approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center space-x-1 shadow-2xs">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>行委同意</span>
+                    </button>
+                    <button type="button" onclick="signFormI('supervisor', 'rejected')" class="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition-colors">
+                      退回
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 物業承辦操作按鈕 -->
+              <div class="flex items-center justify-between pt-2 border-t border-emerald-100 flex-wrap gap-2">
+                <div class="text-xs text-slate-400">固德物業高瑞彣可在此修改並儲存；亦可點擊上方 3 位委員專屬區進行線上簽核。</div>
+                <div class="flex items-center space-x-2">
+                  <button type="button" onclick="resetFormIToDefault()" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-all">
+                    還原八月標準資料
+                  </button>
+                  <button type="button" onclick="saveFormIData()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 shadow-xs">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                    <span>儲存表單資料</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 表單頁尾固德寓廈管理服務 -->
+            <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t">
+              <div>GOOD 固德寓廈管理服務 · 財務表件 (財I表)</div>
+              <div>大清天朵二期社區管理委員會 存查聯</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作列 -->
+      <div class="p-3.5 border-t bg-white flex items-center justify-between flex-wrap gap-2">
+        <div class="text-xs text-slate-500">
+          💡 承辦人高瑞彣鍵入之各項收支數據與 3 位委員線上簽章，將即時同步於後端資料庫與列印核准書中。
+        </div>
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="printFormIArea()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center space-x-1 shadow-xs">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>列印本表 / 存為 PDF</span>
+          </button>
+          <button type="button" onclick="closeFormIModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs sm:text-sm rounded-xl transition-all">
+            關閉
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================== -->
   <!-- MODAL 4: 單據附件管理與選擇 (大畫廊展示：最多3張；1張置中、2張左右對稱、3張依序排放；紫色緊湊按鈕) -->
   <div id="receipt-option-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" style="z-index: 8500;" onclick="if(event.target === this) closeReceiptOptionModal()">
     <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[94vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm animate-in fade-in zoom-in duration-150">
@@ -1349,6 +1838,43 @@
           {"id": "att-15", "title": "固德公司財務通知函 (LINE推播稿)", "type": "pdf", "file": "財務通知.pdf", "category": "推播公文", "desc": "固德高瑞彣向3位委員提報簽核之文字公文"}
         ]
       },
+      "financial_statement_i": {
+        "month_code": "11508",
+        "month_title": "一一五年八月份",
+        "doc_title": "大清天朵二期社區一一五年八月份財務收支表（Ｉ）",
+        "date": "115年9月3日",
+        "submitter": "高瑞彣",
+        "submitter_stamp_date": "115. 9. 03",
+        "previous_balance": 1266550,
+        "incomes": {
+          "management_fee": 35634,
+          "parking_rent": 0,
+          "temp_parking": 0,
+          "public_phone": 0,
+          "bank_interest": 0,
+          "other_income": 0
+        },
+        "expenses": [
+          {"no": 15, "title": "環境清潔", "amount": 3000, "desc": "本月份服務費"},
+          {"no": 16, "title": "管理服務", "amount": 18000, "desc": "七月份、八月份服務費"},
+          {"no": 17, "title": "門口門禁鎖故障", "amount": 1500, "desc": "8/3維修完成"},
+          {"no": 18, "title": "安全系統檢測", "amount": 2000, "desc": "8/20出勤工資"}
+        ],
+        "assets": {
+          "petty_cash": 0,
+          "pending_cash": 0,
+          "pending_check_in": 0,
+          "pending_check_out": 0,
+          "bank_deposit": 99347,
+          "post_deposit": 1178337
+        },
+        "approvals": {
+          "director": {"role": "主任委員", "name": "陳建宏", "status": "approved", "comment": "財務收支表勾稽正確，結餘款核算無誤，同意簽核備查。", "time": "2026-08-25 09:30"},
+          "finance": {"role": "財務委員", "name": "林秀玲", "status": "approved", "comment": "收支金額與銀行及郵局存簿結餘吻合，符合會計規範，同意簽核。", "time": "2026-08-25 10:15"},
+          "supervisor": {"role": "行政委員", "name": "王國華", "status": "approved", "comment": "各項請款核銷與出勤維護內容核對無誤，同意簽核。", "time": "2026-08-25 14:00"}
+        },
+        "final_status": "approved"
+      },
       "flood_system": {
         "annual_drill": {
           "status": "已完成",
@@ -1461,32 +1987,37 @@
         const testRes = await fetch('/api/status', { method: 'GET' });
         if (testRes.ok) {
           isStandalone = false;
-          const [resDispatches, resPetty, resBylaws, resResidents, resFlood] = await Promise.all([
+          const [resDispatches, resPetty, resBylaws, resResidents, resFlood, resFormI] = await Promise.all([
             fetch('/api/dispatches').then(r => r.json()),
             fetch('/api/petty_cash').then(r => r.json()),
             fetch('/api/bylaws').then(r => r.json()),
             fetch(`/api/residents?role=${currentRole}&unit=${currentUnit}`).then(r => r.json()),
-            fetch('/api/flood_system').then(r => r.json())
+            fetch('/api/flood_system').then(r => r.json()),
+            fetch('/api/financial_statement_i').then(r => r.json()).catch(() => ({ financial_statement_i: null }))
           ]);
           appData = {
             dispatches: resDispatches.dispatches,
             petty_cash: resPetty.petty_cash,
             bylaws: resBylaws.bylaws,
             residents: resResidents.residents || [resResidents.resident],
-            flood_system: resFlood.flood_system
+            flood_system: resFlood.flood_system,
+            financial_statement_i: (resFormI && resFormI.financial_statement_i) || JSON.parse(JSON.stringify(SEED_DATA.financial_statement_i))
           };
           return;
         }
       } catch (e) {}
 
       isStandalone = true;
-      const DATA_VER = 'v115_08_gao_receipt_multi_images_v9';
+      const DATA_VER = 'v115_08_form_i_fillable_v1';
       if (localStorage.getItem('daqing_community_data_ver') !== DATA_VER) {
         localStorage.removeItem('daqing_community_data');
         localStorage.setItem('daqing_community_data_ver', DATA_VER);
       }
       const local = localStorage.getItem('daqing_community_data');
       appData = local ? JSON.parse(local) : JSON.parse(JSON.stringify(SEED_DATA));
+      if (!appData.financial_statement_i) {
+        appData.financial_statement_i = JSON.parse(JSON.stringify(SEED_DATA.financial_statement_i));
+      }
     }
 
     function saveLocal() {
@@ -2606,6 +3137,460 @@
         printWin.focus();
       } else {
         window.location.href = 'print_formq.html';
+      }
+    }
+
+    // ==============================================
+    // 八月份財務收支表 (財I表) 電子填報與三委員線上簽核功能
+    // ==============================================
+
+    function openFormIModal() {
+      if (!appData) return;
+      if (!appData.financial_statement_i) {
+        appData.financial_statement_i = JSON.parse(JSON.stringify(SEED_DATA.financial_statement_i));
+      }
+      const modal = document.getElementById('form-i-modal');
+      if (modal) modal.classList.remove('hidden');
+      populateFormI();
+    }
+
+    function closeFormIModal() {
+      const modal = document.getElementById('form-i-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function populateFormI() {
+      if (!appData) return;
+      if (!appData.financial_statement_i) {
+        appData.financial_statement_i = JSON.parse(JSON.stringify(SEED_DATA.financial_statement_i));
+      }
+      const fi = appData.financial_statement_i;
+
+      // Meta info
+      const metaCode = document.getElementById('formi-meta-code');
+      const metaDate = document.getElementById('formi-meta-date');
+      const subName = document.getElementById('formi-submitter-name');
+      const stampDate = document.getElementById('formi-stamp-agent-date');
+      if (metaCode) metaCode.textContent = fi.month_code || '11508';
+      if (metaDate) metaDate.textContent = fi.date || '115年9月3日';
+      if (subName) subName.textContent = fi.submitter || '高瑞彣';
+      if (stampDate) stampDate.textContent = fi.submitter_stamp_date || '115. 9. 03';
+
+      // 1. 前月結餘
+      const inpPrev = document.getElementById('formi-inp-prev-balance');
+      if (inpPrev) inpPrev.value = fi.previous_balance !== undefined ? fi.previous_balance : 1266550;
+
+      // 2. 本月收入
+      const inc = fi.incomes || {};
+      const inpFee = document.getElementById('formi-inp-inc-fee');
+      const inpPark = document.getElementById('formi-inp-inc-park');
+      const inpTmp = document.getElementById('formi-inp-inc-tmp');
+      const inpTel = document.getElementById('formi-inp-inc-tel');
+      const inpInt = document.getElementById('formi-inp-inc-int');
+      const inpOth = document.getElementById('formi-inp-inc-oth');
+
+      if (inpFee) inpFee.value = inc.management_fee !== undefined ? inc.management_fee : 35634;
+      if (inpPark) inpPark.value = inc.parking_rent !== undefined ? inc.parking_rent : 0;
+      if (inpTmp) inpTmp.value = inc.temp_parking !== undefined ? inc.temp_parking : 0;
+      if (inpTel) inpTel.value = inc.public_phone !== undefined ? inc.public_phone : 0;
+      if (inpInt) inpInt.value = inc.bank_interest !== undefined ? inc.bank_interest : 0;
+      if (inpOth) inpOth.value = inc.other_income !== undefined ? inc.other_income : 0;
+
+      // 3. 本月支出表格
+      if (!fi.expenses || !Array.isArray(fi.expenses) || fi.expenses.length === 0) {
+        fi.expenses = JSON.parse(JSON.stringify(SEED_DATA.financial_statement_i.expenses));
+      }
+      const tbody = document.getElementById('formi-expenses-tbody');
+      if (tbody) {
+        tbody.innerHTML = fi.expenses.map((item, idx) => `
+          <tr class="hover:bg-slate-50 transition-colors formi-row" data-idx="${idx}">
+            <td class="py-2 px-2 text-center">
+              <input type="number" class="w-16 text-center px-1 py-1 border border-slate-300 rounded font-mono font-bold text-emerald-800 text-xs formi-inp-no" value="${item.no || (idx+15)}">
+            </td>
+            <td class="py-2 px-2">
+              <input type="text" class="w-full px-2 py-1 border border-slate-300 rounded font-bold text-slate-900 text-xs formi-inp-title" value="${item.title || ''}" placeholder="支出項目名稱">
+            </td>
+            <td class="py-2 px-2 text-right">
+              <input type="number" oninput="recalcFormITotal()" class="w-28 text-right px-2 py-1 border border-slate-300 rounded font-mono font-bold text-slate-900 text-xs formi-inp-amount" value="${item.amount || 0}">
+            </td>
+            <td class="py-2 px-2">
+              <input type="text" class="w-full px-2 py-1 border border-slate-300 rounded text-slate-700 text-xs formi-inp-desc" value="${item.desc || ''}" placeholder="說明">
+            </td>
+            <td class="py-2 px-2 text-center">
+              <button type="button" onclick="deleteFormIExpenseItem(${idx})" class="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors cursor-pointer" title="刪除此列">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // 5. 資產調節表
+      const ast = fi.assets || {};
+      const inpPetty = document.getElementById('formi-inp-ast-petty');
+      const inpChkin = document.getElementById('formi-inp-ast-chkin');
+      const inpBank = document.getElementById('formi-inp-ast-bank');
+      const inpPendcash = document.getElementById('formi-inp-ast-pendcash');
+      const inpChkout = document.getElementById('formi-inp-ast-chkout');
+      const inpPost = document.getElementById('formi-inp-ast-post');
+
+      if (inpPetty) inpPetty.value = ast.petty_cash !== undefined ? ast.petty_cash : 0;
+      if (inpChkin) inpChkin.value = ast.pending_check_in !== undefined ? ast.pending_check_in : 0;
+      if (inpBank) inpBank.value = ast.bank_deposit !== undefined ? ast.bank_deposit : 99347;
+      if (inpPendcash) inpPendcash.value = ast.pending_cash !== undefined ? ast.pending_cash : 0;
+      if (inpChkout) inpChkout.value = ast.pending_check_out !== undefined ? ast.pending_check_out : 0;
+      if (inpPost) inpPost.value = ast.post_deposit !== undefined ? ast.post_deposit : 1178337;
+
+      // 簽核狀態徽章
+      const statusBadge = document.getElementById('formi-status-badge');
+      if (statusBadge) {
+        if (fi.final_status === 'approved') {
+          statusBadge.innerHTML = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center space-x-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>3位委員全數審核同意備查</span></span>`;
+        } else if (fi.final_status === 'rejected') {
+          statusBadge.innerHTML = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 flex items-center space-x-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i><span>已被委員退回修正 (請物業補正)</span></span>`;
+        } else {
+          statusBadge.innerHTML = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center space-x-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>等待管委會委員審核中</span></span>`;
+        }
+      }
+
+      // 3 位委員簽核專區
+      const officers = [
+        { key: 'director', role: '主任委員', name: '陳建宏' },
+        { key: 'finance', role: '財務委員', name: '林秀玲' },
+        { key: 'supervisor', role: '行政委員', name: '王國華' }
+      ];
+
+      officers.forEach(off => {
+        const app = (fi.approvals && fi.approvals[off.key]) || {};
+        const badge = document.getElementById(`formi-badge-${off.key}`);
+        const timeEl = document.getElementById(`formi-time-${off.key}`);
+        const stampBox = document.getElementById(`formi-stamp-box-${off.key}`);
+        const commentBox = document.getElementById(`formi-comment-${off.key}`);
+
+        if (badge) {
+          if (app.status === 'approved') {
+            badge.textContent = '已核准同意';
+            badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+          } else if (app.status === 'rejected') {
+            badge.textContent = '退回補正';
+            badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300';
+          } else {
+            badge.textContent = '待簽核';
+            badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300';
+          }
+        }
+
+        if (timeEl) {
+          timeEl.textContent = app.time || '尚未簽核';
+        }
+
+        if (commentBox && app.comment) {
+          commentBox.value = app.comment;
+        }
+
+        if (stampBox) {
+          if (app.status === 'approved') {
+            stampBox.innerHTML = `
+              <div class="w-20 h-20 rounded-full border-2 border-red-600 bg-red-50/50 text-red-600 flex flex-col items-center justify-center font-bold text-[10px] leading-tight rotate-[-4deg] shadow-xs select-none">
+                <span class="text-[9px] border-b border-red-400 pb-0.5">${off.role}</span>
+                <span class="text-xs font-black my-0.5 tracking-wider">${off.name}</span>
+                <span class="font-mono text-[9px]">${(app.time || '115.08.25').split(' ')[0]}</span>
+              </div>
+            `;
+          } else if (app.status === 'rejected') {
+            stampBox.innerHTML = `
+              <div class="w-20 h-20 rounded-lg border-2 border-rose-600 bg-rose-50 text-rose-700 flex flex-col items-center justify-center font-bold text-xs select-none">
+                <span class="text-xs font-black text-rose-800">退回修正</span>
+                <span class="text-[9px] font-mono mt-0.5 text-rose-600">${(app.time || '2026-08-25').split(' ')[0]}</span>
+              </div>
+            `;
+          } else {
+            stampBox.innerHTML = `
+              <div class="w-20 h-20 rounded-full border-2 border-dashed border-slate-300 text-slate-400 flex flex-col items-center justify-center font-bold text-xs select-none">
+                <span>待簽核</span>
+                <span class="text-[9px] mt-0.5 text-slate-400">點下方同意</span>
+              </div>
+            `;
+          }
+        }
+      });
+
+      recalcFormITotal();
+      lucide.createIcons();
+    }
+
+    function recalcFormITotal() {
+      // 1. 前月結餘
+      const inpPrev = document.getElementById('formi-inp-prev-balance');
+      const prevBal = inpPrev ? (parseInt(inpPrev.value) || 0) : 1266550;
+
+      // 2. 本月收入合計
+      const fee = parseInt(document.getElementById('formi-inp-inc-fee')?.value) || 0;
+      const park = parseInt(document.getElementById('formi-inp-inc-park')?.value) || 0;
+      const tmp = parseInt(document.getElementById('formi-inp-inc-tmp')?.value) || 0;
+      const tel = parseInt(document.getElementById('formi-inp-inc-tel')?.value) || 0;
+      const bint = parseInt(document.getElementById('formi-inp-inc-int')?.value) || 0;
+      const oth = parseInt(document.getElementById('formi-inp-inc-oth')?.value) || 0;
+      const totalIncome = fee + park + tmp + tel + bint + oth;
+
+      const totalIncEl = document.getElementById('formi-total-income-text');
+      if (totalIncEl) totalIncEl.textContent = totalIncome.toLocaleString();
+
+      // 3. 本月支出合計
+      const rows = document.querySelectorAll('.formi-row');
+      let totalExpense = 0;
+      let expCount = 0;
+      rows.forEach(r => {
+        const amtInp = r.querySelector('.formi-inp-amount');
+        if (amtInp) {
+          totalExpense += (parseInt(amtInp.value) || 0);
+          expCount++;
+        }
+      });
+
+      const expCountEl = document.getElementById('formi-exp-count-text');
+      const expSumEl = document.getElementById('formi-total-expense-text');
+      if (expCountEl) expCountEl.textContent = expCount;
+      if (expSumEl) expSumEl.textContent = `${totalExpense.toLocaleString()} 元`;
+
+      // 4. 收支小計與本月結餘
+      const subtotal = totalIncome - totalExpense;
+      const finalBalance = prevBal + subtotal;
+
+      const subtotalEl = document.getElementById('formi-subtotal-text');
+      const finalBalEl = document.getElementById('formi-final-balance-text');
+      if (subtotalEl) subtotalEl.textContent = (subtotal >= 0 ? '+' : '') + subtotal.toLocaleString();
+      if (finalBalEl) finalBalEl.textContent = finalBalance.toLocaleString();
+
+      // 5. 資產存款合計與核驗
+      const petty = parseInt(document.getElementById('formi-inp-ast-petty')?.value) || 0;
+      const chkin = parseInt(document.getElementById('formi-inp-ast-chkin')?.value) || 0;
+      const bank = parseInt(document.getElementById('formi-inp-ast-bank')?.value) || 0;
+      const pendcash = parseInt(document.getElementById('formi-inp-ast-pendcash')?.value) || 0;
+      const chkout = parseInt(document.getElementById('formi-inp-ast-chkout')?.value) || 0;
+      const post = parseInt(document.getElementById('formi-inp-ast-post')?.value) || 0;
+
+      const totalAssets = petty + pendcash + chkin - chkout + bank + post;
+      const totalAssetsEl = document.getElementById('formi-total-assets-text');
+      if (totalAssetsEl) totalAssetsEl.textContent = totalAssets.toLocaleString();
+
+      const checkBadge = document.getElementById('formi-assets-check-badge');
+      if (checkBadge) {
+        if (totalAssets === finalBalance) {
+          checkBadge.innerHTML = `<span class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs flex items-center space-x-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>結餘與存簿存款完全平衡吻合 ($${finalBalance.toLocaleString()})</span></span>`;
+        } else {
+          const diff = Math.abs(totalAssets - finalBalance);
+          checkBadge.innerHTML = `<span class="px-2.5 py-1 rounded bg-rose-100 text-rose-800 border border-rose-300 font-bold text-xs flex items-center space-x-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i><span>試算差額 NT$ ${diff.toLocaleString()} 元 (存簿:${totalAssets.toLocaleString()} ≠ 結餘:${finalBalance.toLocaleString()})</span></span>`;
+        }
+        lucide.createIcons();
+      }
+    }
+
+    function addFormIExpenseItem() {
+      if (!appData) return;
+      if (!appData.financial_statement_i) {
+        appData.financial_statement_i = JSON.parse(JSON.stringify(SEED_DATA.financial_statement_i));
+      }
+      const exp = appData.financial_statement_i.expenses || [];
+      const nextNo = (exp.length > 0)
+        ? Math.max(...exp.map(i => i.no || 0)) + 1
+        : 19;
+
+      exp.push({
+        no: nextNo,
+        title: "新增維護支出項目",
+        amount: 1000,
+        desc: "一般維護服務工作"
+      });
+
+      appData.financial_statement_i.expenses = exp;
+      populateFormI();
+    }
+
+    function deleteFormIExpenseItem(idx) {
+      if (!appData || !appData.financial_statement_i) return;
+      const exp = appData.financial_statement_i.expenses || [];
+      if (exp.length <= 1) {
+        alert('至少需保留一筆支出項目！');
+        return;
+      }
+      if (confirm(`確定要刪除第 ${idx + 1} 筆支出明細項目嗎？`)) {
+        exp.splice(idx, 1);
+        populateFormI();
+      }
+    }
+
+    function saveFormIData(notify = true) {
+      if (!appData || !appData.financial_statement_i) return;
+      const fi = appData.financial_statement_i;
+
+      // 1. 前月結餘
+      fi.previous_balance = parseInt(document.getElementById('formi-inp-prev-balance')?.value) || 1266550;
+
+      // 2. 本月收入
+      fi.incomes = {
+        management_fee: parseInt(document.getElementById('formi-inp-inc-fee')?.value) || 0,
+        parking_rent: parseInt(document.getElementById('formi-inp-inc-park')?.value) || 0,
+        temp_parking: parseInt(document.getElementById('formi-inp-inc-tmp')?.value) || 0,
+        public_phone: parseInt(document.getElementById('formi-inp-inc-tel')?.value) || 0,
+        bank_interest: parseInt(document.getElementById('formi-inp-inc-int')?.value) || 0,
+        other_income: parseInt(document.getElementById('formi-inp-inc-oth')?.value) || 0
+      };
+
+      // 3. 本月支出
+      const rows = document.querySelectorAll('.formi-row');
+      const newExp = [];
+      rows.forEach((r, idx) => {
+        const orig = (fi.expenses && fi.expenses[idx]) || {};
+        const no = parseInt(r.querySelector('.formi-inp-no')?.value) || (idx + 15);
+        const title = r.querySelector('.formi-inp-title')?.value.trim() || orig.title || '支出項目';
+        const amount = parseInt(r.querySelector('.formi-inp-amount')?.value) || 0;
+        const desc = r.querySelector('.formi-inp-desc')?.value.trim() || orig.desc || '';
+
+        newExp.push({
+          ...orig,
+          no: no,
+          title: title,
+          amount: amount,
+          desc: desc
+        });
+      });
+      fi.expenses = newExp;
+
+      // 4. 資產與存簿
+      fi.assets = {
+        petty_cash: parseInt(document.getElementById('formi-inp-ast-petty')?.value) || 0,
+        pending_check_in: parseInt(document.getElementById('formi-inp-ast-chkin')?.value) || 0,
+        bank_deposit: parseInt(document.getElementById('formi-inp-ast-bank')?.value) || 0,
+        pending_cash: parseInt(document.getElementById('formi-inp-ast-pendcash')?.value) || 0,
+        pending_check_out: parseInt(document.getElementById('formi-inp-ast-chkout')?.value) || 0,
+        post_deposit: parseInt(document.getElementById('formi-inp-ast-post')?.value) || 0
+      };
+
+      // 同步到 localStorage
+      try {
+        localStorage.setItem('daqing_community_financial_i', JSON.stringify(fi));
+        localStorage.setItem('daqing_community_data', JSON.stringify(appData));
+      } catch (e) {
+        console.warn('saveFormIData storage error:', e);
+      }
+      saveLocal();
+
+      // 同步到後端 API
+      if (!isStandalone) {
+        fetch('/api/financial_statement_i/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ financial_statement_i: fi })
+        }).catch(e => console.log('Update Form I offline:', e));
+      }
+
+      populateFormI();
+      if (notify) {
+        const totalInc = Object.values(fi.incomes).reduce((s, v) => s + v, 0);
+        const totalExp = fi.expenses.reduce((s, v) => s + v.amount, 0);
+        const bal = fi.previous_balance + totalInc - totalExp;
+        alert('✅ 八月份財務收支表 (財I表) 資料已儲存！\n本期收入：$' + totalInc.toLocaleString() + ' 元\n本期支出：$' + totalExp.toLocaleString() + ' 元\n本月結餘：$' + bal.toLocaleString() + ' 元');
+      }
+    }
+
+    function signFormI(officer, decision) {
+      if (!appData || !appData.financial_statement_i) return;
+      const fi = appData.financial_statement_i;
+      const commentBox = document.getElementById(`formi-comment-${officer}`);
+      let comment = commentBox ? commentBox.value.trim() : '';
+
+      const officerNames = { director: '主任委員 陳建宏', finance: '財務委員 林秀玲', supervisor: '行政委員 王國華' };
+      const officerName = officerNames[officer] || officer;
+
+      if (!fi.approvals) fi.approvals = {};
+      if (!fi.approvals[officer]) {
+        fi.approvals[officer] = { role: officer, name: officerName, status: decision };
+      }
+
+      if (decision === 'rejected') {
+        const defaultApprovedTexts = [
+          '財務收支表勾稽正確，結餘款核算無誤，同意簽核備查。',
+          '收支金額與銀行及郵局存簿結餘吻合，符合會計規範，同意簽核。',
+          '各項請款核銷與出勤維護內容核對無誤，同意簽核。',
+          '已同意通過'
+        ];
+        if (!comment || defaultApprovedTexts.includes(comment)) {
+          const reason = prompt(`請輸入【${officerName}】退回補正意見：`, '收支表科目或存簿結餘金額有疑義，退回請物業承辦人重新核對。');
+          if (reason === null) return;
+          comment = reason.trim() || '收支有疑義，退回請物業承辦人補正。';
+          if (commentBox) commentBox.value = comment;
+        }
+      } else {
+        if (!comment || comment.includes('退回')) {
+          const defaultAcceptTexts = {
+            director: '財務收支表勾稽正確，結餘款核算無誤，同意簽核備查。',
+            finance: '收支金額與銀行及郵局存簿結餘吻合，符合會計規範，同意簽核。',
+            supervisor: '各項請款核銷與出勤維護內容核對無誤，同意簽核。'
+          };
+          comment = defaultAcceptTexts[officer] || '核算無誤，同意簽核備查。';
+          if (commentBox) commentBox.value = comment;
+        }
+      }
+
+      fi.approvals[officer].status = decision;
+      fi.approvals[officer].comment = comment;
+
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      fi.approvals[officer].time = timeStr;
+
+      const allApproved = Object.values(fi.approvals).every(a => a.status === 'approved');
+      const anyRejected = Object.values(fi.approvals).some(a => a.status === 'rejected');
+      if (anyRejected) fi.final_status = 'rejected';
+      else if (allApproved) fi.final_status = 'approved';
+      else fi.final_status = 'in_review';
+
+      saveFormIData(false);
+
+      if (!isStandalone) {
+        fetch('/api/financial_statement_i/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ officer, decision, comment: fi.approvals[officer].comment })
+        }).catch(e => console.log('Approve Form I offline:', e));
+      }
+
+      populateFormI();
+
+      if (decision === 'approved') {
+        alert(`✅ 【${officerName}】已在「八月份財務收支表 (財I表)」完成線上簽核同意！`);
+      } else {
+        alert(`⚠️ 【${officerName}】已退回本案件要求補正說明。`);
+      }
+    }
+
+    function resetFormIToDefault() {
+      if (!confirm('確定要還原為八月份原始標準財務收支表資料嗎？')) return;
+      appData.financial_statement_i = JSON.parse(JSON.stringify(SEED_DATA.financial_statement_i));
+      saveFormIData(false);
+      if (!isStandalone) {
+        fetch('/api/financial_statement_i/reset', { method: 'POST' }).catch(e => console.log('Reset form I offline:', e));
+      }
+      populateFormI();
+      alert('已還原為八月份原始財務收支表標準資料！');
+    }
+
+    function printFormIArea() {
+      saveFormIData(false);
+      if (appData && appData.financial_statement_i) {
+        try {
+          localStorage.setItem('daqing_community_data', JSON.stringify(appData));
+          localStorage.setItem('daqing_community_financial_i', JSON.stringify(appData.financial_statement_i));
+        } catch (e) {
+          console.warn('printFormIArea localStorage sync error:', e);
+        }
+      }
+      const printWin = window.open('print_formi.html', '_blank');
+      if (printWin) {
+        printWin.focus();
+      } else {
+        window.location.href = 'print_formi.html';
       }
     }
 
