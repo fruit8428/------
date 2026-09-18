@@ -652,8 +652,19 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
 
                     # Update specific item if item_idx given
                     if item_idx is not None and 0 <= int(item_idx) < len(data["petty_cash"]["items"]):
-                        data["petty_cash"]["items"][int(item_idx)]["attachment"] = filename
-                        data["petty_cash"]["items"][int(item_idx)]["is_uploaded"] = True
+                        item_ref = data["petty_cash"]["items"][int(item_idx)]
+                        if "attachments" not in item_ref or not isinstance(item_ref["attachments"], list):
+                            cur = []
+                            if item_ref.get("attachment"): cur.append(item_ref["attachment"])
+                            if item_ref.get("quote_slip") and item_ref.get("quote_slip") not in cur: cur.append(item_ref["quote_slip"])
+                            if item_ref.get("payment_slip") and item_ref.get("payment_slip") not in cur: cur.append(item_ref["payment_slip"])
+                            item_ref["attachments"] = cur
+                        if len(item_ref["attachments"]) < 3:
+                            item_ref["attachments"].append(filename)
+                        else:
+                            return self.send_json({"error": "該款項項目已附加滿 3 張單據，無法再新增。請先刪除既有單據！"}, 400)
+                        item_ref["attachment"] = item_ref["attachments"][0]
+                        item_ref["is_uploaded"] = True
 
                     # Append to attachments database list
                     new_att = {
@@ -677,6 +688,38 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                     self.send_json({"error": f"Upload failed: {str(e)}"}, 500)
             else:
                 self.send_json({"error": "No image data provided"}, 400)
+
+        elif path == "/api/petty_cash/delete_receipt":
+            item_idx = body.get("item_idx")
+            img_idx = body.get("img_idx")
+
+            if item_idx is not None and 0 <= int(item_idx) < len(data["petty_cash"]["items"]):
+                item_ref = data["petty_cash"]["items"][int(item_idx)]
+                if "attachments" in item_ref and isinstance(item_ref["attachments"], list):
+                    if img_idx is not None and 0 <= int(img_idx) < len(item_ref["attachments"]):
+                        removed = item_ref["attachments"].pop(int(img_idx))
+                        if len(item_ref["attachments"]) > 0:
+                            item_ref["attachment"] = item_ref["attachments"][0]
+                        else:
+                            item_ref["attachment"] = ""
+                        save_data(data)
+                        self.send_json({
+                            "success": True,
+                            "removed": removed,
+                            "petty_cash": data["petty_cash"]
+                        })
+                    else:
+                        self.send_json({"error": "Invalid img_idx"}, 400)
+                else:
+                    item_ref["attachment"] = ""
+                    item_ref["attachments"] = []
+                    save_data(data)
+                    self.send_json({
+                        "success": True,
+                        "petty_cash": data["petty_cash"]
+                    })
+            else:
+                self.send_json({"error": "Invalid item_idx"}, 400)
 
         elif path == "/api/chat":
             user_msg = body.get("message", "").strip()

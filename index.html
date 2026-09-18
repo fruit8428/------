@@ -1245,9 +1245,9 @@
   </div>
 
   <!-- ============================================== -->
-  <!-- MODAL 4: 單據附件管理與選擇 (雙選擇：從資料庫抓取 / 提供手機拍照直接上傳) -->
+  <!-- MODAL 4: 單據附件管理與選擇 (大畫廊展示：最多3張；1張置中、2張左右對稱、3張依序排放；紫色緊湊按鈕) -->
   <div id="receipt-option-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" style="z-index: 8500;" onclick="if(event.target === this) closeReceiptOptionModal()">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm animate-in fade-in zoom-in duration-150">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[94vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm animate-in fade-in zoom-in duration-150">
       
       <!-- 頂部標題列 -->
       <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-700">
@@ -1257,13 +1257,13 @@
           </div>
           <div>
             <div class="font-bold text-base flex items-center space-x-2">
-              <span>單據附件管理 · 手機拍照上傳</span>
+              <span>單據附件管理 · 影像畫廊</span>
               <span id="receipt-modal-badge" class="text-xs px-2 py-0.5 rounded-full bg-teal-900 text-teal-200 border border-teal-600 font-mono">第 15 筆</span>
             </div>
             <div id="receipt-modal-sub" class="text-xs text-slate-300 mt-0.5">環境清潔服務費 (八月份) · 誼潔家事服務企業社</div>
           </div>
         </div>
-        <button type="button" onclick="closeReceiptOptionModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors">
+        <button type="button" onclick="closeReceiptOptionModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -1271,78 +1271,67 @@
       <!-- 內容區 (可滾動) -->
       <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 bg-slate-50">
         
-        <!-- 目前單據狀態卡片 -->
-        <div id="receipt-current-status-box" class="p-3.5 sm:p-4 bg-white rounded-xl border-2 border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-3">
-          <div class="flex items-center space-x-3.5 min-w-0">
-            <div id="receipt-status-thumb" class="w-14 h-14 rounded-xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
-              <i data-lucide="file-text" class="w-7 h-7 text-slate-400"></i>
+        <!-- 紅色方框大一點：目前關聯單據附件畫廊 (最多3張：1張置中、2張左右對稱、3張依序排放) -->
+        <div id="receipt-current-status-box" class="p-4 sm:p-5 bg-white rounded-2xl border-2 border-red-400 shadow-sm space-y-3">
+          <div class="flex items-center justify-between pb-3 border-b border-red-100 flex-wrap gap-2">
+            <div class="flex items-center space-x-2.5">
+              <span class="w-3 h-3 rounded-full bg-red-500 inline-block animate-pulse"></span>
+              <span class="font-bold text-slate-900 text-base sm:text-lg tracking-wide">目前關聯單據附件</span>
+              <span id="receipt-count-badge" class="text-xs px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 font-mono font-bold border border-red-300">0 / 3 張</span>
             </div>
-            <div class="min-w-0">
-              <div class="text-xs font-bold text-slate-400 uppercase tracking-wide">目前關聯單據附件</div>
-              <div id="receipt-current-name" class="text-base font-bold text-slate-900 truncate">一般費用報支單.jpg</div>
-              <div id="receipt-current-desc" class="text-xs text-slate-500 mt-0.5">已由固德物業高瑞彣核章存檔</div>
-            </div>
+            <span class="text-xs text-slate-500 font-medium">最多附加 3 張單據 · 點擊圖片或按鈕可全螢幕放大檢視</span>
           </div>
-          <div id="receipt-current-actions" class="flex items-center space-x-2">
-            <button type="button" onclick="previewCurrentReceipt()" class="px-4 py-2 rounded-xl border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-950 font-bold text-xs sm:text-sm flex items-center space-x-1.5 shadow-2xs cursor-pointer">
-              <i data-lucide="eye" class="w-4 h-4 text-teal-700"></i>
-              <span>放大檢視目前單據</span>
-            </button>
+
+          <!-- 動態照片畫廊容器 (由 JS updateReceiptStatusBox 渲染 1張置中 / 2張對稱 / 3張依序) -->
+          <div id="receipt-gallery-container" class="min-h-[200px] flex items-center justify-center">
+            <!-- JS 動態生成 -->
           </div>
         </div>
 
-        <!-- 提供手機拍照，直接上傳 (保留功能) -->
-        <div class="p-5 bg-white rounded-2xl border-2 border-emerald-400 shadow-xs space-y-4">
-          <div class="flex items-center space-x-3 text-emerald-950 pb-3 border-b border-emerald-100">
-            <div class="p-2.5 bg-emerald-100 border border-emerald-300 rounded-xl text-emerald-800 shadow-2xs">
-              <i data-lucide="camera" class="w-6 h-6"></i>
+        <!-- 紫方方框小一點：精簡緊湊操作區 (黑色劃掉的文字全部去除，只保留拍照與選檔大按鈕) -->
+        <div id="receipt-action-box" class="p-3.5 sm:p-4 bg-purple-50/60 rounded-xl border-2 border-purple-300 shadow-2xs">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="text-xs sm:text-sm font-bold text-purple-950 flex items-center space-x-2 self-start sm:self-center">
+              <i data-lucide="plus-circle" class="w-5 h-5 text-purple-600 shrink-0"></i>
+              <span id="receipt-upload-hint">新增單據照片 (最多可附加 3 張 JPG)</span>
             </div>
-            <div>
-              <h4 class="font-bold text-base text-emerald-950">提供手機拍照，直接上傳</h4>
-              <p class="text-xs text-emerald-700 font-semibold">手機相機現場拍攝 / 相簿檔案上傳</p>
+            <div class="grid grid-cols-2 gap-2.5 w-full sm:w-auto">
+              <button type="button" id="btn-trigger-camera" onclick="triggerMobileCamera()" class="py-2.5 px-4 bg-purple-700 hover:bg-purple-800 active:scale-95 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+                <span>📸 啟動手機相機拍照</span>
+              </button>
+              <button type="button" id="btn-trigger-upload" onclick="triggerFileUpload()" class="py-2.5 px-4 bg-white hover:bg-purple-100 active:scale-95 text-purple-950 border-2 border-purple-400 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition-all shadow-2xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+                <i data-lucide="upload-cloud" class="w-4 h-4 text-purple-700"></i>
+                <span>📁 從相簿或電腦選取檔案</span>
+              </button>
             </div>
-          </div>
-
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            物業人員高瑞彣或管理員可持手機現場開啟鏡頭拍照，直接上傳收據發票或工作單據，即時關聯至本筆待支付項目。
-          </p>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <button type="button" onclick="triggerMobileCamera()" class="py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center space-x-2 transition-all shadow-xs cursor-pointer">
-              <i data-lucide="camera" class="w-5 h-5"></i>
-              <span>📸 啟動手機相機拍照</span>
-            </button>
-            <button type="button" onclick="triggerFileUpload()" class="py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-2 border-emerald-300 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center space-x-2 transition-all cursor-pointer">
-              <i data-lucide="upload-cloud" class="w-5 h-5 text-emerald-700"></i>
-              <span>📁 從相簿或電腦選取檔案</span>
-            </button>
           </div>
         </div>
 
-        <!-- 隱藏的手機相機與檔案 Input (capture="environment" 會直接調用手機後置相機鏡頭) -->
+        <!-- 隱藏的手機相機與檔案 Input (capture="environment" 調用手機後置鏡頭) -->
         <input type="file" id="formq-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptFileSelect(event, 'camera')">
         <input type="file" id="formq-file-input" accept="image/*" class="hidden" onchange="handleReceiptFileSelect(event, 'file')">
 
-        <!-- 拍照/上傳後的即時預覽與確認區 (預設隱藏，拍照或選檔後顯示) -->
-        <div id="receipt-upload-preview-box" class="hidden p-4 bg-emerald-50 rounded-xl border-2 border-emerald-400 space-y-3">
-          <div class="flex items-center justify-between text-emerald-900">
-            <span class="font-bold text-xs flex items-center space-x-1.5">
+        <!-- 拍照/選檔後的就緒確認區 (未選擇前 hidden，選擇後浮現確認) -->
+        <div id="receipt-upload-preview-box" class="hidden p-4 bg-emerald-50 rounded-xl border-2 border-emerald-400 space-y-3 animate-in fade-in duration-150">
+          <div class="flex items-center justify-between text-emerald-950">
+            <span class="font-bold text-xs sm:text-sm flex items-center space-x-1.5">
               <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-              <span>單據照片就緒 (點擊放大預覽)</span>
+              <span>待確認照片就緒 (點擊照片可放大全螢幕檢視)</span>
             </span>
             <span id="receipt-upload-meta" class="text-2xs text-emerald-700 font-mono"></span>
           </div>
-          <div class="flex items-center space-x-3 bg-white p-2.5 rounded-lg border border-emerald-200">
-            <img id="receipt-new-preview-img" src="" class="w-20 h-20 object-cover rounded-lg border border-slate-200 shadow-2xs cursor-pointer hover:opacity-90 transition-opacity" onclick="previewUploadedImageFull()" title="點擊放大全螢幕檢視">
+          <div class="flex items-center space-x-3 bg-white p-3 rounded-lg border border-emerald-200">
+            <img id="receipt-new-preview-img" src="" class="w-20 h-20 object-cover rounded-lg border border-slate-200 shadow-2xs cursor-pointer hover:opacity-90 transition-opacity shrink-0" onclick="previewUploadedImageFull()" title="點擊放大全螢幕檢視">
             <div class="flex-1 text-xs text-slate-700 space-y-1 min-w-0">
               <div id="receipt-new-filename" class="font-bold text-slate-900 truncate">photo.jpg</div>
-              <div class="text-[11px] text-slate-500">取得時間：<span id="receipt-new-time"></span></div>
-              <div class="text-[11px] text-emerald-700 font-semibold">✅ 點擊「確認套用並綁定」即可完成關聯。</div>
+              <div class="text-[11px] text-slate-500">拍攝/取得時間：<span id="receipt-new-time"></span></div>
+              <div class="text-[11px] text-emerald-700 font-semibold">✅ 點擊「確認套用並綁定」即可將本張單據加入上方畫廊！</div>
             </div>
           </div>
           <div class="flex items-center justify-end space-x-2 pt-1">
-            <button type="button" onclick="cancelUploadedReceipt()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold">放棄取消</button>
-            <button type="button" onclick="confirmApplyUploadedReceipt()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center space-x-1 shadow-2xs">
+            <button type="button" onclick="cancelUploadedReceipt()" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold cursor-pointer">放棄取消</button>
+            <button type="button" onclick="confirmApplyUploadedReceipt()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center space-x-1 shadow-2xs cursor-pointer">
               <i data-lucide="check" class="w-3.5 h-3.5"></i>
               <span>確認套用並綁定此單據</span>
             </button>
@@ -1351,10 +1340,9 @@
 
       </div>
 
-      <!-- 頁尾完成按鈕 -->
-      <div class="bg-white p-3 px-5 flex items-center justify-between border-t border-slate-200 text-xs">
-        <span class="text-slate-500">💡 手機瀏覽器可直接啟用鏡頭拍照；照片將自動壓縮並存入社區核銷庫。</span>
-        <button type="button" onclick="closeReceiptOptionModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs shadow-xs">
+      <!-- 頁尾完成按鈕 (黑色劃掉的說明文字已去除，僅保留完成關閉) -->
+      <div class="bg-white p-3 px-5 flex items-center justify-end border-t border-slate-200 text-xs">
+        <button type="button" onclick="closeReceiptOptionModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-sm shadow-xs cursor-pointer">
           完成關閉
         </button>
       </div>
@@ -1409,10 +1397,10 @@
           "statement_balance": 1277684
         },
         "items": [
-          {"id": 15, "no": 15, "title": "環境清潔服務費 (八月份)", "amount": 3000, "category": "環境清潔", "vendor": "誼潔家事服務企業社", "invoice": "收據 (免用發票)", "date": "115-08-15", "desc": "八月份梯廳與公共走廊環境清潔服務費", "attachment": "一般費用報支單.jpg"},
-          {"id": 16, "no": 16, "title": "管理維護顧問服務費 (七、八月份)", "amount": 18000, "category": "管理服務", "vendor": "固德建築物管理維護有限公司", "invoice": "二聯式發票 CC22775061", "date": "115-08-15", "desc": "七、八月份顧問服務費 (2式*9,000元)", "attachment": "一般費用報支單1.jpg", "payment_slip": "一般費用報支單3.jpg"},
-          {"id": 17, "no": 17, "title": "門口門禁鎖故障檢修工資", "amount": 1500, "category": "門禁維修", "vendor": "宏捷機電企業社", "invoice": "工程報價單 (管委會已簽認)", "date": "115-08-03", "desc": "門口鎖具繼電器故障檢修拆裝 (8/3完成)", "attachment": "一般費用報支單7.jpg", "quote_slip": "維修商報價單1.jpg", "payment_slip": "一般費用報支單5.jpg"},
-          {"id": 18, "no": 18, "title": "安全監視系統檢測出勤工資", "amount": 2000, "category": "安全監控", "vendor": "鼎聖通訊有限公司", "invoice": "出勤工資單", "date": "115-08-20", "desc": "8/20至社區檢測安全系統出勤工資", "attachment": "一般費用報支單2.jpg", "payment_slip": "一般費用報支單6.jpg"}
+          {"id": 15, "no": 15, "title": "環境清潔服務費 (八月份)", "amount": 3000, "category": "環境清潔", "vendor": "誼潔家事服務企業社", "invoice": "收據 (免用發票)", "date": "115-08-15", "desc": "八月份梯廳與公共走廊環境清潔服務費", "attachment": "一般費用報支單.jpg", "attachments": ["一般費用報支單.jpg"]},
+          {"id": 16, "no": 16, "title": "管理維護顧問服務費 (七、八月份)", "amount": 18000, "category": "管理服務", "vendor": "固德建築物管理維護有限公司", "invoice": "二聯式發票 CC22775061", "date": "115-08-15", "desc": "七、八月份顧問服務費 (2式*9,000元)", "attachment": "一般費用報支單1.jpg", "payment_slip": "一般費用報支單3.jpg", "attachments": ["一般費用報支單1.jpg", "一般費用報支單3.jpg"]},
+          {"id": 17, "no": 17, "title": "門口門禁鎖故障檢修工資", "amount": 1500, "category": "門禁維修", "vendor": "宏捷機電企業社", "invoice": "工程報價單 (管委會已簽認)", "date": "115-08-03", "desc": "門口鎖具繼電器故障檢修拆裝 (8/3完成)", "attachment": "一般費用報支單7.jpg", "quote_slip": "維修商報價單1.jpg", "payment_slip": "一般費用報支單5.jpg", "attachments": ["一般費用報支單7.jpg", "維修商報價單1.jpg", "一般費用報支單5.jpg"]},
+          {"id": 18, "no": 18, "title": "安全監視系統檢測出勤工資", "amount": 2000, "category": "安全監控", "vendor": "鼎聖通訊有限公司", "invoice": "出勤工資單", "date": "115-08-20", "desc": "8/20至社區檢測安全系統出勤工資", "attachment": "一般費用報支單2.jpg", "payment_slip": "一般費用報支單6.jpg", "attachments": ["一般費用報支單2.jpg", "一般費用報支單6.jpg"]}
         ],
         "approvals": {
           "director": {"role": "主任委員", "name": "陳建宏", "status": "approved", "comment": "四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。", "time": "2026-08-25 09:30"},
@@ -1566,7 +1554,7 @@
       } catch (e) {}
 
       isStandalone = true;
-      const DATA_VER = 'v115_08_gao_receipt_mobile_only_v7';
+      const DATA_VER = 'v115_08_gao_receipt_multi_images_v9';
       if (localStorage.getItem('daqing_community_data_ver') !== DATA_VER) {
         localStorage.removeItem('daqing_community_data');
         localStorage.setItem('daqing_community_data_ver', DATA_VER);
@@ -2339,10 +2327,20 @@
             <input type="number" class="w-12 text-center px-1 py-1 border border-slate-300 rounded text-xs font-mono formq-inp-vcount" value="${item.voucher_count || 1}">
           </td>
           <td class="py-2 px-2 text-center">
-            <button type="button" onclick="openReceiptOptionModal(${idx})" class="px-2.5 py-1 rounded-lg ${item.attachment ? ((item.is_uploaded || (item.attachment && (item.attachment.startsWith('data:') || item.attachment.includes('現場拍照')))) ? 'bg-emerald-50 border border-emerald-400 text-emerald-800 hover:bg-emerald-100 shadow-2xs' : 'bg-teal-50 border border-teal-300 text-teal-900 hover:bg-teal-100 shadow-2xs') : 'bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100'} text-xs font-bold inline-flex items-center space-x-1 transition-all" title="點擊管理單據：從資料庫抓取或手機拍照上傳">
-              <i data-lucide="${item.attachment ? ((item.is_uploaded || (item.attachment && (item.attachment.startsWith('data:') || item.attachment.includes('現場拍照')))) ? 'camera' : 'file-text') : 'paperclip'}" class="w-3.5 h-3.5"></i>
-              <span>${item.attachment ? ((item.is_uploaded || (item.attachment && (item.attachment.startsWith('data:') || item.attachment.includes('現場拍照')))) ? '拍照單據' : '單據') : '+單據'}</span>
-            </button>
+            ${(() => {
+              const itemImgs = getItemImages(item);
+              const count = itemImgs.length;
+              const hasImgs = count > 0;
+              const colorClass = count >= 3 
+                ? 'bg-emerald-50 border border-emerald-400 text-emerald-800 hover:bg-emerald-100 shadow-2xs' 
+                : (count > 0 ? 'bg-teal-50 border border-teal-300 text-teal-900 hover:bg-teal-100 shadow-2xs' : 'bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100');
+              return `
+                <button type="button" onclick="openReceiptOptionModal(${idx})" class="px-2.5 py-1 rounded-lg ${colorClass} text-xs font-bold inline-flex items-center space-x-1 transition-all cursor-pointer" title="點擊檢視單據畫廊與手機拍照管理">
+                  <i data-lucide="${hasImgs ? 'file-text' : 'paperclip'}" class="w-3.5 h-3.5"></i>
+                  <span>${hasImgs ? `單據 (${count})` : '+單據'}</span>
+                </button>
+              `;
+            })()}
           </td>
           <td class="py-2 px-2 text-center">
             <button type="button" onclick="deleteFormQItem(${idx})" class="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors" title="刪除此列">
@@ -2637,13 +2635,26 @@
     }
 
     // ==============================================
-    // 單據附件選擇與手機拍照上傳邏輯
+    // 單據附件選擇與手機拍照上傳畫廊邏輯 (最多3張：1張置中、2張對稱、3張依序)
     // ==============================================
     let currentReceiptItemIdx = null;
     let tempUploadedImageData = null;
 
+    function getItemImages(item) {
+      if (!item) return [];
+      let list = [];
+      if (Array.isArray(item.attachments) && item.attachments.length > 0) {
+        list = [...item.attachments];
+      } else {
+        if (item.attachment) list.push(item.attachment);
+        if (item.quote_slip && !list.includes(item.quote_slip)) list.push(item.quote_slip);
+        if (item.payment_slip && !list.includes(item.payment_slip)) list.push(item.payment_slip);
+      }
+      return list.filter(Boolean).slice(0, 3);
+    }
+
     function openReceiptOptionModal(idx) {
-      if (!appData || !appData.petty_cash) return;
+      if (!appData || !appData.petty_cash || !appData.petty_cash.items) return;
       currentReceiptItemIdx = idx;
       tempUploadedImageData = null;
 
@@ -2671,58 +2682,203 @@
     function updateReceiptStatusBox() {
       if (currentReceiptItemIdx === null) return;
       const item = appData.petty_cash.items[currentReceiptItemIdx];
-      const thumbEl = document.getElementById('receipt-status-thumb');
-      const nameEl = document.getElementById('receipt-current-name');
-      const descEl = document.getElementById('receipt-current-desc');
-      const actionEl = document.getElementById('receipt-current-actions');
+      if (!item) return;
 
-      if (!item || !item.attachment) {
-        if (thumbEl) thumbEl.innerHTML = `<i data-lucide="paperclip" class="w-6 h-6 text-amber-500"></i>`;
-        if (nameEl) nameEl.textContent = '尚未綁定單據附件';
-        if (descEl) descEl.textContent = '請點擊下方按鈕啟動手機相機拍照或上傳單據照片';
-        if (actionEl) actionEl.innerHTML = `<span class="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg font-bold">待拍照上傳</span>`;
+      const images = getItemImages(item);
+      const countBadge = document.getElementById('receipt-count-badge');
+      if (countBadge) {
+        countBadge.textContent = `${images.length} / 3 張`;
+        if (images.length === 3) {
+          countBadge.className = "text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono font-bold border border-emerald-300";
+        } else if (images.length > 0) {
+          countBadge.className = "text-xs px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 font-mono font-bold border border-teal-300";
+        } else {
+          countBadge.className = "text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono font-bold border border-slate-300";
+        }
+      }
+
+      // 控制新增按鈕與提示 (紫框緊湊提示)
+      const hintEl = document.getElementById('receipt-upload-hint');
+      const btnCam = document.getElementById('btn-trigger-camera');
+      const btnFile = document.getElementById('btn-trigger-upload');
+      if (images.length >= 3) {
+        if (hintEl) hintEl.innerHTML = `<span class="text-amber-800 font-bold">⚠️ 已附加滿 3 張單據上限 (如需更換請先點擊既有單據的「刪除」)</span>`;
+        if (btnCam) btnCam.disabled = true;
+        if (btnFile) btnFile.disabled = true;
       } else {
-        const isData = item.attachment.startsWith('data:');
-        const isUp = item.is_uploaded || isData || item.attachment.includes('現場拍照');
-        const src = isData ? item.attachment : encodeURI(item.attachment);
+        if (hintEl) hintEl.innerHTML = `新增單據照片 (最多 3 張，目前尚可附加 <span class="text-purple-700 font-bold font-mono text-sm">${3 - images.length}</span> 張)`;
+        if (btnCam) btnCam.disabled = false;
+        if (btnFile) btnFile.disabled = false;
+      }
 
-        if (thumbEl) {
-          thumbEl.innerHTML = `<img src="${src}" class="w-full h-full object-cover cursor-pointer hover:opacity-90" onclick="previewCurrentReceipt()" title="點擊放大預覽">`;
-        }
-        if (nameEl) {
-          nameEl.textContent = isData ? '現場拍照單據 (已儲存)' : item.attachment;
-        }
-        if (descEl) {
-          descEl.textContent = isUp ? '物業現場手機拍照上傳之單據憑證' : '已由固德物業高瑞彣核章存檔';
-        }
-        if (actionEl) {
-          actionEl.innerHTML = `
-            <button type="button" onclick="previewCurrentReceipt()" class="px-4 py-2 rounded-xl border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-950 font-bold text-xs sm:text-sm flex items-center space-x-1.5 shadow-2xs cursor-pointer">
-              <i data-lucide="eye" class="w-4 h-4 text-teal-700"></i>
-              <span>放大檢視目前單據</span>
-            </button>
+      const galleryEl = document.getElementById('receipt-gallery-container');
+      if (!galleryEl) return;
+
+      if (images.length === 0) {
+        galleryEl.className = "min-h-[220px] flex items-center justify-center p-6";
+        galleryEl.innerHTML = `
+          <div class="text-center text-slate-400 py-8">
+            <div class="w-14 h-14 mx-auto mb-2 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 shadow-2xs">
+              <i data-lucide="image-off" class="w-7 h-7"></i>
+            </div>
+            <div class="font-bold text-sm text-slate-700">本項目尚未附加任何單據照片</div>
+            <div class="text-xs text-slate-400 mt-1">請利用下方按鈕啟動手機相機拍照或從相簿選取（最多支援 3 張）</div>
+          </div>
+        `;
+      } else if (images.length === 1) {
+        // 當 1 張時就置中
+        galleryEl.className = "w-full flex justify-center items-center py-2";
+        const img = images[0];
+        const src = img.startsWith('data:') ? img : encodeURI(img);
+        const fileName = img.startsWith('data:') ? '現場手機拍照單據.jpg' : img;
+        galleryEl.innerHTML = `
+          <div class="w-full max-w-lg bg-slate-50 rounded-2xl border-2 border-teal-300 overflow-hidden shadow-xs hover:shadow-md transition-all">
+            <div class="p-3 bg-white border-b border-slate-200 flex items-center justify-between">
+              <div class="flex items-center space-x-2 min-w-0">
+                <span class="px-2 py-0.5 rounded-md bg-teal-600 text-white font-mono text-xs font-bold shrink-0">#1</span>
+                <span class="text-xs sm:text-sm font-bold text-slate-800 truncate" title="${fileName}">${fileName}</span>
+              </div>
+              <span class="text-2xs px-2 py-0.5 bg-teal-50 text-teal-700 rounded-full font-bold border border-teal-200 shrink-0">單張置中</span>
+            </div>
+            <div class="p-2 bg-slate-100/70 flex items-center justify-center">
+              <img src="${src}" alt="${fileName}" class="h-64 sm:h-72 w-full object-contain rounded-lg border border-slate-200 bg-white cursor-pointer hover:opacity-95 transition-opacity" onclick="previewSingleReceiptImage(0)" title="點擊放大全螢幕檢視">
+            </div>
+            <div class="p-2.5 bg-white border-t border-slate-200 flex items-center space-x-2">
+              <button type="button" onclick="previewSingleReceiptImage(0)" class="flex-1 py-2 px-3 bg-teal-50 hover:bg-teal-100 text-teal-950 border border-teal-300 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition-colors cursor-pointer">
+                <i data-lucide="eye" class="w-4 h-4 text-teal-700"></i>
+                <span>👁️ 放大檢視</span>
+              </button>
+              <button type="button" onclick="deleteReceiptImage(0)" class="py-2 px-3.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1 transition-colors cursor-pointer" title="刪除本張照片">
+                <i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i>
+                <span>🗑️ 刪除</span>
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (images.length === 2) {
+        // 當 2 張時就左右對稱
+        galleryEl.className = "w-full grid grid-cols-1 sm:grid-cols-2 gap-4 py-2";
+        galleryEl.innerHTML = images.map((img, idx) => {
+          const src = img.startsWith('data:') ? img : encodeURI(img);
+          const fileName = img.startsWith('data:') ? `現場手機拍照單據_${idx+1}.jpg` : img;
+          return `
+            <div class="bg-slate-50 rounded-2xl border-2 border-teal-300 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div class="p-2.5 bg-white border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center space-x-1.5 min-w-0">
+                  <span class="px-2 py-0.5 rounded-md bg-teal-600 text-white font-mono text-xs font-bold shrink-0">#${idx+1}</span>
+                  <span class="text-xs sm:text-sm font-bold text-slate-800 truncate" title="${fileName}">${fileName}</span>
+                </div>
+                <span class="text-2xs px-2 py-0.5 bg-sky-50 text-sky-700 rounded-full font-bold border border-sky-200 shrink-0">左右對稱</span>
+              </div>
+              <div class="p-2 bg-slate-100/70 flex items-center justify-center flex-1">
+                <img src="${src}" alt="${fileName}" class="h-56 sm:h-64 w-full object-contain rounded-lg border border-slate-200 bg-white cursor-pointer hover:opacity-95 transition-opacity" onclick="previewSingleReceiptImage(${idx})" title="點擊放大全螢幕檢視">
+              </div>
+              <div class="p-2.5 bg-white border-t border-slate-200 flex items-center space-x-2">
+                <button type="button" onclick="previewSingleReceiptImage(${idx})" class="flex-1 py-2 px-2.5 bg-teal-50 hover:bg-teal-100 text-teal-950 border border-teal-300 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1.5 transition-colors cursor-pointer">
+                  <i data-lucide="eye" class="w-4 h-4 text-teal-700"></i>
+                  <span>👁️ 放大檢視</span>
+                </button>
+                <button type="button" onclick="deleteReceiptImage(${idx})" class="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-1 transition-colors cursor-pointer" title="刪除本張照片">
+                  <i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i>
+                  <span>🗑️ 刪除</span>
+                </button>
+              </div>
+            </div>
           `;
-        }
+        }).join('');
+      } else {
+        // 當 3 張時就依序排放 (3 欄)
+        galleryEl.className = "w-full grid grid-cols-1 sm:grid-cols-3 gap-3.5 py-2";
+        galleryEl.innerHTML = images.map((img, idx) => {
+          const src = img.startsWith('data:') ? img : encodeURI(img);
+          const fileName = img.startsWith('data:') ? `現場手機拍照單據_${idx+1}.jpg` : img;
+          return `
+            <div class="bg-slate-50 rounded-2xl border-2 border-teal-300 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+              <div class="p-2 bg-white border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center space-x-1.5 min-w-0">
+                  <span class="px-1.5 py-0.5 rounded-md bg-teal-600 text-white font-mono text-2xs font-bold shrink-0">#${idx+1}</span>
+                  <span class="text-xs font-bold text-slate-800 truncate" title="${fileName}">${fileName}</span>
+                </div>
+                <span class="text-2xs px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-bold border border-teal-200 shrink-0">第${idx+1}張</span>
+              </div>
+              <div class="p-1.5 bg-slate-100/70 flex items-center justify-center flex-1">
+                <img src="${src}" alt="${fileName}" class="h-44 sm:h-52 w-full object-contain rounded-lg border border-slate-200 bg-white cursor-pointer hover:opacity-95 transition-opacity" onclick="previewSingleReceiptImage(${idx})" title="點擊放大全螢幕檢視">
+              </div>
+              <div class="p-2 bg-white border-t border-slate-200 flex items-center space-x-1.5">
+                <button type="button" onclick="previewSingleReceiptImage(${idx})" class="flex-1 py-1.5 px-2 bg-teal-50 hover:bg-teal-100 text-teal-950 border border-teal-300 rounded-lg font-bold text-xs flex items-center justify-center space-x-1 transition-colors cursor-pointer">
+                  <i data-lucide="eye" class="w-3.5 h-3.5 text-teal-700"></i>
+                  <span>👁️ 放大</span>
+                </button>
+                <button type="button" onclick="deleteReceiptImage(${idx})" class="py-1.5 px-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg font-bold text-xs flex items-center justify-center space-x-1 transition-colors cursor-pointer" title="刪除本張照片">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
+                  <span>🗑️ 刪除</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
       }
       lucide.createIcons();
     }
 
-    function previewCurrentReceipt(customIdx) {
-      const idx = (customIdx !== undefined && customIdx !== null) ? customIdx : currentReceiptItemIdx;
-      if (idx === null || idx === undefined) {
-        alert('請先選擇欲檢視之單據項目！');
-        return;
+    function previewSingleReceiptImage(imgIdx) {
+      if (currentReceiptItemIdx === null) return;
+      const item = appData.petty_cash.items[currentReceiptItemIdx];
+      if (!item) return;
+      const images = getItemImages(item);
+      const targetImg = images[imgIdx];
+      if (!targetImg) return;
+      const isPdf = typeof targetImg === 'string' && targetImg.toLowerCase().endsWith('.pdf');
+      openAttachmentModal(targetImg, `${item.title || '款項單據'} (第 ${imgIdx + 1} / ${images.length} 張)`, item.category || '費用報支單據', isPdf ? 'pdf' : 'jpg');
+    }
+
+    async function deleteReceiptImage(imgIdx) {
+      if (currentReceiptItemIdx === null) return;
+      const item = appData.petty_cash.items[currentReceiptItemIdx];
+      if (!item) return;
+      const images = getItemImages(item);
+      const targetName = images[imgIdx] || `第 ${imgIdx + 1} 張照片`;
+      if (!confirm(`確定要刪除第 ${imgIdx + 1} 張單據附件（${targetName}）嗎？`)) return;
+
+      if (!isStandalone) {
+        try {
+          const resp = await fetch('/api/petty_cash/delete_receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              item_idx: currentReceiptItemIdx,
+              img_idx: imgIdx
+            })
+          });
+          const resJson = await resp.json();
+          if (resJson.success && resJson.petty_cash) {
+            appData.petty_cash = resJson.petty_cash;
+          }
+        } catch (e) {
+          console.warn('Delete receipt API error:', e);
+        }
       }
-      const item = (appData && appData.petty_cash && appData.petty_cash.items) ? appData.petty_cash.items[idx] : null;
-      if (!item || !item.attachment) {
-        alert('此項目尚未關聯單據，請先由下方選擇「從資料庫抓取」或「手機拍照」進行綁定！');
-        return;
-      }
-      const isPdf = typeof item.attachment === 'string' && item.attachment.toLowerCase().endsWith('.pdf');
-      openAttachmentModal(item.attachment, item.title || '款項單據', item.category || '費用報支', isPdf ? 'pdf' : 'jpg');
+
+      // 更新本地 item
+      let curImages = getItemImages(item);
+      curImages.splice(imgIdx, 1);
+      item.attachments = curImages;
+      item.attachment = curImages.length > 0 ? curImages[0] : "";
+      if (curImages.length === 0) item.is_uploaded = false;
+
+      saveFormQData(false);
+      populateFormQ();
+      updateReceiptStatusBox();
     }
 
     function triggerMobileCamera() {
+      if (currentReceiptItemIdx !== null) {
+        const item = appData.petty_cash.items[currentReceiptItemIdx];
+        if (getItemImages(item).length >= 3) {
+          alert('此項目已達到最多 3 張單據照片上限！若需更換請先點擊既有單據右下方的「刪除」按鈕。');
+          return;
+        }
+      }
       const inp = document.getElementById('formq-camera-input');
       if (inp) {
         inp.value = '';
@@ -2731,6 +2887,13 @@
     }
 
     function triggerFileUpload() {
+      if (currentReceiptItemIdx !== null) {
+        const item = appData.petty_cash.items[currentReceiptItemIdx];
+        if (getItemImages(item).length >= 3) {
+          alert('此項目已達到最多 3 張單據照片上限！若需更換請先點擊既有單據右下方的「刪除」按鈕。');
+          return;
+        }
+      }
       const inp = document.getElementById('formq-file-input');
       if (inp) {
         inp.value = '';
@@ -2779,13 +2942,21 @@
 
     function previewUploadedImageFull() {
       if (!tempUploadedImageData || !tempUploadedImageData.dataUrl) return;
-      openAttachmentModal(tempUploadedImageData.dataUrl, '現場拍攝單據預覽', '拍照憑證', 'jpg');
+      openAttachmentModal(tempUploadedImageData.dataUrl, '待確認單據照片放大預覽', '拍照憑證', 'jpg');
     }
 
     async function confirmApplyUploadedReceipt() {
       if (!tempUploadedImageData || currentReceiptItemIdx === null) return;
       const idx = currentReceiptItemIdx;
       const item = appData.petty_cash.items[idx];
+      if (!item) return;
+
+      let curImages = getItemImages(item);
+      if (curImages.length >= 3) {
+        alert('此款項項目已達到最多 3 張單據上限，無法再新增！請先刪除既有單據。');
+        return;
+      }
+
       const dataUrl = tempUploadedImageData.dataUrl;
 
       // 如果有後端服務，呼叫 /api/petty_cash/upload_receipt 儲存實體檔案
@@ -2797,27 +2968,34 @@
             body: JSON.stringify({
               image_base64: dataUrl,
               item_idx: idx,
-              title: `${item.title || '項目'} (現場拍照單據)`
+              title: `${item.title || '項目'} (單據照片)`
             })
           });
           const resJson = await resp.json();
-          if (resJson.success && resJson.filename) {
-            item.attachment = resJson.filename;
-            item.is_uploaded = true;
+          if (resJson.success) {
             if (resJson.petty_cash) {
               appData.petty_cash = resJson.petty_cash;
+            } else if (resJson.filename) {
+              curImages.push(resJson.filename);
+              item.attachments = curImages;
+              item.attachment = curImages[0];
+              item.is_uploaded = true;
             }
           } else {
-            item.attachment = dataUrl;
-            item.is_uploaded = true;
+            alert(resJson.error || '上傳失敗');
+            return;
           }
         } catch (e) {
           console.log('Upload receipt API offline, saving to local state:', e);
-          item.attachment = dataUrl;
+          curImages.push(dataUrl);
+          item.attachments = curImages;
+          item.attachment = curImages[0];
           item.is_uploaded = true;
         }
       } else {
-        item.attachment = dataUrl;
+        curImages.push(dataUrl);
+        item.attachments = curImages;
+        item.attachment = curImages[0];
         item.is_uploaded = true;
       }
 
@@ -2829,7 +3007,7 @@
       if (uploadBox) uploadBox.classList.add('hidden');
       tempUploadedImageData = null;
 
-      alert('🎉 手機拍照單據已成功上傳並正式綁定！');
+      alert('🎉 單據照片已成功新增並加入本項目畫廊！');
     }
   </script>
 </body>
