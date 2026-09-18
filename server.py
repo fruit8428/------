@@ -67,6 +67,13 @@ DEFAULT_DATA = {
         "submitter_stamp": "承辦人 115.8.23 高瑞彣 (核章完成)",
         "submitted_date": "115年8月20日",
         "scheduled_payment_date": "115年8月31日",
+        "withdrawal_date": "115年8月31日",
+        "declarations": {
+            "no_inserted_text": True,
+            "all_signed_by_agent": True,
+            "balance_match": "match",
+            "passbook_balance": 173847
+        },
         "total_spent": 24500,
         "limit": 100000,
         "deposit_transfer_amount": 50000,
@@ -590,6 +597,36 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                 self.send_json({"success": True, "petty_cash": data["petty_cash"]})
             else:
                 self.send_json({"error": "Invalid officer"}, 400)
+
+        elif path == "/api/petty_cash/update_form_q":
+            items = body.get("items")
+            declarations = body.get("declarations")
+            scheduled_payment_date = body.get("scheduled_payment_date")
+            withdrawal_date = body.get("withdrawal_date")
+            passbook_balance = body.get("passbook_balance")
+
+            if items is not None:
+                data["petty_cash"]["items"] = items
+                data["petty_cash"]["total_spent"] = sum(int(i.get("amount", 0)) for i in items)
+            if declarations is not None:
+                data["petty_cash"]["declarations"] = declarations
+            if scheduled_payment_date:
+                data["petty_cash"]["scheduled_payment_date"] = scheduled_payment_date
+            if withdrawal_date:
+                data["petty_cash"]["withdrawal_date"] = withdrawal_date
+            if passbook_balance is not None:
+                try:
+                    data["petty_cash"]["balance_info"]["passbook_balance_before"] = int(passbook_balance)
+                except Exception:
+                    pass
+
+            save_data(data)
+            self.send_json({"success": True, "petty_cash": data["petty_cash"]})
+
+        elif path == "/api/petty_cash/reset":
+            data["petty_cash"] = json.loads(json.dumps(DEFAULT_DATA["petty_cash"]))
+            save_data(data)
+            self.send_json({"success": True, "petty_cash": data["petty_cash"]})
 
         elif path == "/api/chat":
             user_msg = body.get("message", "").strip()

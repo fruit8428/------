@@ -18,8 +18,8 @@
     }
     @media print {
       body * { visibility: hidden; }
-      #printableArea, #printableArea * { visibility: visible; }
-      #printableArea { position: absolute; left: 0; top: 0; width: 100%; }
+      #printableArea, #printableArea *, #formq-printable, #formq-printable * { visibility: visible; }
+      #printableArea, #formq-printable { position: absolute; left: 0; top: 0; width: 100%; }
     }
   </style>
 </head>
@@ -439,6 +439,10 @@
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2.5">
+            <button onclick="openFormQModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white border-2 border-indigo-700 rounded-xl font-bold text-sm flex items-center space-x-1.5 transition-all shadow-xs">
+              <i data-lucide="file-edit" class="w-4 h-4"></i>
+              <span>待支付明細 (財Q表) 線上填單與簽核</span>
+            </button>
             <button onclick="sendLineNotificationDemo()" class="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-2 border-emerald-300 rounded-xl font-bold text-sm flex items-center space-x-1.5 transition-all shadow-xs">
               <i data-lucide="bell" class="w-4 h-4"></i>
               <span>推播 LINE 簽核通知</span>
@@ -612,18 +616,21 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="attachment-grid">
-          <!-- 1. 待支付費用明細表 -->
-          <div onclick="openAttachmentModal('八月份待支付費用明細表.jpg', '待支付費用明細表 (財Q表)', '明細總表', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
+          <!-- 1. 待支付費用明細表 (財Q表) 電子表單與簽核 -->
+          <div onclick="openFormQModal()" class="p-3.5 rounded-xl border-2 border-indigo-400 bg-indigo-50/70 hover:border-indigo-600 hover:bg-indigo-100/60 cursor-pointer transition-all flex items-center justify-between group shadow-xs">
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-sm">
-                <i data-lucide="file-text" class="w-5 h-5"></i>
+              <div class="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">
+                <i data-lucide="file-edit" class="w-5 h-5"></i>
               </div>
               <div>
-                <div class="font-bold text-slate-900 text-sm group-hover:text-teal-900">待支付費用明細表 (財Q表)</div>
-                <div class="text-xs text-slate-500">高瑞彣115.8.23編制 · 4筆共$24,500</div>
+                <div class="font-bold text-indigo-950 text-sm group-hover:text-indigo-900 flex items-center space-x-1.5 flex-wrap">
+                  <span>待支付費用明細表 (財Q表)</span>
+                  <span class="px-2 py-0.5 rounded-md bg-indigo-200 text-indigo-900 text-[10px] font-bold">可鍵入選取 · 三委員簽核</span>
+                </div>
+                <div class="text-xs text-indigo-700 font-medium">高瑞彣線上填報 · 3位委員線上多重審查簽核</div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
+            <span class="px-2.5 py-1 rounded bg-indigo-700 text-white text-xs font-bold shadow-2xs group-hover:bg-indigo-800">開啟表單</span>
           </div>
 
           <!-- 2. 待支付明細表-存摺補登核銷版 -->
@@ -880,6 +887,366 @@
     </div>
   </div>
 
+  <!-- ============================================== -->
+  <!-- MODAL 3: 待支付費用明細表 (財Q表) 電子填單與三委員簽核 -->
+  <!-- ============================================== -->
+  <div id="form-q-modal" class="fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm">
+      
+      <!-- 頂部標題列 -->
+      <div class="p-3.5 sm:p-4 border-b bg-slate-900 text-white flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-teal-500 text-slate-900 flex items-center justify-center font-bold">
+            <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="font-bold text-base sm:text-lg flex items-center space-x-2">
+              <span>待支付費用明細表 (財Q表)</span>
+              <span class="px-2 py-0.5 rounded text-xs font-semibold bg-teal-800 text-teal-200 border border-teal-600">電子互動表單</span>
+            </div>
+            <div class="text-xs text-slate-300">大清天朵二期社區 · 固德寓廈管理服務 · 承辦人：高瑞彣</div>
+          </div>
+        </div>
+        
+        <!-- 分頁切換器：電子表單 vs 原始掃描照 -->
+        <div class="flex items-center space-x-2">
+          <div class="inline-flex rounded-lg border border-slate-700 bg-slate-800 p-1">
+            <button id="formq-tab-btn-form" onclick="switchFormQTab('form')" class="px-3 py-1 text-xs font-bold rounded-md bg-teal-500 text-slate-950 shadow-xs flex items-center space-x-1">
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              <span>電子填單與簽核</span>
+            </button>
+            <button id="formq-tab-btn-scan" onclick="switchFormQTab('scan')" class="px-3 py-1 text-xs font-bold rounded-md text-slate-300 hover:text-white flex items-center space-x-1">
+              <i data-lucide="image" class="w-3.5 h-3.5"></i>
+              <span>原始紙本照片對照</span>
+            </button>
+          </div>
+          <button onclick="closeFormQModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 滾動內容主體 -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 bg-slate-50">
+        
+        <!-- 視圖 1: 原始紙本照片對照 (預設隱藏) -->
+        <div id="formq-view-scan" class="hidden space-y-3">
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="info" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+              <span>此為固德物業高瑞彣於 115.8.23 提送之「八月份待支付費用明細表 (財Q表)」原始紙本掃描檔案。</span>
+            </div>
+            <a href="八月份待支付費用明細表.jpg" target="_blank" class="font-bold underline text-amber-800 hover:text-amber-950">在新分頁開啟全圖</a>
+          </div>
+          <div class="flex justify-center bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
+            <img src="八月份待支付費用明細表.jpg" alt="八月份待支付費用明細表 (財Q表)" class="max-h-[70vh] object-contain rounded border">
+          </div>
+        </div>
+
+        <!-- 視圖 2: 電子化可點選鍵入表單與三委員簽核 (預設顯示) -->
+        <div id="formq-view-form" class="space-y-5">
+          
+          <!-- 表單公文主區 (支援列印) -->
+          <div id="formq-printable" class="bg-white p-5 rounded-2xl border-2 border-slate-300 shadow-xs space-y-4">
+            <div class="text-center border-b pb-4">
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-wide">大清天朵二期社區八月份待支付費用明細表（財Q表）</h2>
+              <div class="flex items-center justify-center space-x-4 text-xs text-slate-500 mt-1 font-mono">
+                <span>[ 財務悍將 ] \ [ 本月待支付費用明細表(Q) ]</span>
+                <span>·</span>
+                <span>列印日期：2026年8月23日</span>
+                <span>·</span>
+                <span>頁 1 之 1</span>
+              </div>
+            </div>
+
+            <!-- 身分與審核狀態提示列 -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-teal-50/60 border border-teal-200 rounded-xl text-xs">
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-0.5 rounded bg-teal-600 text-white font-bold">填報人</span>
+                <span class="font-bold text-teal-950">固德物業作業承辦人：高瑞彣 (115.8.23 核章)</span>
+                <span class="text-teal-700 hidden sm:inline">· 支援文字鍵入與勾選</span>
+              </div>
+              <div id="formq-status-badge">
+                <!-- 動態注入簽核狀態 -->
+              </div>
+            </div>
+
+            <!-- 1. 待支付項目表格 (可編輯、增刪列) -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
+                  <i data-lucide="list-ordered" class="w-4 h-4 text-teal-600"></i>
+                  <span>待支付款項明細清單 (可直接在各欄位鍵入修改)</span>
+                </div>
+                <button type="button" onclick="addFormQItem()" class="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-lg transition-all flex items-center space-x-1 shadow-2xs">
+                  <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                  <span>新增一筆項目</span>
+                </button>
+              </div>
+
+              <div class="overflow-x-auto border-2 border-slate-200 rounded-xl">
+                <table class="w-full text-left text-xs sm:text-sm">
+                  <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                      <th class="py-2.5 px-3 w-16 text-center">申請單編號</th>
+                      <th class="py-2.5 px-3 w-32">貨品或服務項目</th>
+                      <th class="py-2.5 px-3 w-44">廠商名稱</th>
+                      <th class="py-2.5 px-3">說明</th>
+                      <th class="py-2.5 px-3 w-28 text-right">支出金額(元)</th>
+                      <th class="py-2.5 px-3 w-20 text-center">憑證張數</th>
+                      <th class="py-2.5 px-3 w-24 text-center">單據附件</th>
+                      <th class="py-2.5 px-3 w-16 text-center">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="formq-items-tbody" class="divide-y divide-slate-200 bg-white">
+                    <!-- 動態渲染各列 -->
+                  </tbody>
+                  <tfoot class="bg-slate-50 font-bold border-t-2 border-slate-300">
+                    <tr>
+                      <td colspan="4" class="py-3 px-3 text-slate-800">
+                        合計支出 <span id="formq-count-text" class="text-teal-700 font-mono text-base">4</span> 筆
+                        <span class="text-slate-400 font-normal ml-2 text-xs" id="formq-chinese-total">新臺幣 貳萬肆仟伍佰元整</span>
+                      </td>
+                      <td class="py-3 px-3 text-right font-mono text-base text-slate-900" id="formq-sum-text">
+                        24,500 元
+                      </td>
+                      <td colspan="3"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <!-- 2. 勾選核對與存簿結餘 (依真實單據 100% 打造之點選與鍵入欄位) -->
+            <div class="p-4 bg-slate-50 border-2 border-slate-200 rounded-xl space-y-3.5">
+              <div class="font-bold text-slate-800 text-xs sm:text-sm flex items-center space-x-1.5 border-b pb-2">
+                <i data-lucide="check-square" class="w-4 h-4 text-teal-600"></i>
+                <span>承辦作業核對與聲明事項 (點擊選取與文字鍵入)：</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                <!-- 勾選 1 -->
+                <label class="flex items-start space-x-2 cursor-pointer p-2.5 bg-white rounded-lg border border-slate-200 hover:bg-teal-50/40 transition-colors">
+                  <input type="checkbox" id="formq-chk-inserted-text" class="mt-0.5 w-4 h-4 text-teal-600 rounded border-slate-300 focus:ring-teal-500" checked>
+                  <span class="font-medium text-slate-800">提款單上所書寫之提領金額無再插入文字空間</span>
+                </label>
+
+                <!-- 勾選 2 -->
+                <label class="flex items-start space-x-2 cursor-pointer p-2.5 bg-white rounded-lg border border-slate-200 hover:bg-teal-50/40 transition-colors">
+                  <input type="checkbox" id="formq-chk-signed-agent" class="mt-0.5 w-4 h-4 text-teal-600 rounded border-slate-300 focus:ring-teal-500" checked>
+                  <span class="font-medium text-slate-800">上列各一般費用報支單上皆已簽具作業承辦人姓名</span>
+                </label>
+              </div>
+
+              <!-- 日期與存簿金額鍵入 -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">預定支付日期：</label>
+                  <input type="text" id="formq-sched-date" value="115 年 8 月 31 日" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs sm:text-sm font-medium focus:ring-2 focus:ring-teal-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">提領支付日期：</label>
+                  <input type="text" id="formq-withd-date" value="115 年 8 月 31 日" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs sm:text-sm font-medium focus:ring-2 focus:ring-teal-500">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">存簿餘額 (元)：</label>
+                  <div class="flex items-center space-x-1">
+                    <input type="number" id="formq-passbook-bal" value="173847" class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs sm:text-sm font-mono font-bold focus:ring-2 focus:ring-teal-500">
+                    <span class="text-xs text-slate-500 font-bold">元</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 結餘比對單選與承辦人印章 -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-200">
+                <div class="space-y-1.5">
+                  <div class="text-xs font-bold text-slate-600">結餘金額電腦核對 (點選)：</div>
+                  <div class="flex items-center space-x-4 text-xs sm:text-sm">
+                    <label class="flex items-center space-x-1.5 cursor-pointer">
+                      <input type="radio" name="formq-balance-match" value="match" checked class="text-teal-600">
+                      <span class="font-bold text-emerald-800">與電腦結餘金額相同</span>
+                    </label>
+                    <label class="flex items-center space-x-1.5 cursor-pointer">
+                      <input type="radio" name="formq-balance-match" value="mismatch" class="text-rose-600">
+                      <span class="text-slate-600">與電腦結餘金額不符，已通知處理</span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 承辦人印戳 -->
+                <div class="flex items-center space-x-3 bg-white p-2.5 rounded-xl border border-slate-200 shadow-2xs">
+                  <div class="text-xs text-slate-500 font-medium">作業承辦人：<strong class="text-slate-800 text-sm">高瑞彣</strong></div>
+                  <!-- 實體公文風格的承辦人藍色印章 -->
+                  <div class="w-16 h-16 rounded-full border-2 border-blue-600 bg-blue-50/50 text-blue-700 flex flex-col items-center justify-center font-bold text-[10px] leading-tight rotate-[-4deg] shadow-xs select-none">
+                    <span>承辦人</span>
+                    <span class="font-mono text-[9px]">115. 8. 23</span>
+                    <span>高瑞彣</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 物業承辦操作按鈕 -->
+              <div class="flex items-center justify-between pt-2 border-t border-slate-200 flex-wrap gap-2">
+                <div class="text-xs text-slate-400">固德物業高瑞彣可在此修改並儲存；亦可點擊下方 3 位委員專屬區進行線上簽核。</div>
+                <div class="flex items-center space-x-2">
+                  <button type="button" onclick="resetFormQToDefault()" class="px-3 py-1.5 border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-all">
+                    還原八月標準資料
+                  </button>
+                  <button type="button" onclick="saveFormQData()" class="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-bold transition-all flex items-center space-x-1 shadow-xs">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                    <span>儲存表單資料</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. 【核心功能】管委會 3 位委員線上多重簽核專屬區 -->
+            <div class="border-2 border-indigo-200 rounded-2xl p-4 sm:p-5 bg-gradient-to-b from-indigo-50/40 to-white space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-indigo-100 pb-3">
+                <div>
+                  <div class="font-bold text-slate-900 text-base flex items-center space-x-2">
+                    <i data-lucide="stamp" class="w-5 h-5 text-indigo-600"></i>
+                    <span>管委會 3 位法定委員線上多重簽核專區 (線上批閱、簽署意見與蓋章)</span>
+                  </div>
+                  <div class="text-xs text-slate-500 mt-0.5">本明細表與所有附件檢核無誤後，由 3 位委員直接於下方簽署核准</div>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-900 self-start sm:self-auto">法定多重簽核權限</span>
+              </div>
+
+              <!-- 3 位委員簽核卡片 (主任委員、財務委員、行政委員) -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="formq-committee-approval-grid">
+                <!-- 1. 主任委員 -->
+                <div class="bg-white p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-300 transition-all flex flex-col justify-between space-y-3 shadow-xs">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-400">法定職掌 · 主任委員</span>
+                      <span id="formq-badge-director" class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                      <div class="text-base font-bold text-slate-900">陳建宏</div>
+                      <div class="text-xs text-slate-400 font-mono" id="formq-time-director">2026-08-25 09:30</div>
+                    </div>
+
+                    <!-- 主任委員印戳展示區 -->
+                    <div class="flex justify-center my-2.5" id="formq-stamp-box-director">
+                      <!-- 動態注入委員印章 -->
+                    </div>
+
+                    <!-- 審核意見輸入框 (可文字鍵入) -->
+                    <label class="block text-xs font-bold text-slate-500 mb-1">主委簽核意見：</label>
+                    <textarea id="formq-comment-director" rows="2" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="鍵入審核意見...">四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。</textarea>
+                  </div>
+
+                  <!-- 簽核按鈕 -->
+                  <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="signFormQ('director', 'approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center space-x-1 shadow-2xs">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>主委同意</span>
+                    </button>
+                    <button type="button" onclick="signFormQ('director', 'rejected')" class="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition-colors">
+                      退回
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2. 財務委員 -->
+                <div class="bg-white p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-300 transition-all flex flex-col justify-between space-y-3 shadow-xs">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-400">法定職掌 · 財務委員</span>
+                      <span id="formq-badge-finance" class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                      <div class="text-base font-bold text-slate-900">林秀玲</div>
+                      <div class="text-xs text-slate-400 font-mono" id="formq-time-finance">2026-08-25 10:15</div>
+                    </div>
+
+                    <!-- 財務委員印戳展示區 -->
+                    <div class="flex justify-center my-2.5" id="formq-stamp-box-finance">
+                      <!-- 動態注入委員印章 -->
+                    </div>
+
+                    <!-- 審核意見輸入框 (可文字鍵入) -->
+                    <label class="block text-xs font-bold text-slate-500 mb-1">財委簽核意見：</label>
+                    <textarea id="formq-comment-finance" rows="2" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="鍵入審核意見...">四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。</textarea>
+                  </div>
+
+                  <!-- 簽核按鈕 -->
+                  <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="signFormQ('finance', 'approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center space-x-1 shadow-2xs">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>財委同意</span>
+                    </button>
+                    <button type="button" onclick="signFormQ('finance', 'rejected')" class="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition-colors">
+                      退回
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 3. 行政委員 -->
+                <div class="bg-white p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-300 transition-all flex flex-col justify-between space-y-3 shadow-xs">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-400">法定職掌 · 行政委員</span>
+                      <span id="formq-badge-supervisor" class="px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                      <div class="text-base font-bold text-slate-900">王國華</div>
+                      <div class="text-xs text-slate-400 font-mono" id="formq-time-supervisor">2026-08-25 14:00</div>
+                    </div>
+
+                    <!-- 行政委員印戳展示區 -->
+                    <div class="flex justify-center my-2.5" id="formq-stamp-box-supervisor">
+                      <!-- 動態注入委員印章 -->
+                    </div>
+
+                    <!-- 審核意見輸入框 (可文字鍵入) -->
+                    <label class="block text-xs font-bold text-slate-500 mb-1">行委簽核意見：</label>
+                    <textarea id="formq-comment-supervisor" rows="2" class="w-full text-xs p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="鍵入審核意見...">宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。</textarea>
+                  </div>
+
+                  <!-- 簽核按鈕 -->
+                  <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="signFormQ('supervisor', 'approved')" class="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center space-x-1 shadow-2xs">
+                      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                      <span>行委同意</span>
+                    </button>
+                    <button type="button" onclick="signFormQ('supervisor', 'rejected')" class="py-1.5 px-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition-colors">
+                      退回
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 表單頁尾固德寓廈管理服務 -->
+            <div class="flex items-center justify-between text-xs text-slate-400 pt-2 border-t">
+              <div>GOOD 固德寓廈管理服務 · 財務表件 (財Q表)</div>
+              <div>大清天朵二期社區管理委員會 存查聯</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部操作列 -->
+      <div class="p-3.5 border-t bg-white flex items-center justify-between flex-wrap gap-2">
+        <div class="text-xs text-slate-500">
+          💡 承辦人高瑞彣鍵入之各項數據與 3 位委員線上簽章，將即時同步於後端資料庫與列印核准書中。
+        </div>
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="printFormQArea()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center space-x-1 shadow-xs">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>列印本表 / 存為 PDF</span>
+          </button>
+          <button type="button" onclick="closeFormQModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs sm:text-sm rounded-xl transition-all">
+            關閉
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- 頁尾 -->
   <footer class="py-4 text-center text-xs sm:text-sm text-slate-400 border-t border-slate-200">
     大清天朵二期 AI 社區管理助手 · 固德物業管理中心
@@ -909,6 +1276,13 @@
         "submitter_stamp": "承辦人 115.8.23 高瑞彣 (核章完成)",
         "submitted_date": "115年8月20日",
         "scheduled_payment_date": "115年8月31日",
+        "withdrawal_date": "115年8月31日",
+        "declarations": {
+          "no_inserted_text": true,
+          "all_signed_by_agent": true,
+          "balance_match": "match",
+          "passbook_balance": 173847
+        },
         "total_spent": 24500,
         "limit": 100000,
         "deposit_transfer_amount": 50000,
@@ -1077,7 +1451,7 @@
       } catch (e) {}
 
       isStandalone = true;
-      const DATA_VER = 'v115_08_gao_real_docs_v3';
+      const DATA_VER = 'v115_08_gao_form_q_interactive_v4';
       if (localStorage.getItem('daqing_community_data_ver') !== DATA_VER) {
         localStorage.removeItem('daqing_community_data');
         localStorage.setItem('daqing_community_data_ver', DATA_VER);
@@ -1741,6 +2115,396 @@
 
     function closeApprovalPdfModal() {
       document.getElementById('pdf-modal').classList.add('hidden');
+    }
+
+    // ==============================================
+    // 待支付費用明細表 (財Q表) 電子填報與三委員線上簽核功能
+    // ==============================================
+
+    function numberToChineseCurrency(num) {
+      if (isNaN(num) || num <= 0) return '零元整';
+      if (num === 24500) return '新臺幣 貳萬肆仟伍佰元整';
+      const digits = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖'];
+      const units = ['', '拾', '佰', '仟'];
+      const bigUnits = ['', '萬', '億'];
+      let strNum = Math.floor(num).toString();
+      let parts = [];
+      while (strNum.length > 0) {
+        parts.push(strNum.slice(-4));
+        strNum = strNum.slice(0, -4);
+      }
+      let chStr = '';
+      for (let i = parts.length - 1; i >= 0; i--) {
+        let p = parts[i];
+        let pStr = '';
+        for (let j = 0; j < p.length; j++) {
+          let d = parseInt(p[j]);
+          let u = units[p.length - 1 - j];
+          if (d !== 0) {
+            pStr += digits[d] + u;
+          } else if (pStr && !pStr.endsWith('零')) {
+            pStr += '零';
+          }
+        }
+        if (pStr.endsWith('零')) pStr = pStr.slice(0, -1);
+        if (pStr) pStr += bigUnits[i];
+        chStr += pStr;
+      }
+      return '新臺幣 ' + (chStr || '零') + '元整';
+    }
+
+    function openFormQModal() {
+      if (!appData || !appData.petty_cash) return;
+      document.getElementById('form-q-modal').classList.remove('hidden');
+      switchFormQTab('form');
+      populateFormQ();
+    }
+
+    function closeFormQModal() {
+      document.getElementById('form-q-modal').classList.add('hidden');
+    }
+
+    function switchFormQTab(tab) {
+      const vForm = document.getElementById('formq-view-form');
+      const vScan = document.getElementById('formq-view-scan');
+      const btnForm = document.getElementById('formq-tab-btn-form');
+      const btnScan = document.getElementById('formq-tab-btn-scan');
+
+      if (tab === 'scan') {
+        vForm.classList.add('hidden');
+        vScan.classList.remove('hidden');
+        btnScan.className = "px-3 py-1 text-xs font-bold rounded-md bg-teal-500 text-slate-950 shadow-xs flex items-center space-x-1";
+        btnForm.className = "px-3 py-1 text-xs font-bold rounded-md text-slate-300 hover:text-white flex items-center space-x-1";
+      } else {
+        vScan.classList.add('hidden');
+        vForm.classList.remove('hidden');
+        btnForm.className = "px-3 py-1 text-xs font-bold rounded-md bg-teal-500 text-slate-950 shadow-xs flex items-center space-x-1";
+        btnScan.className = "px-3 py-1 text-xs font-bold rounded-md text-slate-300 hover:text-white flex items-center space-x-1";
+      }
+      lucide.createIcons();
+    }
+
+    function populateFormQ() {
+      const petty = appData.petty_cash;
+      const tbody = document.getElementById('formq-items-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = petty.items.map((item, idx) => `
+        <tr class="hover:bg-slate-50 transition-colors formq-row" data-idx="${idx}">
+          <td class="py-2 px-2 text-center">
+            <input type="number" class="w-14 text-center px-1 py-1 border border-slate-300 rounded font-mono font-bold text-teal-800 text-xs formq-inp-no" value="${item.no || item.id || (idx+15)}">
+          </td>
+          <td class="py-2 px-2">
+            <input type="text" class="w-full px-2 py-1 border border-slate-300 rounded font-bold text-slate-900 text-xs formq-inp-title" value="${item.title || ''}" placeholder="貨品或服務項目">
+          </td>
+          <td class="py-2 px-2">
+            <input type="text" class="w-full px-2 py-1 border border-slate-300 rounded text-slate-800 text-xs formq-inp-vendor" value="${item.vendor || ''}" placeholder="廠商全名">
+          </td>
+          <td class="py-2 px-2">
+            <input type="text" class="w-full px-2 py-1 border border-slate-300 rounded text-slate-700 text-xs formq-inp-desc" value="${item.desc || ''}" placeholder="說明摘要">
+          </td>
+          <td class="py-2 px-2 text-right">
+            <input type="number" oninput="recalcFormQTotal()" class="w-24 text-right px-2 py-1 border border-slate-300 rounded font-mono font-bold text-slate-900 text-xs formq-inp-amount" value="${item.amount || 0}">
+          </td>
+          <td class="py-2 px-2 text-center">
+            <input type="number" class="w-12 text-center px-1 py-1 border border-slate-300 rounded text-xs font-mono formq-inp-vcount" value="${item.voucher_count || 1}">
+          </td>
+          <td class="py-2 px-2 text-center">
+            ${item.attachment ? `
+              <button type="button" onclick="openAttachmentModal('${item.attachment}', '${item.title}', '費用報支', 'jpg')" class="px-2 py-1 rounded bg-teal-50 border border-teal-300 text-teal-800 hover:bg-teal-100 text-[11px] font-bold inline-flex items-center space-x-0.5" title="查看報支單據">
+                <i data-lucide="eye" class="w-3 h-3"></i>
+                <span>單據</span>
+              </button>
+            ` : `<span class="text-2xs text-slate-400 font-mono">無</span>`}
+          </td>
+          <td class="py-2 px-2 text-center">
+            <button type="button" onclick="deleteFormQItem(${idx})" class="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors" title="刪除此列">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Declarations 勾選與文字鍵入設定
+      const decl = petty.declarations || {};
+      const chk1 = document.getElementById('formq-chk-inserted-text');
+      const chk2 = document.getElementById('formq-chk-signed-agent');
+      if (chk1) chk1.checked = decl.no_inserted_text !== false;
+      if (chk2) chk2.checked = decl.all_signed_by_agent !== false;
+
+      const schedDate = document.getElementById('formq-sched-date');
+      const withdDate = document.getElementById('formq-withd-date');
+      const passbookBal = document.getElementById('formq-passbook-bal');
+      if (schedDate) schedDate.value = petty.scheduled_payment_date || '115 年 8 月 31 日';
+      if (withdDate) withdDate.value = petty.withdrawal_date || '115 年 8 月 31 日';
+      if (passbookBal) passbookBal.value = decl.passbook_balance || (petty.balance_info ? petty.balance_info.passbook_balance_before : 173847);
+
+      // 結餘金額核對單選
+      const radios = document.getElementsByName('formq-balance-match');
+      const matchVal = decl.balance_match || 'match';
+      radios.forEach(r => {
+        r.checked = (r.value === matchVal);
+      });
+
+      // 整體審核徽章
+      const statusBadge = document.getElementById('formq-status-badge');
+      if (statusBadge) {
+        if (petty.final_status === 'approved') {
+          statusBadge.innerHTML = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center space-x-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i><span>3位委員全數審核同意 (出納准予撥款)</span></span>`;
+        } else if (petty.final_status === 'rejected') {
+          statusBadge.innerHTML = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 flex items-center space-x-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i><span>已被委員退回修正 (請物業補正)</span></span>`;
+        } else {
+          statusBadge.innerHTML = `<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center space-x-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i><span>等待管委會委員審核中</span></span>`;
+        }
+      }
+
+      // 3 位委員簽核專區 (主任委員、財務委員、行政委員)
+      const officers = [
+        { key: 'director', role: '主任委員', name: '陳建宏' },
+        { key: 'finance', role: '財務委員', name: '林秀玲' },
+        { key: 'supervisor', role: '行政委員', name: '王國華' }
+      ];
+
+      officers.forEach(off => {
+        const app = (petty.approvals && petty.approvals[off.key]) || {};
+        const badge = document.getElementById(`formq-badge-${off.key}`);
+        const timeEl = document.getElementById(`formq-time-${off.key}`);
+        const stampBox = document.getElementById(`formq-stamp-box-${off.key}`);
+        const commentBox = document.getElementById(`formq-comment-${off.key}`);
+
+        if (badge) {
+          if (app.status === 'approved') {
+            badge.textContent = '已核准同意';
+            badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300';
+          } else if (app.status === 'rejected') {
+            badge.textContent = '退回補正';
+            badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300';
+          } else {
+            badge.textContent = '待簽核';
+            badge.className = 'px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300';
+          }
+        }
+
+        if (timeEl) {
+          timeEl.textContent = app.time || '尚未簽核';
+        }
+
+        if (commentBox && app.comment) {
+          commentBox.value = app.comment;
+        }
+
+        if (stampBox) {
+          if (app.status === 'approved') {
+            stampBox.innerHTML = `
+              <div class="w-20 h-20 rounded-full border-2 border-red-600 bg-red-50/50 text-red-600 flex flex-col items-center justify-center font-bold text-[10px] leading-tight rotate-[-4deg] shadow-xs select-none">
+                <span class="text-[9px] border-b border-red-400 pb-0.5">${off.role}</span>
+                <span class="text-xs font-black my-0.5 tracking-wider">${off.name}</span>
+                <span class="font-mono text-[9px]">${(app.time || '115.08.25').split(' ')[0]}</span>
+              </div>
+            `;
+          } else if (app.status === 'rejected') {
+            stampBox.innerHTML = `
+              <div class="w-20 h-20 rounded-lg border-2 border-rose-600 bg-rose-50 text-rose-700 flex flex-col items-center justify-center font-bold text-xs select-none">
+                <span class="text-xs font-black text-rose-800">退回修正</span>
+                <span class="text-[9px] font-mono mt-0.5 text-rose-600">${(app.time || '2026-08-25').split(' ')[0]}</span>
+              </div>
+            `;
+          } else {
+            stampBox.innerHTML = `
+              <div class="w-20 h-20 rounded-full border-2 border-dashed border-slate-300 text-slate-400 flex flex-col items-center justify-center font-bold text-xs select-none">
+                <span>待簽核</span>
+                <span class="text-[9px] mt-0.5 text-slate-400">點下方同意</span>
+              </div>
+            `;
+          }
+        }
+      });
+
+      recalcFormQTotal();
+      lucide.createIcons();
+    }
+
+    function recalcFormQTotal() {
+      const rows = document.querySelectorAll('.formq-row');
+      let sum = 0;
+      let count = 0;
+      rows.forEach(r => {
+        const amtInp = r.querySelector('.formq-inp-amount');
+        if (amtInp) {
+          const val = parseInt(amtInp.value) || 0;
+          sum += val;
+          count++;
+        }
+      });
+
+      const countEl = document.getElementById('formq-count-text');
+      const sumEl = document.getElementById('formq-sum-text');
+      const chnEl = document.getElementById('formq-chinese-total');
+
+      if (countEl) countEl.textContent = count;
+      if (sumEl) sumEl.textContent = `${sum.toLocaleString()} 元`;
+      if (chnEl) chnEl.textContent = numberToChineseCurrency(sum);
+    }
+
+    function addFormQItem() {
+      if (!appData || !appData.petty_cash) return;
+      const nextNo = (appData.petty_cash.items.length > 0)
+        ? Math.max(...appData.petty_cash.items.map(i => i.no || i.id || 0)) + 1
+        : 19;
+      
+      appData.petty_cash.items.push({
+        id: nextNo,
+        no: nextNo,
+        title: "新增支出項目",
+        category: "一般事務",
+        vendor: "填寫廠商全名",
+        invoice: "統一發票 / 收據",
+        date: new Date().toISOString().split('T')[0],
+        desc: "工作說明",
+        amount: 1000,
+        voucher_count: 1
+      });
+
+      populateFormQ();
+    }
+
+    function deleteFormQItem(idx) {
+      if (!appData || !appData.petty_cash) return;
+      if (appData.petty_cash.items.length <= 1) {
+        alert('至少需保留一筆支出項目！');
+        return;
+      }
+      if (confirm(`確定要刪除第 ${idx + 1} 筆待支付項目嗎？`)) {
+        appData.petty_cash.items.splice(idx, 1);
+        populateFormQ();
+      }
+    }
+
+    function saveFormQData() {
+      if (!appData || !appData.petty_cash) return;
+      const rows = document.querySelectorAll('.formq-row');
+      const newItems = [];
+      rows.forEach((r, idx) => {
+        const orig = appData.petty_cash.items[idx] || {};
+        const no = parseInt(r.querySelector('.formq-inp-no').value) || (idx + 15);
+        const title = r.querySelector('.formq-inp-title').value.trim() || orig.title || '項目';
+        const vendor = r.querySelector('.formq-inp-vendor').value.trim() || orig.vendor || '廠商';
+        const desc = r.querySelector('.formq-inp-desc').value.trim() || orig.desc || '';
+        const amount = parseInt(r.querySelector('.formq-inp-amount').value) || 0;
+        const vcount = parseInt(r.querySelector('.formq-inp-vcount').value) || 1;
+
+        newItems.push({
+          ...orig,
+          id: no,
+          no: no,
+          title: title,
+          vendor: vendor,
+          desc: desc,
+          amount: amount,
+          voucher_count: vcount
+        });
+      });
+
+      appData.petty_cash.items = newItems;
+      appData.petty_cash.total_spent = newItems.reduce((s, i) => s + i.amount, 0);
+
+      const chk1 = document.getElementById('formq-chk-inserted-text');
+      const chk2 = document.getElementById('formq-chk-signed-agent');
+      const schedDate = document.getElementById('formq-sched-date');
+      const withdDate = document.getElementById('formq-withd-date');
+      const passbookBal = document.getElementById('formq-passbook-bal');
+      const matchRadio = document.querySelector('input[name="formq-balance-match"]:checked');
+
+      if (!appData.petty_cash.declarations) appData.petty_cash.declarations = {};
+      appData.petty_cash.declarations.no_inserted_text = chk1 ? chk1.checked : true;
+      appData.petty_cash.declarations.all_signed_by_agent = chk2 ? chk2.checked : true;
+      appData.petty_cash.declarations.balance_match = matchRadio ? matchRadio.value : 'match';
+      if (passbookBal) appData.petty_cash.declarations.passbook_balance = parseInt(passbookBal.value) || 173847;
+
+      if (schedDate) appData.petty_cash.scheduled_payment_date = schedDate.value.trim();
+      if (withdDate) appData.petty_cash.withdrawal_date = withdDate.value.trim();
+
+      saveLocal();
+
+      if (!isStandalone) {
+        fetch('/api/petty_cash/update_form_q', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: newItems,
+            declarations: appData.petty_cash.declarations,
+            scheduled_payment_date: appData.petty_cash.scheduled_payment_date,
+            withdrawal_date: appData.petty_cash.withdrawal_date,
+            passbook_balance: appData.petty_cash.declarations.passbook_balance
+          })
+        }).catch(e => console.log('Update form Q offline:', e));
+      }
+
+      renderPettyCash();
+      populateFormQ();
+      alert('✅ 待支付費用明細表 (財Q表) 資料已儲存！總額：NT$ ' + appData.petty_cash.total_spent.toLocaleString() + ' 元，已同步提報管委會委員審核！');
+    }
+
+    function signFormQ(officer, decision) {
+      if (!appData || !appData.petty_cash) return;
+      const commentBox = document.getElementById(`formq-comment-${officer}`);
+      const comment = commentBox ? commentBox.value.trim() : '';
+
+      const officerNames = { director: '主任委員 陳建宏', finance: '財務委員 林秀玲', supervisor: '行政委員 王國華' };
+      const officerName = officerNames[officer] || officer;
+
+      if (!appData.petty_cash.approvals) appData.petty_cash.approvals = {};
+      if (!appData.petty_cash.approvals[officer]) {
+        appData.petty_cash.approvals[officer] = { role: officer, name: officerName, status: decision };
+      }
+
+      appData.petty_cash.approvals[officer].status = decision;
+      appData.petty_cash.approvals[officer].comment = comment || (decision === 'approved' ? '已同意通過，准予報支出納付款。' : '退回請物業補正說明。');
+      
+      const now = new Date();
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      appData.petty_cash.approvals[officer].time = timeStr;
+
+      const allApproved = Object.values(appData.petty_cash.approvals).every(a => a.status === 'approved');
+      const anyRejected = Object.values(appData.petty_cash.approvals).some(a => a.status === 'rejected');
+      if (anyRejected) appData.petty_cash.final_status = 'rejected';
+      else if (allApproved) appData.petty_cash.final_status = 'approved';
+      else appData.petty_cash.final_status = 'in_review';
+
+      saveLocal();
+
+      if (!isStandalone) {
+        fetch('/api/petty_cash/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ officer, decision, comment: appData.petty_cash.approvals[officer].comment })
+        }).catch(e => console.log('Approve Form Q offline:', e));
+      }
+
+      populateFormQ();
+      renderPettyCash();
+
+      if (decision === 'approved') {
+        alert(`✅ 【${officerName}】已在「待支付費用明細表 (財Q表)」完成線上簽核同意！`);
+      } else {
+        alert(`⚠️ 【${officerName}】已退回本案件要求補正說明。`);
+      }
+    }
+
+    function resetFormQToDefault() {
+      if (!confirm('確定要還原為八月份原始標準單據資料嗎？')) return;
+      appData.petty_cash = JSON.parse(JSON.stringify(SEED_DATA.petty_cash));
+      saveLocal();
+      if (!isStandalone) {
+        fetch('/api/petty_cash/reset', { method: 'POST' }).catch(e => console.log('Reset form Q offline:', e));
+      }
+      populateFormQ();
+      renderPettyCash();
+      alert('已還原為八月份原始待支付費用明細表標準資料！');
+    }
+
+    function printFormQArea() {
+      window.print();
     }
   </script>
 </body>
