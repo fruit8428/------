@@ -116,6 +116,12 @@
           <i data-lucide="clipboard-check" class="w-4 h-4"></i>
           <span>費用報支簽核</span>
         </button>
+
+        <!-- 7. 生活小幫手 (Purple 紫色系) -->
+        <button onclick="switchTab('helper')" id="tab-helper" class="tab-btn px-4 py-2 rounded-xl border-2 text-sm sm:text-base font-bold transition-all shadow-xs flex items-center space-x-2 bg-purple-50 text-purple-900 border-purple-200 hover:bg-purple-100">
+          <i data-lucide="sparkles" class="w-4 h-4 text-purple-600"></i>
+          <span>生活小幫手</span>
+        </button>
       </div>
     </div>
   </header>
@@ -569,7 +575,291 @@
         </div>
       </div>
     </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 7: 生活小幫手 (水電維修、附近餐館預訂、生鮮團購、燙髮預約、衣服送洗) -->
+    <!-- ============================================== -->
+    <section id="view-helper" class="hidden space-y-5">
+      <!-- 頂部宣傳與說明橫幅 -->
+      <div class="bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white p-6 sm:p-7 rounded-2xl shadow-sm relative overflow-hidden">
+        <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none">
+          <i data-lucide="sparkles" class="w-56 h-56 text-white"></i>
+        </div>
+        <div class="relative z-10 max-w-3xl">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="px-2.5 py-0.5 rounded-lg bg-purple-500/30 text-purple-200 border border-purple-400/30 font-bold text-xs">大清天朵二期 · 社區專屬便民服務</span>
+            <span class="px-2.5 py-0.5 rounded-lg bg-amber-400/20 text-amber-200 border border-amber-300/30 font-bold text-xs flex items-center gap-1">
+              <i data-lucide="clock" class="w-3 h-3 text-amber-300"></i>
+              <span>先建置好 · 後續陸續連結上線</span>
+            </span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white mb-2 flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-6 h-6 text-purple-300"></i>
+            <span>生活小幫手（五大便利生活服務）</span>
+          </h2>
+          <p class="text-purple-100 text-xs sm:text-sm leading-relaxed mb-4">
+            為提供住戶更便捷溫馨的居住體驗，管委會特別規劃「五大在地特約便民服務」，涵蓋居家水電、周邊美食、產地生鮮、時尚美髮與專業衣物送洗。目前各功能板塊已完成建置，後續將陸續完成特約商家對接與線上預約串接！
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-3 py-1 rounded-full bg-white/10 text-white border border-white/15 flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5 text-purple-300"></i> 住戶專屬特約優惠
+            </span>
+            <span class="px-3 py-1 rounded-full bg-white/10 text-white border border-white/15 flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5 text-purple-300"></i> 嚴選合格認證商家
+            </span>
+            <span class="px-3 py-1 rounded-full bg-white/10 text-white border border-white/15 flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5 text-purple-300"></i> 透明公道收費標準
+            </span>
+            <span class="px-3 py-1 rounded-full bg-white/10 text-white border border-white/15 flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5 text-purple-300"></i> 物業櫃檯代收代轉
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 五大生活便利服務卡片列表 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        
+        <!-- 1. 水電維修 -->
+        <div onclick="openHelperModal('plumbing')" class="bg-white p-5 rounded-2xl border-2 border-sky-200 hover:border-sky-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
+                <i data-lucide="wrench" class="w-6 h-6"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-bold border border-sky-200">特約廠商洽談中</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-sky-700 flex items-center gap-1.5">
+              <span>水電維修</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-sky-50 text-sky-700 font-semibold border border-sky-200">到府修繕</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              嚴選具備甲級/乙級證照之專業水電技師，提供住戶專屬報修通道。水管抓漏、插座開關更換、衛浴設備更換與跳電查線，報價透明公道，品質由管委會把關。
+            </p>
+            <div class="mt-3 flex flex-wrap gap-1.5 text-xs text-sky-900">
+              <span class="px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100">🚰 水管抓漏</span>
+              <span class="px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100">⚡ 電路檢測</span>
+              <span class="px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100">🚽 衛浴設備</span>
+              <span class="px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100">💡 燈具安裝</span>
+            </div>
+          </div>
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-medium">後續開放一鍵報修</span>
+            <span class="px-3 py-1.5 rounded-xl bg-sky-600 group-hover:bg-sky-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+              <span>查看詳情</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- 2. 附近餐館預訂 -->
+        <div onclick="openHelperModal('restaurant')" class="bg-white p-5 rounded-2xl border-2 border-amber-200 hover:border-amber-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
+                <i data-lucide="utensils" class="w-6 h-6"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold border border-amber-200">特約店家簽約中</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-amber-700 flex items-center gap-1.5">
+              <span>附近餐館預訂</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-semibold border border-amber-200">住戶折扣</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              彙整社區周邊步行5~10分鐘人氣餐廳、早午餐與私房料理。住戶線上優先保留席位免排隊，並出示住戶APP享專屬 9 折或主廚招待小菜優惠。
+            </p>
+            <div class="mt-3 flex flex-wrap gap-1.5 text-xs text-amber-950">
+              <span class="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-100">🍱 人氣日料</span>
+              <span class="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-100">☕ 輕食早午餐</span>
+              <span class="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-100">🥘 在地特色火鍋</span>
+              <span class="px-2 py-0.5 rounded-md bg-amber-50 border border-amber-100">🏷️ 專屬9折</span>
+            </div>
+          </div>
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-medium">後續開放線上訂位</span>
+            <span class="px-3 py-1.5 rounded-xl bg-amber-600 group-hover:bg-amber-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+              <span>查看詳情</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. 生鮮團購 -->
+        <div onclick="openHelperModal('grocery')" class="bg-white p-5 rounded-2xl border-2 border-emerald-200 hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
+                <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">產地小農洽談中</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 flex items-center gap-1.5">
+              <span>生鮮團購</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">冷藏代收</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              嚴選產地直送有機當令蔬果箱、放牧土雞蛋、特級海鮮與無毒肉品。住戶週週開團享量販批發特惠價，低溫保鮮冷藏車直達社區物業櫃檯代收。
+            </p>
+            <div class="mt-3 flex flex-wrap gap-1.5 text-xs text-emerald-900">
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">🥬 當季蔬菜箱</span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">🍎 產地現採鮮果</span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">🥩 急凍海鮮肉品</span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">🧊 物業冷藏代收</span>
+            </div>
+          </div>
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-medium">後續開放每週開團</span>
+            <span class="px-3 py-1.5 rounded-xl bg-emerald-600 group-hover:bg-emerald-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+              <span>查看詳情</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- 4. 燙髮預約 -->
+        <div onclick="openHelperModal('hair')" class="bg-white p-5 rounded-2xl border-2 border-purple-200 hover:border-purple-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
+                <i data-lucide="scissors" class="w-6 h-6"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-purple-100 text-purple-900 text-xs font-bold border border-purple-200">名店沙龍洽談中</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-purple-700 flex items-center gap-1.5">
+              <span>燙髮預約</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-purple-50 text-purple-800 font-semibold border border-purple-200">專屬禮遇</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              與周邊優質口碑美髮沙龍合作，線上可指定資深設計師與預約專屬離峰/尖峰時段，免現場排隊等待，住戶尊享剪、燙、染、護專屬85折起特惠。
+            </p>
+            <div class="mt-3 flex flex-wrap gap-1.5 text-xs text-purple-950">
+              <span class="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-100">💇 韓系燙髮</span>
+              <span class="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-100">🎨 質感染髮</span>
+              <span class="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-100">💆 頭皮深層護理</span>
+              <span class="px-2 py-0.5 rounded-md bg-purple-50 border border-purple-100">⭐ 指定設計師</span>
+            </div>
+          </div>
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-medium">後續開放時段預約</span>
+            <span class="px-3 py-1.5 rounded-xl bg-purple-600 group-hover:bg-purple-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+              <span>查看詳情</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- 5. 衣服送洗 -->
+        <div onclick="openHelperModal('laundry')" class="bg-white p-5 rounded-2xl border-2 border-indigo-200 hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
+                <i data-lucide="shirt" class="w-6 h-6"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-900 text-xs font-bold border border-indigo-200">專業洗衣對接中</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-indigo-700 flex items-center gap-1.5">
+              <span>衣服送洗</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-indigo-50 text-indigo-800 font-semibold border border-indigo-200">物業代收送</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              特約專業連鎖洗衣乾洗廠每週定期收送，西裝、羽絨大衣、羊毛被與高級衣物皆能細心整燙清潔。住戶交由物業櫃檯代轉，洗滌完成推播通知領件。
+            </p>
+            <div class="mt-3 flex flex-wrap gap-1.5 text-xs text-indigo-950">
+              <span class="px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-100">👔 高級西裝乾洗</span>
+              <span class="px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-100">🧥 羽絨長大衣</span>
+              <span class="px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-100">🛏️ 寢具被單水洗</span>
+              <span class="px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-100">📦 社區櫃檯收送</span>
+            </div>
+          </div>
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-medium">後續開放登記送洗</span>
+            <span class="px-3 py-1.5 rounded-xl bg-indigo-600 group-hover:bg-indigo-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+              <span>查看詳情</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- 6. 服務許願池 / 店家推薦 -->
+        <div onclick="openHelperModal('suggest')" class="bg-slate-50/70 p-5 rounded-2xl border-2 border-dashed border-slate-300 hover:border-purple-400 hover:bg-purple-50/30 transition-all cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
+                <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-bold">住戶許願池</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-800 group-hover:text-purple-900 flex items-center gap-1.5">
+              <span>推薦特約店家</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold border border-slate-200">持續擴充</span>
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+              您有常去的生活愛店或希望社區引進的便民服務嗎？歡迎向管委會或物業總幹事提議，我們將優先安排洽談特約合作！
+            </p>
+          </div>
+          <div class="pt-4 mt-4 border-t border-slate-200 flex items-center justify-between">
+            <span class="text-xs text-slate-400 font-medium">共同打造美好社區</span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-800 group-hover:bg-purple-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+              <span>提議推薦</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </section>
   </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 生活小幫手服務詳情彈窗 (建置中說明) -->
+  <!-- ============================================== -->
+  <div id="helper-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden flex items-center justify-center p-4" style="z-index: 9995;" onclick="if(event.target === this) closeHelperModal()">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-2 border-slate-200">
+      <div class="p-5 border-b flex items-center justify-between bg-slate-50">
+        <div class="flex items-center space-x-2.5">
+          <div id="helper-modal-icon" class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-xs">
+            <i data-lucide="sparkles" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="helper-modal-title" class="text-base sm:text-lg font-bold text-slate-900">生活服務詳情</h3>
+            <div id="helper-modal-badge" class="text-xs text-purple-700 font-bold">服務建置中 · 即將上線</div>
+          </div>
+        </div>
+        <button onclick="closeHelperModal()" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <div class="p-5 sm:p-6 space-y-4">
+        <div class="p-3.5 bg-purple-50/70 border border-purple-200 rounded-xl text-xs sm:text-sm text-purple-950 flex items-start space-x-2.5 leading-relaxed">
+          <i data-lucide="info" class="w-5 h-5 text-purple-700 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <span class="font-bold">【服務建置中說明】：</span>
+            <span>本項便民服務板塊已完成建置，管委會與物業管理團隊目前正積極接洽周邊優質店家與系統對接，後續將陸續開放線上即時預約與一鍵通報功能，敬請期待！</span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-slate-400">服務特色與規劃內容：</div>
+          <div id="helper-modal-content" class="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2"></div>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1.5">
+          <div class="font-bold text-slate-800 flex items-center gap-1.5">
+            <i data-lucide="phone" class="w-3.5 h-3.5 text-slate-500"></i>
+            <span>住戶目前若有急迫需求，亦可直接洽詢社區櫃檯：</span>
+          </div>
+          <div class="text-slate-600">固德物業櫃檯專線：(02) 2345-6789 分機 9（服務時間 08:00 - 20:00）</div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t bg-slate-50 flex items-center justify-end gap-2">
+        <button onclick="closeHelperModal()" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors">
+          我瞭解了
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ============================================== -->
   <!-- MODAL 1: 附件高清預覽 Lightbox (支援 JPG 大圖與 PDF 檢視) -->
@@ -1738,6 +2028,10 @@
       petty: {
         active: "bg-teal-600 text-white border-teal-600 shadow-xs",
         inactive: "bg-teal-50 text-teal-900 border-teal-200 hover:bg-teal-100"
+      },
+      helper: {
+        active: "bg-purple-600 text-white border-purple-600 shadow-xs",
+        inactive: "bg-purple-50 text-purple-900 border-purple-200 hover:bg-purple-100"
       }
     };
 
@@ -1746,28 +2040,28 @@
       resident: {
         desc: '當前登入：<strong>住戶（A棟8樓之1 · 饒先生）</strong>',
         prompts: [
+          { text: '生活小幫手有哪些特約便民服務？', theme: 'border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100' },
           { text: '我這個月管理費繳了嗎？', theme: 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100' },
           { text: '走廊可以放鞋櫃嗎？', theme: 'border-indigo-300 bg-indigo-50 text-indigo-900 hover:bg-indigo-100' },
-          { text: '防水閘門每年何時演練？', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' },
-          { text: '社區可以帶寵物進電梯嗎？', theme: 'border-sky-300 bg-sky-50 text-sky-900 hover:bg-sky-100' }
+          { text: '防水閘門每年何時演練？', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' }
         ]
       },
       property: {
         desc: '當前登入：<strong>固德物業（案場總幹事）</strong>',
         prompts: [
           { text: '固德高瑞彣費用報支簽核進度', theme: 'border-teal-300 bg-teal-50 text-teal-900 hover:bg-teal-100' },
+          { text: '社區生活小幫手五大特約進度', theme: 'border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100' },
           { text: '查詢本月未繳管理費名單', theme: 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100' },
-          { text: '模擬中央氣象局豪大雨特報', theme: 'border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100' },
-          { text: '防水閘門實兵操演規約要求', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' }
+          { text: '模擬中央氣象局豪大雨特報', theme: 'border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100' }
         ]
       },
       committee: {
         desc: '當前登入：<strong>管委會委員（審核監督）</strong>',
         prompts: [
+          { text: '生活小幫手水電與餐飲合作方案', theme: 'border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100' },
           { text: '高瑞彣提報八月份費用與取款條', theme: 'border-teal-300 bg-teal-50 text-teal-900 hover:bg-teal-100' },
           { text: '走廊放鞋櫃是否違反歷史決議？', theme: 'border-indigo-300 bg-indigo-50 text-indigo-900 hover:bg-indigo-100' },
-          { text: '防水閘門未演練有何法律責任？', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' },
-          { text: '地下室安裝充電樁之規定', theme: 'border-blue-300 bg-blue-50 text-blue-900 hover:bg-blue-100' }
+          { text: '防水閘門未演練有何法律責任？', theme: 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100' }
         ]
       }
     };
@@ -1844,7 +2138,7 @@
 
     function switchTab(tabId) {
       currentTab = tabId;
-      ['chat', 'rules', 'flood', 'vision', 'finance', 'petty'].forEach(t => {
+      ['chat', 'rules', 'flood', 'vision', 'finance', 'petty', 'helper'].forEach(t => {
         const el = document.getElementById(`view-${t}`);
         const btn = document.getElementById(`tab-${t}`);
         if (el && btn) {
@@ -1962,6 +2256,9 @@
         const petty = appData.petty_cash;
         const itemsStr = petty.items.map((i, idx) => `  • 編號 ${i.no || idx+1}. ${i.title}（${i.vendor}）：NT$ ${i.amount.toLocaleString()} 元`).join('\n');
         return `【固德物業（承辦人：${petty.submitter_name || '高瑞彣'}）費用報支與簽核進度】\n📋 案件：${petty.case_title || '115年八月份費用報支案'}\n💰 4 筆支出總計：NT$ ${petty.total_spent.toLocaleString()} 元\n${itemsStr}\n🏦 專款存轉：8/31 華南提領 50,000 元轉存入社區郵局帳戶\n🔍 AI 自動勾稽：四表合一金額吻合、5萬存轉無誤、報價單簽認合格、高瑞彣核章完備\n🖋️ 簽核狀態：${petty.final_status === 'approved' ? '已全額核准（3位委員同意）' : '審核中'}\n📎 您可切換至「費用報支簽核」頁籤直接在線預覽所有原始 JPG 單據大圖與 PDF 財務通知！`;
+      }
+      if (/生活小幫手|水電|餐館|餐廳|團購|生鮮|燙髮|美髮|送洗|洗衣|便民/.test(msg)) {
+        return "【大清天朵二期 · 生活小幫手服務】\n社區已建置五大專屬便民生活服務板塊：\n1. 🔧 水電維修：專業持證技師、透明收費標準、到府檢測維修。\n2. 🍽️ 附近餐館預訂：精選周邊人氣名店、住戶專屬9折優惠、免排隊保留席。\n3. 🥬 生鮮團購：有機當令蔬果箱、產地海陸肉品、社區物業低溫冷藏代收。\n4. 💇 燙髮美髮預約：周邊口碑名店沙龍、天朵住戶85折禮遇、指定設計師。\n5. 👔 衣服送洗：專業乾洗水洗、蒸氣立體整燙、物業櫃檯代收代送。\n📌 說明：各功能板塊目前已先建置完成，後續將陸續完成特約商家簽約與線上預約系統串接！您可直接切換至「生活小幫手」頁籤查看詳情。";
       }
       return `收到提問。您可在上方功能按鈕快速執行規約比對、氣象警特報模擬、異常拍照派單或管理費對帳！`;
     }
@@ -2472,6 +2769,108 @@
       document.getElementById('attachment-modal').classList.add('hidden');
       document.getElementById('modal-att-frame').src = '';
       document.getElementById('modal-att-img').src = '';
+    }
+
+    // 生活小幫手服務詳情資料庫與彈窗
+    const helperServicesData = {
+      plumbing: {
+        title: '水電維修服務',
+        badge: '專業合格技師 · 特約洽談中',
+        colorClass: 'bg-sky-600',
+        icon: 'wrench',
+        items: [
+          '【服務項目】：室內漏水抓漏、水龍頭/蓮蓬頭更換、電燈照明檢修、開關插座更換、配電盤跳電查線、衛浴馬桶疏通等。',
+          '【品質承諾】：嚴選具備甲級/乙級技術士合格證照之專業水電技師，出勤統一制服配戴識別證，安全有保障。',
+          '【透明公道】：遵循管委會把關之公定收費標準，施工前出具標準報價單確認，絕不惡意加價或漫天喊價。',
+          '【後續規劃】：先完成功能板塊建置，後續將開放線上「一鍵報修」拍照上傳派單與即時推播施工進度。'
+        ]
+      },
+      restaurant: {
+        title: '附近餐館預訂',
+        badge: '在地人氣美食 · 特約折扣簽約中',
+        colorClass: 'bg-amber-500',
+        icon: 'utensils',
+        items: [
+          '【嚴選店家】：彙整社區周邊步行 5~10 分鐘內人氣餐飲，包括日式定食、輕食早午餐、精緻合菜及私房小館。',
+          '【住戶專屬】：憑社區住戶識別證或住戶 APP，尊享特約用餐 9 折優惠或主廚特製招待小菜。',
+          '【保留席位】：尖峰用餐時段優先保留專屬席位，省去現場排隊久候之苦。',
+          '【後續規劃】：先建置服務模組，後續將直接串接各店家線上即時訂位與外帶外送點餐系統。'
+        ]
+      },
+      grocery: {
+        title: '生鮮團購服務',
+        badge: '產地直送低溫冷藏 · 小農洽談中',
+        colorClass: 'bg-emerald-600',
+        icon: 'shopping-bag',
+        items: [
+          '【品質嚴選】：與產地友善耕作小農、認證生鮮供應商合作，定期抽檢農藥殘留，為食安嚴格把關。',
+          '【團購好物】：每週精選有機當季蔬菜箱、無毒放牧土雞蛋、特級急凍海鮮、優質肉品與產地水果。',
+          '【冷藏代收】：生鮮低溫專車定期直送社區，物業管理室低溫保鮮冷藏箱代收，住戶下班便利領取。',
+          '【後續規劃】：先建置好服務版面，後續將上線每週開團表單與一鍵湊團功能，享產地量販超值優惠。'
+        ]
+      },
+      hair: {
+        title: '燙髮美髮預約',
+        badge: '口碑名店沙龍 · 特約禮遇簽約中',
+        colorClass: 'bg-purple-600',
+        icon: 'scissors',
+        items: [
+          '【特約沙龍】：合作周邊高評價、設計師資深經驗豐富之知名美髮品牌與專業造型工作室。',
+          '【住戶禮遇】：天朵二期住戶獨享剪髮、韓系燙髮、質感染髮、頭皮深層養護專屬 85 折至 9 折折扣。',
+          '【專屬時段】：可線上指定設計師與避開尖峰時段，享受一對一細緻服務。',
+          '【後續規劃】：先建置好展示版塊，後續將提供線上作品集瀏覽與設計師預約行事曆串接。'
+        ]
+      },
+      laundry: {
+        title: '衣服送洗服務',
+        badge: '專業乾洗整燙 · 社區代收代送',
+        colorClass: 'bg-indigo-600',
+        icon: 'shirt',
+        items: [
+          '【洗滌項目】：高級西裝、禮服、羽絨長大衣、羊毛大衣、厚重蠶絲被、床單被套及精品皮件保養。',
+          '【專業工法】：合作專業環保乾洗中央大廠，蒸氣立體整燙，防塵袋密封包裝，深層抗菌除蟎。',
+          '【零接觸收送】：只需放入專用送洗袋交由 1 樓物業櫃檯登記，送洗完成推播通知住戶取件。',
+          '【後續規劃】：先建置好服務介面，後續將提供線上登記件數、價格估算與送洗條碼追蹤功能。'
+        ]
+      },
+      suggest: {
+        title: '推薦特約店家 / 住戶許願池',
+        badge: '共同打造美好社區 · 持續擴充中',
+        colorClass: 'bg-purple-800',
+        icon: 'heart-handshake',
+        items: [
+          '【住戶許願】：您在社區周邊有經常光顧、品質優良的私房好店（如寵物美容、居家清潔、洗車等）嗎？',
+          '【管委會接洽】：只要住戶向管委會或物業總幹事提議，物業團隊將主動洽訪商家溝通天朵住戶專屬特約方案！',
+          '【提議管道】：可於線上 AI 助理留言提議，或至 1 樓物業櫃檯向總幹事登記推薦名單。'
+        ]
+      }
+    };
+
+    function openHelperModal(serviceKey) {
+      const info = helperServicesData[serviceKey];
+      if (!info) return;
+
+      document.getElementById('helper-modal-title').textContent = info.title;
+      document.getElementById('helper-modal-badge').textContent = info.badge;
+
+      const iconEl = document.getElementById('helper-modal-icon');
+      iconEl.className = `w-10 h-10 rounded-xl ${info.colorClass} text-white flex items-center justify-center font-bold shadow-xs`;
+      iconEl.innerHTML = `<i data-lucide="${info.icon}" class="w-5 h-5"></i>`;
+
+      const contentEl = document.getElementById('helper-modal-content');
+      contentEl.innerHTML = info.items.map(item => `
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+          ${item}
+        </div>
+      `).join('');
+
+      document.getElementById('helper-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeHelperModal() {
+      const modal = document.getElementById('helper-modal');
+      if (modal) modal.classList.add('hidden');
     }
 
     // 模擬推播 LINE 簽核通知
