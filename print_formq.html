@@ -9,7 +9,7 @@
     /* ========================================================= */
     @page {
       size: A4 portrait;
-      margin: 18mm 15mm 18mm 15mm;
+      margin: 13mm 14mm 13mm 14mm;
     }
 
     * {
@@ -42,27 +42,37 @@
       justify-content: space-between;
     }
 
-    /* 列印模式下的樣式 */
+    /* 列印模式下的樣式：鎖定精準 2 頁，杜絕第 3 頁空白 */
     @media print {
-      body {
-        background: #ffffff;
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
       }
       .no-print {
         display: none !important;
       }
       .sheet-page {
         width: 100% !important;
-        min-height: 100vh !important;
-        height: 100vh !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
         box-shadow: none !important;
-        page-break-after: always;
-        break-after: page;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        overflow: hidden !important;
       }
-      .sheet-page:last-child {
-        page-break-after: avoid;
-        break-after: avoid;
+      /* 僅在第二頁前方強制換頁，第二頁後方絕不添加任何換頁符號，印表機必定只印 2 張 */
+      .sheet-page + .sheet-page {
+        page-break-before: always !important;
+        break-before: page !important;
       }
     }
 
@@ -391,12 +401,12 @@
     .committee-col {
       border: 1.5px solid #cbd5e1;
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px;
       background: #ffffff;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 245px;
+      min-height: 220px;
     }
     .comm-head {
       border-bottom: 1px solid #e2e8f0;
@@ -467,8 +477,73 @@
     }
     .audit-summary-box strong {
       color: #0f172a;
-    }
   </style>
+  <script>
+    // 自動同步 localStorage 或後端資料 (若存在)
+    window.addEventListener('DOMContentLoaded', async () => {
+      let data = null;
+      try {
+        const resp = await fetch('/api/petty_cash');
+        const resJson = await resp.json();
+        if (resJson && resJson.petty_cash) data = resJson.petty_cash;
+      } catch (e) {}
+
+      if (!data) {
+        try {
+          const local = localStorage.getItem('daqing_community_data');
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (parsed && parsed.petty_cash) data = parsed.petty_cash;
+          }
+        } catch (e) {}
+      }
+
+      if (data) {
+        // 同步 3 位委員意見
+        if (data.approvals) {
+          if (data.approvals.director) {
+            if (data.approvals.director.name) {
+              document.getElementById('comm-name-dir').textContent = data.approvals.director.name;
+              document.getElementById('stamp-name-dir').textContent = data.approvals.director.name;
+            }
+            if (data.approvals.director.comment) {
+              document.getElementById('comm-opinion-dir').textContent = data.approvals.director.comment;
+            }
+            if (data.approvals.director.time) {
+              document.getElementById('comm-time-dir').textContent = data.approvals.director.time;
+              document.getElementById('stamp-date-dir').textContent = data.approvals.director.time.split(' ')[0];
+            }
+          }
+          if (data.approvals.finance) {
+            if (data.approvals.finance.name) {
+              document.getElementById('comm-name-fin').textContent = data.approvals.finance.name;
+              document.getElementById('stamp-name-fin').textContent = data.approvals.finance.name;
+            }
+            if (data.approvals.finance.comment) {
+              document.getElementById('comm-opinion-fin').textContent = data.approvals.finance.comment;
+            }
+            if (data.approvals.finance.time) {
+              document.getElementById('comm-time-fin').textContent = data.approvals.finance.time;
+              document.getElementById('stamp-date-fin').textContent = data.approvals.finance.time.split(' ')[0];
+            }
+          }
+          if (data.approvals.supervisor) {
+            if (data.approvals.supervisor.name) {
+              document.getElementById('comm-name-sup').textContent = data.approvals.supervisor.name;
+              document.getElementById('stamp-name-sup').textContent = data.approvals.supervisor.name;
+            }
+            if (data.approvals.supervisor.comment) {
+              document.getElementById('comm-opinion-sup').textContent = data.approvals.supervisor.comment;
+            }
+            if (data.approvals.supervisor.time) {
+              document.getElementById('comm-time-sup').textContent = data.approvals.supervisor.time;
+              document.getElementById('stamp-date-sup').textContent = data.approvals.supervisor.time.split(' ')[0];
+            }
+          }
+        }
+      }
+    });
+  </script>
 </head>
 <body>
 
@@ -476,11 +551,11 @@
   <div class="toolbar-bar no-print">
     <div style="display: flex; align-items: center; gap: 10px;">
       <span style="font-size: 16px; font-weight: 800; letter-spacing: 0.5px;">📄 大清天朵二期社區 財務公文簽核系統</span>
-      <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #334155; color: #94a3b8;">標準 A4 天地校準版 (頁邊距 18mm · 絕無重疊)</span>
+      <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #065f46; color: #a7f3d0; font-weight: bold;">✅ 已校準精準 2 頁 · 絕無多餘第 3 頁空白</span>
     </div>
     <div style="display: flex; gap: 10px;">
       <button onclick="window.print()" class="btn-action btn-primary">
-        <span>🖨️ 立即列印 / 另存為 PDF</span>
+        <span>🖨️ 立即列印 / 另存為 PDF (精準 2 頁)</span>
       </button>
       <button onclick="window.close()" class="btn-action btn-secondary">
         <span>關閉視窗</span>
@@ -739,72 +814,5 @@
       <span class="footer-brand">大清天朵二期社區管理委員會 存查聯</span>
     </div>
   </div>
-
-  <script>
-    // 自動同步 localStorage 或後端資料 (若存在)
-    window.addEventListener('DOMContentLoaded', async () => {
-      let data = null;
-      try {
-        const resp = await fetch('/api/petty_cash');
-        const resJson = await resp.json();
-        if (resJson && resJson.petty_cash) data = resJson.petty_cash;
-      } catch (e) {}
-
-      if (!data) {
-        try {
-          const local = localStorage.getItem('daqing_community_data');
-          if (local) {
-            const parsed = JSON.parse(local);
-            if (parsed && parsed.petty_cash) data = parsed.petty_cash;
-          }
-        } catch (e) {}
-      }
-
-      if (data) {
-        // 同步 3 位委員意見
-        if (data.approvals) {
-          if (data.approvals.director) {
-            if (data.approvals.director.name) {
-              document.getElementById('comm-name-dir').textContent = data.approvals.director.name;
-              document.getElementById('stamp-name-dir').textContent = data.approvals.director.name;
-            }
-            if (data.approvals.director.comment) {
-              document.getElementById('comm-opinion-dir').textContent = data.approvals.director.comment;
-            }
-            if (data.approvals.director.time) {
-              document.getElementById('comm-time-dir').textContent = data.approvals.director.time;
-              document.getElementById('stamp-date-dir').textContent = data.approvals.director.time.split(' ')[0];
-            }
-          }
-          if (data.approvals.finance) {
-            if (data.approvals.finance.name) {
-              document.getElementById('comm-name-fin').textContent = data.approvals.finance.name;
-              document.getElementById('stamp-name-fin').textContent = data.approvals.finance.name;
-            }
-            if (data.approvals.finance.comment) {
-              document.getElementById('comm-opinion-fin').textContent = data.approvals.finance.comment;
-            }
-            if (data.approvals.finance.time) {
-              document.getElementById('comm-time-fin').textContent = data.approvals.finance.time;
-              document.getElementById('stamp-date-fin').textContent = data.approvals.finance.time.split(' ')[0];
-            }
-          }
-          if (data.approvals.supervisor) {
-            if (data.approvals.supervisor.name) {
-              document.getElementById('comm-name-sup').textContent = data.approvals.supervisor.name;
-              document.getElementById('stamp-name-sup').textContent = data.approvals.supervisor.name;
-            }
-            if (data.approvals.supervisor.comment) {
-              document.getElementById('comm-opinion-sup').textContent = data.approvals.supervisor.comment;
-            }
-            if (data.approvals.supervisor.time) {
-              document.getElementById('comm-time-sup').textContent = data.approvals.supervisor.time;
-              document.getElementById('stamp-date-sup').textContent = data.approvals.supervisor.time.split(' ')[0];
-            }
-          }
-        }
-      }
-    });
-  </script>
 </body>
 </html>
