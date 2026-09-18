@@ -103,7 +103,8 @@ DEFAULT_DATA = {
                 "invoice": "收據 (免用發票專用收據)",
                 "date": "115-08-15",
                 "desc": "本月份梯廳與公共走廊環境清潔服務費",
-                "attachment": "一般費用報支單.jpg"
+                "attachment": "一般費用報支單.jpg",
+                "attachments": ["一般費用報支單.jpg"]
             },
             {
                 "id": 16,
@@ -116,7 +117,8 @@ DEFAULT_DATA = {
                 "date": "115-08-15",
                 "desc": "七月份、八月份顧問服務費 (2式*9,000元)",
                 "attachment": "一般費用報支單1.jpg",
-                "payment_slip": "一般費用報支單3.jpg"
+                "payment_slip": "一般費用報支單3.jpg",
+                "attachments": ["一般費用報支單1.jpg", "一般費用報支單3.jpg"]
             },
             {
                 "id": 17,
@@ -130,7 +132,8 @@ DEFAULT_DATA = {
                 "desc": "門口鎖具繼電器故障檢修與拆裝 (8/3維修完成)",
                 "attachment": "一般費用報支單7.jpg",
                 "quote_slip": "維修商報價單1.jpg",
-                "payment_slip": "一般費用報支單5.jpg"
+                "payment_slip": "一般費用報支單5.jpg",
+                "attachments": ["一般費用報支單7.jpg", "維修商報價單1.jpg", "一般費用報支單5.jpg"]
             },
             {
                 "id": 18,
@@ -143,7 +146,8 @@ DEFAULT_DATA = {
                 "date": "115-08-20",
                 "desc": "8/20至社區檢測安全系統出勤工資",
                 "attachment": "一般費用報支單2.jpg",
-                "payment_slip": "一般費用報支單6.jpg"
+                "payment_slip": "一般費用報支單6.jpg",
+                "attachments": ["一般費用報支單2.jpg", "一般費用報支單6.jpg"]
             }
         ],
         "approvals": {

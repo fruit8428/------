@@ -1446,6 +1446,9 @@
       renderPettyCash();
       renderResidentsTable();
       renderFloodSystem();
+      if (window.location.hash === '#open-formq' || new URLSearchParams(window.location.search).get('modal') === 'formq') {
+        openFormQModal();
+      }
     });
 
     function toggleElement(id) {
@@ -2204,37 +2207,34 @@
 
     function openFormQModal() {
       if (!appData || !appData.petty_cash) return;
-      document.getElementById('form-q-modal').classList.remove('hidden');
-      switchFormQTab('form');
+      const modal = document.getElementById('form-q-modal');
+      if (modal) modal.classList.remove('hidden');
       populateFormQ();
     }
 
     function closeFormQModal() {
-      document.getElementById('form-q-modal').classList.add('hidden');
+      const modal = document.getElementById('form-q-modal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function switchFormQTab(tab) {
       const vForm = document.getElementById('formq-view-form');
+      if (vForm) vForm.classList.remove('hidden');
       const vScan = document.getElementById('formq-view-scan');
-      const btnForm = document.getElementById('formq-tab-btn-form');
-      const btnScan = document.getElementById('formq-tab-btn-scan');
-
-      if (tab === 'scan') {
-        vForm.classList.add('hidden');
-        vScan.classList.remove('hidden');
-        btnScan.className = "px-3 py-1 text-xs font-bold rounded-md bg-teal-500 text-slate-950 shadow-xs flex items-center space-x-1";
-        btnForm.className = "px-3 py-1 text-xs font-bold rounded-md text-slate-300 hover:text-white flex items-center space-x-1";
-      } else {
-        vScan.classList.add('hidden');
-        vForm.classList.remove('hidden');
-        btnForm.className = "px-3 py-1 text-xs font-bold rounded-md bg-teal-500 text-slate-950 shadow-xs flex items-center space-x-1";
-        btnScan.className = "px-3 py-1 text-xs font-bold rounded-md text-slate-300 hover:text-white flex items-center space-x-1";
-      }
-      lucide.createIcons();
+      if (vScan) vScan.classList.add('hidden');
     }
 
     function populateFormQ() {
+      if (!appData) return;
+      if (!appData.petty_cash) {
+        appData.petty_cash = JSON.parse(JSON.stringify(SEED_DATA.petty_cash));
+      }
       const petty = appData.petty_cash;
+      if (!petty.items || !Array.isArray(petty.items) || petty.items.length === 0) {
+        if (SEED_DATA && SEED_DATA.petty_cash && SEED_DATA.petty_cash.items) {
+          petty.items = JSON.parse(JSON.stringify(SEED_DATA.petty_cash.items));
+        }
+      }
       const tbody = document.getElementById('formq-items-tbody');
       if (!tbody) return;
 
