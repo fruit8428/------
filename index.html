@@ -1257,7 +1257,7 @@
           </div>
           <div>
             <div class="font-bold text-base flex items-center space-x-2">
-              <span>單據附件選擇與管理</span>
+              <span>單據附件管理 · 手機拍照上傳</span>
               <span id="receipt-modal-badge" class="text-xs px-2 py-0.5 rounded-full bg-teal-900 text-teal-200 border border-teal-600 font-mono">第 15 筆</span>
             </div>
             <div id="receipt-modal-sub" class="text-xs text-slate-300 mt-0.5">環境清潔服務費 (八月份) · 誼潔家事服務企業社</div>
@@ -1272,112 +1272,56 @@
       <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 bg-slate-50">
         
         <!-- 目前單據狀態卡片 -->
-        <div id="receipt-current-status-box" class="p-3.5 bg-white rounded-xl border-2 border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-3">
-          <div class="flex items-center space-x-3 min-w-0">
-            <div id="receipt-status-thumb" class="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
-              <i data-lucide="file-text" class="w-6 h-6 text-slate-400"></i>
+        <div id="receipt-current-status-box" class="p-3.5 sm:p-4 bg-white rounded-xl border-2 border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center space-x-3.5 min-w-0">
+            <div id="receipt-status-thumb" class="w-14 h-14 rounded-xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
+              <i data-lucide="file-text" class="w-7 h-7 text-slate-400"></i>
             </div>
             <div class="min-w-0">
-              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">目前關聯單據附件</div>
-              <div id="receipt-current-name" class="text-sm font-bold text-slate-800 truncate">一般費用報支單.jpg</div>
+              <div class="text-xs font-bold text-slate-400 uppercase tracking-wide">目前關聯單據附件</div>
+              <div id="receipt-current-name" class="text-base font-bold text-slate-900 truncate">一般費用報支單.jpg</div>
               <div id="receipt-current-desc" class="text-xs text-slate-500 mt-0.5">已由固德物業高瑞彣核章存檔</div>
             </div>
           </div>
           <div id="receipt-current-actions" class="flex items-center space-x-2">
-            <button type="button" onclick="previewCurrentReceipt()" class="px-3 py-1.5 rounded-lg border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold text-xs flex items-center space-x-1 shadow-2xs">
-              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            <button type="button" onclick="previewCurrentReceipt()" class="px-4 py-2 rounded-xl border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-950 font-bold text-xs sm:text-sm flex items-center space-x-1.5 shadow-2xs cursor-pointer">
+              <i data-lucide="eye" class="w-4 h-4 text-teal-700"></i>
               <span>放大檢視目前單據</span>
             </button>
           </div>
         </div>
 
-        <!-- 提示分隔字樣 -->
-        <div class="relative flex py-1 items-center">
-          <div class="flex-grow border-t border-slate-300"></div>
-          <span class="flex-shrink mx-4 text-xs font-bold text-slate-500 bg-slate-200 px-3 py-1 rounded-full uppercase tracking-wider">請選擇單據取得方式</span>
-          <div class="flex-grow border-t border-slate-300"></div>
-        </div>
-
-        <!-- 兩個選擇卡片 (大按鈕、清晰外框、敬老友善) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <!-- 選擇一：從資料庫照或照片中抓取 -->
-          <div class="p-4 bg-white rounded-xl border-2 border-indigo-300 hover:border-indigo-500 shadow-xs flex flex-col justify-between transition-all">
-            <div>
-              <div class="flex items-center space-x-2 text-indigo-900 mb-2">
-                <div class="p-2 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-700">
-                  <i data-lucide="database" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h4 class="font-bold text-sm text-indigo-950">1. 從資料庫照中抓取</h4>
-                  <p class="text-2xs text-indigo-700 font-semibold">檢視現有單據或從單據庫挑選</p>
-                </div>
-              </div>
-              <p class="text-xs text-slate-600 leading-relaxed mb-3">
-                直接預覽目前關聯的正式照片，或從社區現有 15 份單據庫（報支單、發票、報價單、取款條傳票）中點選抓取綁定。
-              </p>
+        <!-- 提供手機拍照，直接上傳 (保留功能) -->
+        <div class="p-5 bg-white rounded-2xl border-2 border-emerald-400 shadow-xs space-y-4">
+          <div class="flex items-center space-x-3 text-emerald-950 pb-3 border-b border-emerald-100">
+            <div class="p-2.5 bg-emerald-100 border border-emerald-300 rounded-xl text-emerald-800 shadow-2xs">
+              <i data-lucide="camera" class="w-6 h-6"></i>
             </div>
-
-            <div class="space-y-2 pt-3 border-t border-indigo-100">
-              <button type="button" onclick="previewCurrentReceipt()" class="w-full py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors shadow-2xs">
-                <i data-lucide="eye" class="w-4 h-4"></i>
-                <span>👁️ 預覽目前已抓取的單據照片</span>
-              </button>
-              <button type="button" onclick="toggleDatabasePicker()" class="w-full py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border-2 border-indigo-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors">
-                <i data-lucide="folder-search" class="w-3.5 h-3.5"></i>
-                <span>🗄️ 從資料庫 15 份單據中挑選更換</span>
-              </button>
+            <div>
+              <h4 class="font-bold text-base text-emerald-950">提供手機拍照，直接上傳</h4>
+              <p class="text-xs text-emerald-700 font-semibold">手機相機現場拍攝 / 相簿檔案上傳</p>
             </div>
           </div>
 
-          <!-- 選擇二：提供手機拍照，直接上傳 -->
-          <div class="p-4 bg-white rounded-xl border-2 border-emerald-300 hover:border-emerald-500 shadow-xs flex flex-col justify-between transition-all">
-            <div>
-              <div class="flex items-center space-x-2 text-emerald-900 mb-2">
-                <div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700">
-                  <i data-lucide="camera" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h4 class="font-bold text-sm text-emerald-950">2. 提供手機拍照，直接上傳</h4>
-                  <p class="text-2xs text-emerald-700 font-semibold">手機相機現場拍攝 / 相簿檔案上傳</p>
-                </div>
-              </div>
-              <p class="text-xs text-slate-600 leading-relaxed mb-3">
-                物業人員高瑞彣或管理員可持手機現場開啟鏡頭拍照，直接上傳收據發票，即時關聯至本筆待支付項目。
-              </p>
-            </div>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            物業人員高瑞彣或管理員可持手機現場開啟鏡頭拍照，直接上傳收據發票或工作單據，即時關聯至本筆待支付項目。
+          </p>
 
-            <div class="space-y-2 pt-3 border-t border-emerald-100">
-              <button type="button" onclick="triggerMobileCamera()" class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors shadow-2xs">
-                <i data-lucide="camera" class="w-4 h-4"></i>
-                <span>📸 啟動手機相機拍照</span>
-              </button>
-              <button type="button" onclick="triggerFileUpload()" class="w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-2 border-emerald-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors">
-                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
-                <span>📁 從相簿或電腦選取檔案</span>
-              </button>
-            </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <button type="button" onclick="triggerMobileCamera()" class="py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm sm:text-base flex items-center justify-center space-x-2 transition-all shadow-xs cursor-pointer">
+              <i data-lucide="camera" class="w-5 h-5"></i>
+              <span>📸 啟動手機相機拍照</span>
+            </button>
+            <button type="button" onclick="triggerFileUpload()" class="py-3 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-2 border-emerald-300 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center space-x-2 transition-all cursor-pointer">
+              <i data-lucide="upload-cloud" class="w-5 h-5 text-emerald-700"></i>
+              <span>📁 從相簿或電腦選取檔案</span>
+            </button>
           </div>
-
         </div>
 
         <!-- 隱藏的手機相機與檔案 Input (capture="environment" 會直接調用手機後置相機鏡頭) -->
         <input type="file" id="formq-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptFileSelect(event, 'camera')">
         <input type="file" id="formq-file-input" accept="image/*" class="hidden" onchange="handleReceiptFileSelect(event, 'file')">
-
-        <!-- 展開的資料庫選單 (預設隱藏) -->
-        <div id="receipt-db-picker" class="hidden p-4 bg-indigo-50/70 rounded-xl border-2 border-indigo-200 space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-indigo-950 flex items-center space-x-1.5">
-              <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
-              <span>請自社區 15 份資料庫單據中點選一張抓取：</span>
-            </span>
-            <button type="button" onclick="toggleDatabasePicker()" class="text-xs text-indigo-700 hover:underline font-bold">收起清單 ▲</button>
-          </div>
-          <div id="receipt-db-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1 text-xs">
-            <!-- 動態渲染資料庫 15 張單據項目 -->
-          </div>
-        </div>
 
         <!-- 拍照/上傳後的即時預覽與確認區 (預設隱藏，拍照或選檔後顯示) -->
         <div id="receipt-upload-preview-box" class="hidden p-4 bg-emerald-50 rounded-xl border-2 border-emerald-400 space-y-3">
@@ -1622,7 +1566,7 @@
       } catch (e) {}
 
       isStandalone = true;
-      const DATA_VER = 'v115_08_gao_receipt_zindex_fix_v6';
+      const DATA_VER = 'v115_08_gao_receipt_mobile_only_v7';
       if (localStorage.getItem('daqing_community_data_ver') !== DATA_VER) {
         localStorage.removeItem('daqing_community_data');
         localStorage.setItem('daqing_community_data_ver', DATA_VER);
@@ -2703,9 +2647,7 @@
       currentReceiptItemIdx = idx;
       tempUploadedImageData = null;
 
-      const dbPicker = document.getElementById('receipt-db-picker');
       const uploadBox = document.getElementById('receipt-upload-preview-box');
-      if (dbPicker) dbPicker.classList.add('hidden');
       if (uploadBox) uploadBox.classList.add('hidden');
 
       const item = appData.petty_cash.items[idx];
@@ -2717,7 +2659,6 @@
       if (sub) sub.textContent = `${item.title || '待支付項目'} · ${item.vendor || '廠商'} (NT$ ${(item.amount || 0).toLocaleString()} 元)`;
 
       updateReceiptStatusBox();
-      renderReceiptDbList();
 
       document.getElementById('receipt-option-modal').classList.remove('hidden');
       lucide.createIcons();
@@ -2738,8 +2679,8 @@
       if (!item || !item.attachment) {
         if (thumbEl) thumbEl.innerHTML = `<i data-lucide="paperclip" class="w-6 h-6 text-amber-500"></i>`;
         if (nameEl) nameEl.textContent = '尚未綁定單據附件';
-        if (descEl) descEl.textContent = '請從下方選擇「從資料庫抓取」或「手機拍照直接上傳」';
-        if (actionEl) actionEl.innerHTML = `<span class="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg font-bold">待附單據</span>`;
+        if (descEl) descEl.textContent = '請點擊下方按鈕啟動手機相機拍照或上傳單據照片';
+        if (actionEl) actionEl.innerHTML = `<span class="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg font-bold">待拍照上傳</span>`;
       } else {
         const isData = item.attachment.startsWith('data:');
         const isUp = item.is_uploaded || isData || item.attachment.includes('現場拍照');
@@ -2752,66 +2693,18 @@
           nameEl.textContent = isData ? '現場拍照單據 (已儲存)' : item.attachment;
         }
         if (descEl) {
-          descEl.textContent = isUp ? '物業現場手機拍照上傳之單據憑證' : '已由固德物業高瑞彣自資料庫提送存檔';
+          descEl.textContent = isUp ? '物業現場手機拍照上傳之單據憑證' : '已由固德物業高瑞彣核章存檔';
         }
         if (actionEl) {
           actionEl.innerHTML = `
-            <button type="button" onclick="previewCurrentReceipt()" class="px-3 py-1.5 rounded-lg border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold text-xs flex items-center space-x-1 shadow-2xs">
-              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            <button type="button" onclick="previewCurrentReceipt()" class="px-4 py-2 rounded-xl border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-950 font-bold text-xs sm:text-sm flex items-center space-x-1.5 shadow-2xs cursor-pointer">
+              <i data-lucide="eye" class="w-4 h-4 text-teal-700"></i>
               <span>放大檢視目前單據</span>
             </button>
           `;
         }
       }
       lucide.createIcons();
-    }
-
-    function renderReceiptDbList() {
-      const listEl = document.getElementById('receipt-db-list');
-      if (!listEl) return;
-      const atts = appData.petty_cash.attachments || [];
-
-      listEl.innerHTML = atts.map((att) => `
-        <div class="p-2 bg-white rounded-lg border border-slate-200 hover:border-indigo-400 flex items-center justify-between space-x-2 transition-all">
-          <div class="flex items-center space-x-2 min-w-0 flex-1">
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">
-              ${att.category || '單據'}
-            </span>
-            <span class="truncate font-medium text-slate-800 text-xs" title="${att.title}">${att.title}</span>
-          </div>
-          <div class="flex items-center space-x-1 shrink-0">
-            <button type="button" onclick="openAttachmentModal('${att.file}', '${att.title}', '${att.category}', '${att.type}')" class="p-1 text-slate-500 hover:text-indigo-600 rounded hover:bg-indigo-50" title="預覽此張單據">
-              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-            </button>
-            <button type="button" onclick="selectDatabaseReceipt('${att.file}', '${att.title}')" class="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[11px] font-bold flex items-center space-x-0.5 shadow-2xs" title="抓取此單據綁定至本項目">
-              <i data-lucide="check" class="w-3 h-3"></i>
-              <span>抓取指定</span>
-            </button>
-          </div>
-        </div>
-      `).join('');
-      lucide.createIcons();
-    }
-
-    function toggleDatabasePicker() {
-      const dbPicker = document.getElementById('receipt-db-picker');
-      if (dbPicker) dbPicker.classList.toggle('hidden');
-      lucide.createIcons();
-    }
-
-    function selectDatabaseReceipt(fileName, fileTitle) {
-      if (currentReceiptItemIdx === null) return;
-      appData.petty_cash.items[currentReceiptItemIdx].attachment = fileName;
-      appData.petty_cash.items[currentReceiptItemIdx].is_uploaded = false;
-      
-      saveFormQData(false);
-      populateFormQ();
-      updateReceiptStatusBox();
-
-      const dbPicker = document.getElementById('receipt-db-picker');
-      if (dbPicker) dbPicker.classList.add('hidden');
-
-      alert(`✅ 已成功從資料庫抓取「${fileTitle}」並綁定至本筆款項！`);
     }
 
     function previewCurrentReceipt(customIdx) {
