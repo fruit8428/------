@@ -803,8 +803,7 @@
 
   <!-- ============================================== -->
   <!-- MODAL 1: 附件高清預覽 Lightbox (支援 JPG 大圖與 PDF 檢視) -->
-  <!-- ============================================== -->
-  <div id="attachment-modal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-6">
+  <div id="attachment-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-6" style="z-index: 9999;" onclick="if(event.target === this) closeAttachmentModal()">
     <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border-2 border-slate-300">
       <div class="p-4 border-b flex items-center justify-between bg-slate-50 font-bold text-slate-900">
         <div class="flex items-center space-x-2">
@@ -839,8 +838,7 @@
 
   <!-- ============================================== -->
   <!-- MODAL 2: 費用報支結算核准書 (列印預覽) -->
-  <!-- ============================================== -->
-  <div id="pdf-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs hidden flex items-center justify-center p-4">
+  <div id="pdf-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs hidden flex items-center justify-center p-4" style="z-index: 9990;" onclick="if(event.target === this) closeApprovalPdfModal()">
     <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full flex flex-col overflow-hidden border-2 border-slate-300 text-sm">
       <div class="p-4 border-b flex items-center justify-between bg-slate-50 font-bold text-base text-slate-900">
         <span>費用報支結算核准證明書</span>
@@ -889,8 +887,7 @@
 
   <!-- ============================================== -->
   <!-- MODAL 3: 待支付費用明細表 (財Q表) 電子填單與三委員簽核 -->
-  <!-- ============================================== -->
-  <div id="form-q-modal" class="fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4">
+  <div id="form-q-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" style="z-index: 7000;">
     <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[95vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm">
       
       <!-- 頂部標題列 -->
@@ -1249,8 +1246,7 @@
 
   <!-- ============================================== -->
   <!-- MODAL 4: 單據附件管理與選擇 (雙選擇：從資料庫抓取 / 提供手機拍照直接上傳) -->
-  <!-- ============================================== -->
-  <div id="receipt-option-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4">
+  <div id="receipt-option-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4" style="z-index: 8500;" onclick="if(event.target === this) closeReceiptOptionModal()">
     <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm animate-in fade-in zoom-in duration-150">
       
       <!-- 頂部標題列 -->
@@ -1626,7 +1622,7 @@
       } catch (e) {}
 
       isStandalone = true;
-      const DATA_VER = 'v115_08_gao_receipt_picker_v5';
+      const DATA_VER = 'v115_08_gao_receipt_zindex_fix_v6';
       if (localStorage.getItem('daqing_community_data_ver') !== DATA_VER) {
         localStorage.removeItem('daqing_community_data');
         localStorage.setItem('daqing_community_data_ver', DATA_VER);
@@ -2818,14 +2814,19 @@
       alert(`✅ 已成功從資料庫抓取「${fileTitle}」並綁定至本筆款項！`);
     }
 
-    function previewCurrentReceipt() {
-      if (currentReceiptItemIdx === null) return;
-      const item = appData.petty_cash.items[currentReceiptItemIdx];
+    function previewCurrentReceipt(customIdx) {
+      const idx = (customIdx !== undefined && customIdx !== null) ? customIdx : currentReceiptItemIdx;
+      if (idx === null || idx === undefined) {
+        alert('請先選擇欲檢視之單據項目！');
+        return;
+      }
+      const item = (appData && appData.petty_cash && appData.petty_cash.items) ? appData.petty_cash.items[idx] : null;
       if (!item || !item.attachment) {
         alert('此項目尚未關聯單據，請先由下方選擇「從資料庫抓取」或「手機拍照」進行綁定！');
         return;
       }
-      openAttachmentModal(item.attachment, item.title || '款項單據', item.category || '費用報支', 'jpg');
+      const isPdf = typeof item.attachment === 'string' && item.attachment.toLowerCase().endsWith('.pdf');
+      openAttachmentModal(item.attachment, item.title || '款項單據', item.category || '費用報支', isPdf ? 'pdf' : 'jpg');
     }
 
     function triggerMobileCamera() {
