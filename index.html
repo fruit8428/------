@@ -17,9 +17,13 @@
       font-size: 15px;
     }
     @media print {
-      body * { visibility: hidden; }
-      #printableArea, #printableArea *, #formq-printable, #formq-printable * { visibility: visible; }
-      #printableArea, #formq-printable { position: absolute; left: 0; top: 0; width: 100%; }
+      @page {
+        size: A4 portrait;
+        margin: 16mm 14mm 16mm 14mm;
+      }
+      .no-print, header, footer, #cwa-top-alert-banner, #role-selector-bar {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -2631,7 +2635,15 @@
     }
 
     function printFormQArea() {
-      window.print();
+      // 儲存目前最新表單數據
+      saveFormQData(false);
+      // 開啟標準天地校準的公文列印專頁
+      const printWin = window.open('print_formq.html', '_blank');
+      if (printWin) {
+        printWin.focus();
+      } else {
+        window.location.href = 'print_formq.html';
+      }
     }
 
     // ==============================================
