@@ -550,19 +550,19 @@
         </div>
       </div>
 
-      <!-- 6 大類真實單據與憑證附件庫 (JPG & PDF 點擊高清預覽) -->
+      <!-- 核心審核表件與附件庫 (4大表件與存轉證明) -->
       <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <div class="font-bold text-slate-900 text-base sm:text-lg flex items-center space-x-2">
               <i data-lucide="paperclip" class="w-5 h-5 text-teal-600"></i>
-              <span>6 大類審核附件庫 (點擊任一項目即開啟 JPG 大圖 / PDF 預覽)</span>
+              <span>審核附件庫 (點擊任一項目即開啟表單 / JPG 大圖預覽)</span>
             </div>
-            <div class="text-xs text-slate-500 mt-0.5">固德公司高瑞彣所提送之原始表件、取款條、存款證明與報價單</div>
+            <div class="text-xs text-slate-500 mt-0.5">固德公司高瑞彣所提送之原始表件、存摺補登與大額轉存證明</div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="attachment-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="attachment-grid">
           <!-- 1. 待支付費用明細表 (財Q表) 電子表單與簽核 -->
           <div onclick="openFormQModal()" class="p-3.5 rounded-xl border-2 border-indigo-400 bg-indigo-50/70 hover:border-indigo-600 hover:bg-indigo-100/60 cursor-pointer transition-all flex items-center justify-between group shadow-xs">
             <div class="flex items-center space-x-3">
@@ -574,7 +574,7 @@
                   <span>待支付費用明細表 (財Q表)</span>
                   <span class="px-2 py-0.5 rounded-md bg-indigo-200 text-indigo-900 text-[10px] font-bold">可鍵入選取 · 三委員簽核</span>
                 </div>
-                <div class="text-xs text-indigo-700 font-medium">高瑞彣線上填報 · 3位委員線上多重審查簽核</div>
+                <div class="text-xs text-indigo-700 font-medium">高瑞彣線上填報 · 3位委員線上審核</div>
               </div>
             </div>
             <span class="px-2.5 py-1 rounded bg-indigo-700 text-white text-xs font-bold shadow-2xs group-hover:bg-indigo-800">開啟表單</span>
@@ -591,13 +591,13 @@
                   <span>八月份財務收支表 (財I表)</span>
                   <span class="px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-900 text-[10px] font-bold">可鍵入選取 · 三委員簽核</span>
                 </div>
-                <div class="text-xs text-emerald-700 font-medium">高瑞彣線上填報 · 3位委員線上多重審查簽核</div>
+                <div class="text-xs text-emerald-700 font-medium">高瑞彣線上填報 · 3位委員線上審核</div>
               </div>
             </div>
             <span class="px-2.5 py-1 rounded bg-emerald-700 text-white text-xs font-bold shadow-2xs group-hover:bg-emerald-800">開啟表單</span>
           </div>
 
-          <!-- 3. 待支付明細表-存摺補登核銷版 (已右移至第 3 位) -->
+          <!-- 3. 待支付明細表-存摺補登核銷版 -->
           <div onclick="openAttachmentModal('八月份待支付費用明細表1.jpg', '待支付費用明細表 (存摺扣款補登核銷版)', '出納核銷', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center font-bold text-sm">
@@ -611,21 +611,7 @@
             <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
           </div>
 
-          <!-- 4. 固德匯款取款條 -->
-          <div onclick="openAttachmentModal('固德匯款取款條.jpg', '華南商業銀行 匯款申請書與取款憑條傳票', '出納憑證', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-sm">
-                <i data-lucide="credit-card" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-bold text-slate-900 text-sm group-hover:text-teal-900">華南銀行 取款條與傳票</div>
-                <div class="text-xs text-slate-500">含誼潔/固德/宏捷/鼎聖取款單</div>
-              </div>
-            </div>
-            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
-          </div>
-
-          <!-- 5. 存款紀錄 (5萬元轉存) -->
+          <!-- 4. 存款紀錄 (5萬元轉存) -->
           <div onclick="openAttachmentModal('存款紀錄.jpg', '華南提領5萬元轉存郵局存簿紀錄', '資金調度', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-900 flex items-center justify-center font-bold text-sm">
@@ -637,90 +623,6 @@
               </div>
             </div>
             <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
-          </div>
-
-          <!-- 6. 維修商報價單 -->
-          <div onclick="openAttachmentModal('維修商報價單1.jpg', '宏捷機電企業社 門禁鎖維修報價單', '廠商報價', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-900 flex items-center justify-center font-bold text-sm">
-                <i data-lucide="wrench" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-bold text-slate-900 text-sm group-hover:text-teal-900">維修商報價單 (宏捷機電)</div>
-                <div class="text-xs text-slate-500">門口鎖具檢修$1,500 · 主委已蓋章</div>
-              </div>
-            </div>
-            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
-          </div>
-
-          <!-- 7. 一般費用報支單 (誼潔 15) -->
-          <div onclick="openAttachmentModal('一般費用報支單.jpg', '一般費用報支單 15 (誼潔清潔 $3,000)', '費用報支', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-sm">
-                <i data-lucide="file-check" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-bold text-slate-900 text-sm group-hover:text-teal-900">報支單 15 (誼潔清潔)</div>
-                <div class="text-xs text-slate-500">環境清潔費$3,000 · 附收據憑證</div>
-              </div>
-            </div>
-            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
-          </div>
-
-          <!-- 8. 一般費用報支單 (固德 16) -->
-          <div onclick="openAttachmentModal('一般費用報支單1.jpg', '一般費用報支單 16 (固德物業 $18,000)', '費用報支', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-sm">
-                <i data-lucide="file-check" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-bold text-slate-900 text-sm group-hover:text-teal-900">報支單 16 (固德物業)</div>
-                <div class="text-xs text-slate-500">7、8月服務費$18,000 · 附發票</div>
-              </div>
-            </div>
-            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
-          </div>
-
-          <!-- 9. 一般費用報支單 (宏捷 17 - 補上的 一般費用報支單7.jpg) -->
-          <div onclick="openAttachmentModal('一般費用報支單7.jpg', '一般費用報支單 17 (宏捷機電 $1,500)', '費用報支', 'jpg')" class="p-3.5 rounded-xl border-2 border-emerald-300 bg-emerald-50/40 hover:border-emerald-600 cursor-pointer transition-all flex items-center justify-between group">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm">
-                <i data-lucide="file-check-2" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-bold text-emerald-950 text-sm group-hover:text-emerald-900">報支單 17 (宏捷機電)</div>
-                <div class="text-xs text-emerald-700 font-medium">門禁鎖故障檢修$1,500 · 高瑞彣核章</div>
-              </div>
-            </div>
-            <span class="px-2 py-1 rounded bg-emerald-600 text-white text-xs font-bold">預覽</span>
-          </div>
-
-          <!-- 10. 一般費用報支單 (鼎聖 18) -->
-          <div onclick="openAttachmentModal('一般費用報支單2.jpg', '一般費用報支單 18 (鼎聖通訊 $2,000)', '費用報支', 'jpg')" class="p-3.5 rounded-xl border-2 border-slate-200 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer transition-all flex items-center justify-between group">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-800 flex items-center justify-center font-bold text-sm">
-                <i data-lucide="file-check" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-bold text-slate-900 text-sm group-hover:text-teal-900">報支單 18 (鼎聖通訊)</div>
-                <div class="text-xs text-slate-500">8/20監視檢測工資$2,000 · 附工單</div>
-              </div>
-            </div>
-            <span class="px-2 py-1 rounded bg-slate-100 text-slate-700 text-xs font-bold group-hover:bg-teal-600 group-hover:text-white transition-colors">預覽</span>
-          </div>
-
-          <!-- 11. 固德財務通知 (PDF 公文) -->
-          <div onclick="openAttachmentModal('財務通知.pdf', '固德公司 財務通知公文 (高瑞彣 LINE 簽核通知)', '推播公文', 'pdf')" class="p-3.5 rounded-xl border-2 border-teal-300 bg-teal-50/60 hover:border-teal-600 cursor-pointer transition-all flex items-center justify-between group">
-            <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold text-sm">
-                <i data-lucide="file" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="font-bold text-teal-950 text-sm group-hover:underline">財務通知函 (PDF)</div>
-                <div class="text-xs text-teal-800">高瑞彣提送委員簽核之文字公文</div>
-              </div>
-            </div>
-            <span class="px-2 py-1 rounded bg-teal-700 text-white text-xs font-bold">預覽 PDF</span>
           </div>
         </div>
       </div>
@@ -1824,18 +1726,7 @@
           {"id": "att-1", "title": "待支付費用明細表 (財Q表)", "type": "jpg", "file": "八月份待支付費用明細表.jpg", "category": "明細總表", "desc": "高瑞彣115.8.23編制，合計4筆支出$24,500元"},
           {"id": "att-2", "title": "八月份財務收支表 (財I表)", "type": "jpg", "file": "八月份財務收支表.jpg", "category": "收支報表", "desc": "收入$35,634，支出$24,500，結餘$1,277,684"},
           {"id": "att-3", "title": "待支付明細表-核銷版(附存摺)", "type": "jpg", "file": "八月份待支付費用明細表1.jpg", "category": "出納核銷", "desc": "8/31華南銀行存摺補登扣款，餘額$99,347元，轉存郵局5萬"},
-          {"id": "att-4", "title": "取款條與匯款傳票 (華南銀行)", "type": "jpg", "file": "固德匯款取款條.jpg", "category": "出納憑證", "desc": "華南取款傳票4筆（誼潔、固德、宏捷、鼎聖）"},
-          {"id": "att-5", "title": "存款紀錄 (華南轉存郵局)", "type": "jpg", "file": "存款紀錄.jpg", "category": "資金調度", "desc": "華南提領5萬存入社區郵局帳戶之取款與收執聯"},
-          {"id": "att-6", "title": "維修商報價單 (宏捷機電)", "type": "jpg", "file": "維修商報價單1.jpg", "category": "廠商報價", "desc": "門禁鎖檢修$1,500元，管委會陳信諭已簽認"},
-          {"id": "att-7", "title": "一般費用報支單 15 (誼潔清潔)", "type": "jpg", "file": "一般費用報支單.jpg", "category": "費用報支", "desc": "環境清潔服務費$3,000元，附收款章收據"},
-          {"id": "att-8", "title": "一般費用報支單 16 (固德物業)", "type": "jpg", "file": "一般費用報支單1.jpg", "category": "費用報支", "desc": "7、8月份管理服務費$18,000元，附統一發票"},
-          {"id": "att-9", "title": "一般費用報支單 17 (宏捷機電)", "type": "jpg", "file": "一般費用報支單7.jpg", "category": "費用報支", "desc": "門口門禁鎖故障檢修工資$1,500元，承辦人高瑞彣115.8.21核章"},
-          {"id": "att-10", "title": "一般費用報支單 18 (鼎聖通訊)", "type": "jpg", "file": "一般費用報支單2.jpg", "category": "費用報支", "desc": "8/20安全系統檢測出勤工資$2,000元"},
-          {"id": "att-11", "title": "報支單16-出納實施(取款憑條)", "type": "jpg", "file": "一般費用報支單3.jpg", "category": "出納核銷", "desc": "固德$18,000元取款傳票黏貼與出納核章"},
-          {"id": "att-12", "title": "報支單16-出納實施(發票傳票)", "type": "jpg", "file": "一般費用報支單4.jpg", "category": "出納核銷", "desc": "固德$18,000元二聯式發票與華南取款憑條黏貼表"},
-          {"id": "att-13", "title": "報支單17-出納實施(宏捷機電)", "type": "jpg", "file": "一般費用報支單5.jpg", "category": "出納核銷", "desc": "宏捷$1,500元取款傳票黏貼與出納核章"},
-          {"id": "att-14", "title": "報支單18-出納實施(鼎聖通訊)", "type": "jpg", "file": "一般費用報支單6.jpg", "category": "出納核銷", "desc": "鼎聖$2,000元取款傳票黏貼與出納核章"},
-          {"id": "att-15", "title": "固德公司財務通知函 (LINE推播稿)", "type": "pdf", "file": "財務通知.pdf", "category": "推播公文", "desc": "固德高瑞彣向3位委員提報簽核之文字公文"}
+          {"id": "att-4", "title": "存款紀錄 (華南轉存郵局)", "type": "jpg", "file": "存款紀錄.jpg", "category": "資金調度", "desc": "華南提領5萬存入社區郵局帳戶之取款與收執聯"}
         ]
       },
       "financial_statement_i": {
