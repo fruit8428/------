@@ -511,7 +511,7 @@
                   <span>待支付費用明細表 (財Q表)</span>
                   <span class="px-2 py-0.5 rounded-md bg-indigo-200 text-indigo-900 text-[10px] font-bold">可鍵入選取 · 三委員簽核</span>
                 </div>
-                <div class="text-xs text-indigo-700 font-medium">高瑞彣線上填報 · 3位委員線上審核</div>
+                <div id="card-q-status-hint" class="text-xs min-h-[1.25rem] mt-0.5"></div>
               </div>
             </div>
             <span class="px-2.5 py-1 rounded bg-indigo-700 text-white text-xs font-bold shadow-2xs group-hover:bg-indigo-800">開啟表單</span>
@@ -528,7 +528,7 @@
                   <span>八月份財務收支表 (財I表)</span>
                   <span class="px-2 py-0.5 rounded-md bg-emerald-200 text-emerald-900 text-[10px] font-bold">可鍵入選取 · 三委員簽核</span>
                 </div>
-                <div class="text-xs text-emerald-700 font-medium">高瑞彣線上填報 · 3位委員線上審核</div>
+                <div id="card-i-status-hint" class="text-xs min-h-[1.25rem] mt-0.5"></div>
               </div>
             </div>
             <span class="px-2.5 py-1 rounded bg-emerald-700 text-white text-xs font-bold shadow-2xs group-hover:bg-emerald-800">開啟表單</span>
@@ -2393,7 +2393,56 @@
           </tr>
         `).join('');
       }
+      updateAttachmentCardsStatus();
       lucide.createIcons();
+    }
+
+    function updateAttachmentCardsStatus() {
+      function getOfficerLabel(a) {
+        if (!a) return '委員';
+        if (a.role === 'director' || a.role === '主任委員') return '主任委員';
+        if (a.role === 'finance' || a.role === '財務委員') return '財務委員';
+        if (a.role === 'supervisor' || a.role === '行政委員') return '行政委員';
+        if (a.name) {
+          if (a.name.includes('主任')) return '主任委員';
+          if (a.name.includes('財務')) return '財務委員';
+          if (a.name.includes('行政')) return '行政委員';
+          return a.name.split(' ')[0];
+        }
+        return '委員';
+      }
+
+      // 1. 待支付費用明細表 (財Q表) 提示
+      const qHint = document.getElementById('card-q-status-hint');
+      if (qHint) {
+        const petty = (appData && appData.petty_cash) || {};
+        const approvals = Object.values(petty.approvals || {});
+        const rejected = approvals.filter(a => a && a.status === 'rejected');
+        if (rejected.length > 0) {
+          const roles = rejected.map(getOfficerLabel).join('、');
+          qHint.innerHTML = `<span class="inline-flex items-center space-x-1 font-bold text-rose-600"><i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600 flex-shrink-0"></i><span>⚠️ 委員退回補正（${roles}）</span></span>`;
+        } else {
+          qHint.innerHTML = '';
+        }
+      }
+
+      // 2. 八月份財務收支表 (財I表) 提示
+      const iHint = document.getElementById('card-i-status-hint');
+      if (iHint) {
+        const fi = (appData && appData.financial_statement_i) || {};
+        const approvals = Object.values(fi.approvals || {});
+        const rejected = approvals.filter(a => a && a.status === 'rejected');
+        if (rejected.length > 0) {
+          const roles = rejected.map(getOfficerLabel).join('、');
+          iHint.innerHTML = `<span class="inline-flex items-center space-x-1 font-bold text-rose-600"><i data-lucide="alert-circle" class="w-3.5 h-3.5 text-rose-600 flex-shrink-0"></i><span>⚠️ 委員退回補正（${roles}）</span></span>`;
+        } else {
+          iHint.innerHTML = '';
+        }
+      }
+
+      if (window.lucide) {
+        lucide.createIcons();
+      }
     }
 
     // 附件高清預覽 Lightbox 控制
@@ -3144,6 +3193,7 @@
       });
 
       recalcFormITotal();
+      updateAttachmentCardsStatus();
       lucide.createIcons();
     }
 
