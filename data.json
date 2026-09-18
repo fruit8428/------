@@ -75,48 +75,83 @@
     }
   ],
   "petty_cash": {
-    "month": "2026年09月份",
+    "month": "115年08月份",
+    "case_title": "115年八月份社區一般費用報支與出納簽核案",
+    "submitted_by": "固德建築物管理維護有限公司",
+    "submitter_name": "高瑞彣",
+    "submitter_role": "固德物業作業承辦人",
+    "submitter_stamp": "承辦人 115.8.23 高瑞彣 (核章完成)",
+    "submitted_date": "115年8月20日",
+    "scheduled_payment_date": "115年8月31日",
+    "total_spent": 24500,
     "limit": 100000,
+    "deposit_transfer_amount": 50000,
+    "deposit_transfer_desc": "8/31 華南銀行提領現金 50,000 元轉存入社區郵局帳戶 (局帳號: 028115-4 034699-4)",
+    "balance_info": {
+      "passbook_balance_before": 173847,
+      "passbook_balance_after": 99347,
+      "post_office_added": 50000,
+      "statement_balance": 1277684
+    },
+    "ai_audit": {
+      "status": "passed",
+      "summary": "AI 智慧比對：四表支出總額 $24,500 完全一致，專款存轉 $50,000 單據無誤，承辦人高瑞彣章戳齊備，宏捷維修報價單已獲管委會簽認核准。",
+      "items_check": "4筆費用合計 NT$ 24,500 與待支付明細表及財務收支表吻合",
+      "transfer_check": "8/31 華南銀行取款傳票與中華郵政存款人收執聯 NT$ 50,000 勾稽吻合",
+      "quote_check": "宏捷機電門禁鎖維修 NT$ 1,500 報價單已簽認核章",
+      "seal_check": "作業承辦人高瑞彣印戳已逐張確認完備"
+    },
     "items": [
       {
-        "id": 1,
-        "title": "中庭景觀植栽修剪與枯枝清運",
-        "amount": 15000,
-        "category": "公設維護",
-        "invoice": "INV-202609-0821",
-        "date": "2026-09-10"
+        "id": 15,
+        "no": 15,
+        "title": "環境清潔服務費 (八月份)",
+        "amount": 3000,
+        "category": "環境清潔",
+        "vendor": "誼潔家事服務企業社",
+        "invoice": "收據 (免用發票專用收據)",
+        "date": "115-08-15",
+        "desc": "本月份梯廳與公共走廊環境清潔服務費",
+        "attachment": "一般費用報支單.jpg"
       },
       {
-        "id": 2,
-        "title": "地下室水塔清洗前置濾心更換",
-        "amount": 8500,
-        "category": "機電保養",
-        "invoice": "INV-202609-0914",
-        "date": "2026-09-12"
+        "id": 16,
+        "no": 16,
+        "title": "管理維護顧問服務費 (七、八月份)",
+        "amount": 18000,
+        "category": "管理服務",
+        "vendor": "固德建築物管理維護有限公司",
+        "invoice": "二聯式統一發票 CC22775061",
+        "date": "115-08-15",
+        "desc": "七月份、八月份顧問服務費 (2式*9,000元)",
+        "attachment": "一般費用報支單1.jpg",
+        "payment_slip": "一般費用報支單3.jpg"
       },
       {
-        "id": 3,
-        "title": "各棟逃生梯緊急照明燈電池檢修更新",
-        "amount": 6200,
-        "category": "消防安全",
-        "invoice": "INV-202609-1102",
-        "date": "2026-09-14"
+        "id": 17,
+        "no": 17,
+        "title": "門口門禁鎖故障檢修與拆裝工資",
+        "amount": 1500,
+        "category": "門禁維修",
+        "vendor": "宏捷機電企業社",
+        "invoice": "工程報價單 (管委會已簽認)",
+        "date": "115-08-03",
+        "desc": "門口鎖具繼電器故障檢修與拆裝 (8/3維修完成)",
+        "attachment": "維修商報價單1.jpg",
+        "payment_slip": "一般費用報支單5.jpg"
       },
       {
-        "id": 4,
-        "title": "社區管理室門禁卡與防磁貼片批次採購",
-        "amount": 4800,
-        "category": "事務消耗",
-        "invoice": "INV-202609-1198",
-        "date": "2026-09-15"
-      },
-      {
-        "id": 5,
-        "title": "A/B棟公共梯廳節能感應LED燈管補料",
-        "amount": 3200,
-        "category": "修繕五金",
-        "invoice": "INV-202609-1240",
-        "date": "2026-09-16"
+        "id": 18,
+        "no": 18,
+        "title": "安全監視系統檢測出勤工資",
+        "amount": 2000,
+        "category": "安全監控",
+        "vendor": "鼎聖通訊有限公司",
+        "invoice": "出勤工資單憑證",
+        "date": "115-08-20",
+        "desc": "8/20至社區檢測安全系統出勤工資",
+        "attachment": "一般費用報支單2.jpg",
+        "payment_slip": "一般費用報支單6.jpg"
       }
     ],
     "approvals": {
@@ -124,25 +159,40 @@
         "role": "主任委員",
         "name": "陳建宏",
         "status": "approved",
-        "comment": "各項費用單據核對無誤，同意核銷撥款。",
-        "time": "2026-09-17 10:15"
+        "comment": "四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。",
+        "time": "2026-08-25 09:30"
       },
       "finance": {
         "role": "財務委員",
         "name": "林秀玲",
         "status": "approved",
-        "comment": "單據齊全，未逾零用金10萬元上限，同意。",
-        "time": "2026-09-17 11:30"
+        "comment": "四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。",
+        "time": "2026-08-25 10:15"
       },
       "supervisor": {
-        "role": "監察委員",
+        "role": "行政委員",
         "name": "王國華",
-        "status": "pending",
-        "comment": "",
-        "time": null
+        "status": "approved",
+        "comment": "宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。",
+        "time": "2026-08-25 14:00"
       }
     },
-    "final_status": "in_review"
+    "final_status": "approved",
+    "attachments": [
+      { "id": "att-1", "title": "待支付費用明細表 (財Q表)", "type": "jpg", "file": "八月份待支付費用明細表.jpg", "category": "明細總表", "desc": "高瑞彣115.8.23編制，合計4筆支出$24,500元" },
+      { "id": "att-2", "title": "待支付明細表-核銷版(附存摺)", "type": "jpg", "file": "八月份待支付費用明細表1.jpg", "category": "出納核銷", "desc": "8/31華南銀行存摺補登扣款，餘額$99,347元，轉存郵局5萬" },
+      { "id": "att-3", "title": "八月份財務收支表 (財I表)", "type": "jpg", "file": "八月份財務收支表.jpg", "category": "收支報表", "desc": "管理費收入$35,634，支出$24,500，結餘$1,277,684" },
+      { "id": "att-4", "title": "取款條與匯款傳票 (華南銀行)", "type": "jpg", "file": "固德匯款取款條.jpg", "category": "出納憑證", "desc": "華南取款傳票4筆（誼潔、固德、宏捷、鼎聖）" },
+      { "id": "att-5", "title": "存款紀錄 (華南轉存郵局)", "type": "jpg", "file": "存款紀錄.jpg", "category": "資金調度", "desc": "華南提領5萬存入社區郵局帳戶之取款與收執聯" },
+      { "id": "att-6", "title": "維修商報價單 (宏捷機電)", "type": "jpg", "file": "維修商報價單1.jpg", "category": "廠商報價", "desc": "門禁鎖檢修$1,500元，管委會陳信諭已簽認" },
+      { "id": "att-7", "title": "一般費用報支單 15 (誼潔清潔)", "type": "jpg", "file": "一般費用報支單.jpg", "category": "費用報支", "desc": "環境清潔服務費$3,000元，附收款章收據" },
+      { "id": "att-8", "title": "一般費用報支單 16 (固德物業)", "type": "jpg", "file": "一般費用報支單1.jpg", "category": "費用報支", "desc": "7、8月份管理服務費$18,000元，附統一發票" },
+      { "id": "att-9", "title": "一般費用報支單 18 (鼎聖通訊)", "type": "jpg", "file": "一般費用報支單2.jpg", "category": "費用報支", "desc": "8/20安全系統檢測出勤工資$2,000元" },
+      { "id": "att-10", "title": "報支單16-出納實施(取款憑條)", "type": "jpg", "file": "一般費用報支單3.jpg", "category": "出納核銷", "desc": "固德$18,000元取款傳票黏貼與出納核章" },
+      { "id": "att-11", "title": "報支單17-出納實施(宏捷機電)", "type": "jpg", "file": "一般費用報支單5.jpg", "category": "出納核銷", "desc": "宏捷$1,500元取款傳票黏貼與出納核章" },
+      { "id": "att-12", "title": "報支單18-出納實施(鼎聖通訊)", "type": "jpg", "file": "一般費用報支單6.jpg", "category": "出納核銷", "desc": "鼎聖$2,000元取款傳票黏貼與出納核章" },
+      { "id": "att-13", "title": "固德公司財務通知函 (LINE推播稿)", "type": "pdf", "file": "財務通知.pdf", "category": "推播公文", "desc": "固德高瑞彣向3位委員提報簽核之文字公文" }
+    ]
   },
   "bylaws": [
     {
