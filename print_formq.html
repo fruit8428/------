@@ -5,11 +5,12 @@
   <title>大清天朵二期社區八月份待支付費用明細表 (財Q表)</title>
   <style>
     /* ========================================================= */
-    /* 標準會計公文天地排版規範 (A4 縱向，天地各 18mm，左右 15mm) */
+    /* 標準會計公文天地排版規範 (精準單頁 A4 1-Page Perfect Fit)   */
+    /* 天地各留白 10mm，左右各留白 12mm，單頁一次性完整呈現       */
     /* ========================================================= */
     @page {
       size: A4 portrait;
-      margin: 13mm 14mm 13mm 14mm;
+      margin: 10mm 12mm 10mm 12mm;
     }
 
     * {
@@ -22,17 +23,18 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
       color: #111827;
       background: #f1f5f9;
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 11.5px;
+      line-height: 1.35;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
 
-    /* 螢幕預覽時的置中紙張容器 */
+    /* 螢幕預覽時的單張紙容器 */
     .sheet-page {
       width: 210mm;
       min-height: 297mm;
-      padding: 18mm 15mm 18mm 15mm;
+      max-height: 297mm;
+      padding: 10mm 12mm 10mm 12mm;
       margin: 20px auto;
       background: #ffffff;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -40,17 +42,18 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      overflow: hidden;
     }
 
-    /* 列印模式下的樣式：鎖定精準 2 頁，杜絕第 3 頁空白 */
+    /* 列印模式下的樣式：鎖定精準 1 頁，絕不跨頁 */
     @media print {
       html, body {
         background: #ffffff !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: auto !important;
-        min-height: 0 !important;
-        overflow: visible !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
       }
       .no-print {
         display: none !important;
@@ -58,21 +61,18 @@
       .sheet-page {
         width: 100% !important;
         max-width: 100% !important;
-        height: auto !important;
+        height: 100% !important;
+        max-height: 277mm !important;
         min-height: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
         box-shadow: none !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
+        border: none !important;
         page-break-after: avoid !important;
+        page-break-before: avoid !important;
         break-after: avoid !important;
+        break-before: avoid !important;
         overflow: hidden !important;
-      }
-      /* 僅在第二頁前方強制換頁，第二頁後方絕不添加任何換頁符號，印表機必定只印 2 張 */
-      .sheet-page + .sheet-page {
-        page-break-before: always !important;
-        break-before: page !important;
       }
     }
 
@@ -83,7 +83,7 @@
       z-index: 9999;
       background: #0f172a;
       color: #ffffff;
-      padding: 12px 24px;
+      padding: 10px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -94,8 +94,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 18px;
-      font-size: 13px;
+      padding: 7px 16px;
+      font-size: 12.5px;
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
@@ -124,49 +124,48 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11px;
+      font-size: 10.5px;
       color: #475569;
       font-weight: 600;
       border-bottom: 1.5px solid #0f172a;
-      padding-bottom: 5px;
-      margin-bottom: 16px;
+      padding-bottom: 3px;
+      margin-bottom: 8px;
       letter-spacing: 0.5px;
     }
 
     .doc-main-title {
       text-align: center;
-      font-size: 21px;
+      font-size: 18px;
       font-weight: 800;
       color: #0f172a;
-      letter-spacing: 2.5px;
-      margin-bottom: 10px;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
     }
 
     .doc-meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11px;
+      font-size: 10px;
       color: #334155;
-      margin-bottom: 14px;
+      margin-bottom: 8px;
       border-bottom: 1px dashed #cbd5e1;
-      padding-bottom: 6px;
-      flex-wrap: nowrap;
+      padding-bottom: 4px;
     }
 
     /* 填報資訊小欄位 */
     .info-strip {
       display: flex;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 10px;
+      margin-bottom: 8px;
     }
     .info-box {
       flex: 1;
       background: #f8fafc;
       border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 7px 12px;
-      font-size: 11.5px;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 10.5px;
     }
     .info-box strong {
       color: #0f172a;
@@ -178,60 +177,57 @@
     .financial-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 14px;
+      margin-bottom: 8px;
     }
     .financial-table th {
       background: #f1f5f9;
       color: #0f172a;
       font-weight: 700;
-      font-size: 11.5px;
-      padding: 8px 6px;
+      font-size: 10.5px;
+      padding: 5px 4px;
       border-top: 2px solid #0f172a;
       border-bottom: 1.5px solid #0f172a;
       text-align: left;
     }
     .financial-table td {
-      padding: 8px 6px;
+      padding: 5px 4px;
       border-bottom: 1px solid #e2e8f0;
-      font-size: 11.5px;
+      font-size: 10.5px;
       color: #1e293b;
       vertical-align: middle;
     }
-    .financial-table tr:hover td {
-      background: #fafafa;
-    }
     .financial-table .col-num {
       text-align: center;
-      width: 8%;
+      width: 7%;
       font-weight: 700;
       color: #475569;
-      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-family: ui-monospace, monospace;
     }
     .financial-table .col-item {
-      width: 24%;
+      width: 25%;
       font-weight: 700;
       color: #0f172a;
     }
     .financial-table .col-vendor {
-      width: 25%;
+      width: 26%;
     }
     .financial-table .col-desc {
       width: 22%;
       color: #475569;
-      font-size: 11px;
+      font-size: 10px;
     }
     .financial-table .col-amount {
-      width: 13%;
+      width: 12%;
       text-align: right;
-      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-family: ui-monospace, monospace;
       font-weight: 800;
-      font-size: 13px;
+      font-size: 11.5px;
       color: #0f172a;
     }
     .financial-table .col-vcount {
       width: 8%;
       text-align: center;
-      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-family: ui-monospace, monospace;
     }
 
     /* 合計列 */
@@ -240,7 +236,7 @@
       border-bottom: 2.5px double #0f172a !important;
       background: #f8fafc;
       font-weight: 800;
-      padding: 9px 6px;
+      padding: 6px 4px;
     }
 
     /* ------------------------------------------------------------- */
@@ -248,55 +244,54 @@
     /* ------------------------------------------------------------- */
     .verification-section {
       border: 1.5px solid #94a3b8;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 10px;
+      border-radius: 6px;
+      padding: 7px 10px;
+      margin-bottom: 8px;
       background: #ffffff;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
     .verification-left {
       flex: 1;
     }
     .verification-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       color: #0f172a;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 4px;
+      padding-bottom: 3px;
     }
     .check-item {
       display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      font-size: 11px;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
       color: #1e293b;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       font-weight: 500;
     }
     .check-box-icon {
       display: inline-block;
-      width: 13px;
-      height: 13px;
+      width: 12px;
+      height: 12px;
       border: 1.5px solid #0f172a;
       border-radius: 2px;
       text-align: center;
-      line-height: 10px;
-      font-size: 10px;
+      line-height: 9px;
+      font-size: 9px;
       font-weight: bold;
       color: #0284c7;
-      margin-top: 1px;
       background: #f0f9ff;
     }
     .meta-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4px 14px;
-      margin-top: 6px;
-      font-size: 11px;
+      gap: 3px 12px;
+      margin-top: 4px;
+      font-size: 10px;
       color: #334155;
     }
     .meta-grid strong {
@@ -309,18 +304,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0 6px;
+      padding: 0 4px;
     }
     .stamp-title {
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 700;
       color: #475569;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .stamp-oval-blue {
-      width: 72px;
-      height: 72px;
-      border: 2.5px solid #1d4ed8;
+      width: 62px;
+      height: 62px;
+      border: 2px solid #1d4ed8;
       border-radius: 50%;
       background: #eff6ff;
       color: #1e40af;
@@ -329,25 +324,23 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 10.5px;
-      line-height: 1.25;
+      font-size: 9.5px;
+      line-height: 1.2;
       transform: rotate(-3deg);
-      box-shadow: inset 0 0 4px rgba(29, 78, 216, 0.2);
     }
     .stamp-oval-blue .stamp-date {
-      font-family: ui-monospace, SFMono-Regular, monospace;
-      font-size: 9px;
-      letter-spacing: 0.5px;
+      font-family: ui-monospace, monospace;
+      font-size: 8px;
       border-top: 1px dashed #60a5fa;
       border-bottom: 1px dashed #60a5fa;
       padding: 1px 2px;
-      margin: 1.5px 0;
+      margin: 1px 0;
     }
 
     .stamp-round-red {
-      width: 78px;
-      height: 78px;
-      border: 2.5px solid #dc2626;
+      width: 64px;
+      height: 64px;
+      border: 2px solid #dc2626;
       border-radius: 50%;
       background: #fef2f2;
       color: #b91c1c;
@@ -356,18 +349,124 @@
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 10.5px;
-      line-height: 1.25;
+      font-size: 9.5px;
+      line-height: 1.2;
       transform: rotate(-2deg);
-      box-shadow: inset 0 0 5px rgba(220, 38, 38, 0.2);
     }
     .stamp-round-red .stamp-date {
-      font-family: ui-monospace, SFMono-Regular, monospace;
-      font-size: 8.5px;
+      font-family: ui-monospace, monospace;
+      font-size: 8px;
       border-top: 1px dashed #f87171;
       border-bottom: 1px dashed #f87171;
       padding: 1px 2px;
-      margin: 1.5px 0;
+      margin: 1px 0;
+    }
+
+    /* ------------------------------------------------------------- */
+    /* 管委會 3 位法定委員線上多重簽核審批區 (精準整合至單頁)          */
+    /* ------------------------------------------------------------- */
+    .approval-panel {
+      border: 1.5px solid #64748b;
+      border-radius: 6px;
+      padding: 7px 10px;
+      margin-bottom: 8px;
+      background: #ffffff;
+    }
+    .approval-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+    }
+    .approval-panel-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .approval-panel-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .committee-box-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .committee-col {
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 136px;
+    }
+    .comm-head {
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 3px;
+      margin-bottom: 4px;
+    }
+    .comm-role {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .comm-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1px;
+    }
+    .comm-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .comm-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .comm-opinion {
+      font-size: 9.5px;
+      color: #334155;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      flex: 1;
+    }
+    .comm-stamp-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 2px;
+    }
+
+    /* AI 查核精簡提示條 */
+    .audit-summary-box {
+      border: 1px solid #cbd5e1;
+      border-left: 3px solid #0284c7;
+      border-radius: 4px;
+      background: #f8fafc;
+      padding: 4px 8px;
+      font-size: 9.5px;
+      color: #334155;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+    .audit-summary-box strong {
+      color: #0f172a;
     }
 
     /* ------------------------------------------------------------- */
@@ -377,109 +476,20 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 10.5px;
+      font-size: 9.5px;
       color: #64748b;
       border-top: 1.5px solid #0f172a;
-      padding-top: 8px;
-      margin-top: 14px;
+      padding-top: 5px;
+      margin-top: 4px;
     }
     .footer-brand {
       font-weight: 800;
       color: #0f172a;
       letter-spacing: 0.5px;
     }
-
-    /* ------------------------------------------------------------- */
-    /* 第二頁：管委會 3 位法定委員線上多重簽核審批書                    */
-    /* ------------------------------------------------------------- */
-    .committee-box-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 16px 0;
-    }
-    .committee-col {
-      border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 10px;
-      background: #ffffff;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 220px;
-    }
-    .comm-head {
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-    }
-    .comm-role {
-      font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
-    }
-    .comm-name-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 2px;
-    }
-    .comm-name {
-      font-size: 15px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-    .comm-badge {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-    }
-    .comm-opinion {
-      flex: 1;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 11.5px;
-      color: #334155;
-      line-height: 1.45;
-      margin-bottom: 10px;
-    }
-    .comm-opinion-title {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #64748b;
-      margin-bottom: 4px;
-    }
-    .comm-stamp-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding-top: 4px;
-    }
-
-    /* AI 與財務合規檢核條 */
-    .audit-summary-box {
-      border: 1px solid #cbd5e1;
-      border-left: 4px solid #0284c7;
-      border-radius: 6px;
-      background: #f8fafc;
-      padding: 10px 14px;
-      font-size: 11.5px;
-      color: #334155;
-      margin-top: 12px;
-      line-height: 1.5;
-    }
-    .audit-summary-box strong {
-      color: #0f172a;
   </style>
   <script>
-    // 自動同步 localStorage 或後端資料 (若存在)
+    // 自動同步最新資料
     window.addEventListener('DOMContentLoaded', async () => {
       let data = null;
       try {
@@ -498,47 +508,44 @@
         } catch (e) {}
       }
 
-      if (data) {
-        // 同步 3 位委員意見
-        if (data.approvals) {
-          if (data.approvals.director) {
-            if (data.approvals.director.name) {
-              document.getElementById('comm-name-dir').textContent = data.approvals.director.name;
-              document.getElementById('stamp-name-dir').textContent = data.approvals.director.name;
-            }
-            if (data.approvals.director.comment) {
-              document.getElementById('comm-opinion-dir').textContent = data.approvals.director.comment;
-            }
-            if (data.approvals.director.time) {
-              document.getElementById('comm-time-dir').textContent = data.approvals.director.time;
-              document.getElementById('stamp-date-dir').textContent = data.approvals.director.time.split(' ')[0];
-            }
+      if (data && data.approvals) {
+        if (data.approvals.director) {
+          if (data.approvals.director.name) {
+            document.getElementById('comm-name-dir').textContent = data.approvals.director.name;
+            document.getElementById('stamp-name-dir').textContent = data.approvals.director.name;
           }
-          if (data.approvals.finance) {
-            if (data.approvals.finance.name) {
-              document.getElementById('comm-name-fin').textContent = data.approvals.finance.name;
-              document.getElementById('stamp-name-fin').textContent = data.approvals.finance.name;
-            }
-            if (data.approvals.finance.comment) {
-              document.getElementById('comm-opinion-fin').textContent = data.approvals.finance.comment;
-            }
-            if (data.approvals.finance.time) {
-              document.getElementById('comm-time-fin').textContent = data.approvals.finance.time;
-              document.getElementById('stamp-date-fin').textContent = data.approvals.finance.time.split(' ')[0];
-            }
+          if (data.approvals.director.comment) {
+            document.getElementById('comm-opinion-dir').textContent = data.approvals.director.comment;
           }
-          if (data.approvals.supervisor) {
-            if (data.approvals.supervisor.name) {
-              document.getElementById('comm-name-sup').textContent = data.approvals.supervisor.name;
-              document.getElementById('stamp-name-sup').textContent = data.approvals.supervisor.name;
-            }
-            if (data.approvals.supervisor.comment) {
-              document.getElementById('comm-opinion-sup').textContent = data.approvals.supervisor.comment;
-            }
-            if (data.approvals.supervisor.time) {
-              document.getElementById('comm-time-sup').textContent = data.approvals.supervisor.time;
-              document.getElementById('stamp-date-sup').textContent = data.approvals.supervisor.time.split(' ')[0];
-            }
+          if (data.approvals.director.time) {
+            document.getElementById('comm-time-dir').textContent = data.approvals.director.time;
+            document.getElementById('stamp-date-dir').textContent = data.approvals.director.time.split(' ')[0];
+          }
+        }
+        if (data.approvals.finance) {
+          if (data.approvals.finance.name) {
+            document.getElementById('comm-name-fin').textContent = data.approvals.finance.name;
+            document.getElementById('stamp-name-fin').textContent = data.approvals.finance.name;
+          }
+          if (data.approvals.finance.comment) {
+            document.getElementById('comm-opinion-fin').textContent = data.approvals.finance.comment;
+          }
+          if (data.approvals.finance.time) {
+            document.getElementById('comm-time-fin').textContent = data.approvals.finance.time;
+            document.getElementById('stamp-date-fin').textContent = data.approvals.finance.time.split(' ')[0];
+          }
+        }
+        if (data.approvals.supervisor) {
+          if (data.approvals.supervisor.name) {
+            document.getElementById('comm-name-sup').textContent = data.approvals.supervisor.name;
+            document.getElementById('stamp-name-sup').textContent = data.approvals.supervisor.name;
+          }
+          if (data.approvals.supervisor.comment) {
+            document.getElementById('comm-opinion-sup').textContent = data.approvals.supervisor.comment;
+          }
+          if (data.approvals.supervisor.time) {
+            document.getElementById('comm-time-sup').textContent = data.approvals.supervisor.time;
+            document.getElementById('stamp-date-sup').textContent = data.approvals.supervisor.time.split(' ')[0];
           }
         }
       }
@@ -550,12 +557,12 @@
   <!-- 頂部操作列 (僅供螢幕檢視與快捷列印，列印時自動隱藏) -->
   <div class="toolbar-bar no-print">
     <div style="display: flex; align-items: center; gap: 10px;">
-      <span style="font-size: 16px; font-weight: 800; letter-spacing: 0.5px;">📄 大清天朵二期社區 財務公文簽核系統</span>
-      <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #065f46; color: #a7f3d0; font-weight: bold;">✅ 已校準精準 2 頁 · 絕無多餘第 3 頁空白</span>
+      <span style="font-size: 15px; font-weight: 800; letter-spacing: 0.5px;">📄 大清天朵二期社區 財務公文簽核系統</span>
+      <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #065f46; color: #a7f3d0; font-weight: bold;">✅ 已精準合併為 A4 單頁 (1 頁到底 · 絕無多餘空白頁)</span>
     </div>
     <div style="display: flex; gap: 10px;">
       <button onclick="window.print()" class="btn-action btn-primary">
-        <span>🖨️ 立即列印 / 另存為 PDF (精準 2 頁)</span>
+        <span>🖨️ 立即列印 / 存為 PDF (精準 1 頁)</span>
       </button>
       <button onclick="window.close()" class="btn-action btn-secondary">
         <span>關閉視窗</span>
@@ -564,37 +571,37 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- 第一頁：待支付費用明細表（財Q表）標準天地公文                            -->
+  <!-- 單一頁面：待支付費用明細表（財Q表）+ 3位委員線上簽核 (精準合併為 1 頁)      -->
   <!-- ===================================================================== -->
-  <div class="sheet-page" id="page-1">
+  <div class="sheet-page" id="page-single">
     <div>
-      <!-- 天頭：公文表頭 -->
+      <!-- 1. 天頭：公文表頭 -->
       <div class="header-institution">
         <span>固德建築物管理維護有限公司 · 寓廈管理服務</span>
         <span>大清天朵二期社區管理委員會 存查聯</span>
       </div>
 
-      <!-- 主標題 -->
+      <!-- 2. 主標題 -->
       <h1 class="doc-main-title">大清天朵二期社區八月份待支付費用明細表（財Q表）</h1>
 
-      <!-- 表頭副資訊 -->
+      <!-- 3. 表頭副資訊 -->
       <div class="doc-meta-row">
         <span><strong>【 財務悍將系統 】</strong> \ <strong>【 本月待支付費用明細表(Q) 】</strong></span>
         <span>提領支付日：<strong>115 年 08 月 31 日</strong></span>
-        <span>列印日期：2026年08月23日</span>
+        <span>列印日期：2026年08月23日 · 頁 1 之 1</span>
       </div>
 
-      <!-- 填報資訊小欄 -->
+      <!-- 4. 填報資訊小欄 -->
       <div class="info-strip">
         <div class="info-box">
           填報人：<strong>固德物業作業承辦人 · 高瑞彣</strong> (115.8.23 審核存檔)
         </div>
         <div class="info-box" style="text-align: right;">
-          簽核進度：<strong style="color: #047857;">✅ 管委會 3 位法定委員全數審核同意 (出納准予付款)</strong>
+          簽核進度：<strong style="color: #047857;">✅ 管委會 3 位法定委員全數審核同意 (出納准予撥款)</strong>
         </div>
       </div>
 
-      <!-- 待支付款項明細清單 (標準會計三線表) -->
+      <!-- 5. 待支付款項明細清單 (標準會計三線表) -->
       <table class="financial-table">
         <thead>
           <tr>
@@ -641,17 +648,17 @@
           </tr>
           <!-- 合計列 -->
           <tr class="total-row">
-            <td colspan="3" style="font-size: 12.5px; color: #0f172a; padding-left: 8px;">
+            <td colspan="3" style="font-size: 11px; color: #0f172a; padding-left: 6px;">
               合計支出 <strong>4</strong> 筆 &nbsp;&nbsp;&nbsp;&nbsp; 新臺幣：<strong>貳萬肆仟伍佰元整</strong>
             </td>
-            <td style="text-align: right; color: #64748b; font-size: 11px;">實付總計：</td>
-            <td class="col-amount" style="font-size: 14.5px; color: #0f172a;">24,500</td>
+            <td style="text-align: right; color: #64748b; font-size: 10px;">實付總計：</td>
+            <td class="col-amount" style="font-size: 13px; color: #0f172a;">24,500</td>
             <td class="col-vcount"><strong>4</strong></td>
           </tr>
         </tbody>
       </table>
 
-      <!-- 承辦作業核對與聲明事項 (高瑞彣核章) -->
+      <!-- 6. 承辦作業核對與聲明事項 (高瑞彣核章) -->
       <div class="verification-section">
         <div class="verification-left">
           <div class="verification-title">承辦作業核對與聲明事項（物業承辦人 高瑞彣 覆核）</div>
@@ -672,9 +679,9 @@
           </div>
         </div>
 
-        <!-- 右側承辦人圓戳章 -->
+        <!-- 承辦人印戳 -->
         <div class="stamp-container">
-          <div class="stamp-title">作業承辦人核章</div>
+          <div class="stamp-title">作業承辦人</div>
           <div class="stamp-oval-blue">
             <span>承辦人</span>
             <span class="stamp-date">115. 8. 23</span>
@@ -682,137 +689,103 @@
           </div>
         </div>
       </div>
+
+      <!-- 7. 管委會 3 位法定委員線上多重簽核審批區 -->
+      <div class="approval-panel">
+        <div class="approval-panel-head">
+          <span class="approval-panel-title">管委會 3 位法定審核委員線上簽核與批覆印章 (全數核准撥款)</span>
+          <span class="approval-panel-badge">依規約法定多重審核權限</span>
+        </div>
+
+        <div class="committee-box-grid">
+          <!-- 1. 主任委員 -->
+          <div class="committee-col">
+            <div>
+              <div class="comm-head">
+                <div class="comm-role">法定職掌 · 主任委員</div>
+                <div class="comm-name-row">
+                  <span class="comm-name" id="comm-name-dir">陳建宏</span>
+                  <span class="comm-badge">已同意</span>
+                </div>
+                <div style="font-size: 8.5px; color: #64748b; font-family: monospace;" id="comm-time-dir">2026-08-25 09:30</div>
+              </div>
+              <div class="comm-opinion" id="comm-opinion-dir">
+                四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。
+              </div>
+            </div>
+            <div class="comm-stamp-wrap">
+              <div class="stamp-round-red">
+                <span>主任委員</span>
+                <span class="stamp-date" id="stamp-date-dir">2026-08-25</span>
+                <span id="stamp-name-dir">陳建宏</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 財務委員 -->
+          <div class="committee-col">
+            <div>
+              <div class="comm-head">
+                <div class="comm-role">法定職掌 · 財務委員</div>
+                <div class="comm-name-row">
+                  <span class="comm-name" id="comm-name-fin">林秀玲</span>
+                  <span class="comm-badge">已同意</span>
+                </div>
+                <div style="font-size: 8.5px; color: #64748b; font-family: monospace;" id="comm-time-fin">2026-08-25 10:15</div>
+              </div>
+              <div class="comm-opinion" id="comm-opinion-fin">
+                四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。
+              </div>
+            </div>
+            <div class="comm-stamp-wrap">
+              <div class="stamp-round-red">
+                <span>財務委員</span>
+                <span class="stamp-date" id="stamp-date-fin">2026-08-25</span>
+                <span id="stamp-name-fin">林秀玲</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 行政委員 -->
+          <div class="committee-col">
+            <div>
+              <div class="comm-head">
+                <div class="comm-role">法定職掌 · 行政委員</div>
+                <div class="comm-name-row">
+                  <span class="comm-name" id="comm-name-sup">王國華</span>
+                  <span class="comm-badge">已同意</span>
+                </div>
+                <div style="font-size: 8.5px; color: #64748b; font-family: monospace;" id="comm-time-sup">2026-08-25 14:00</div>
+              </div>
+              <div class="comm-opinion" id="comm-opinion-sup">
+                宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。
+              </div>
+            </div>
+            <div class="comm-stamp-wrap">
+              <div class="stamp-round-red">
+                <span>行政委員</span>
+                <span class="stamp-date" id="stamp-date-sup">2026-08-25</span>
+                <span id="stamp-name-sup">王國華</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. AI 查核精簡提示條 -->
+      <div class="audit-summary-box">
+        <strong>🔍 四表合一勾稽查核證明 (AI 智慧會計核驗通過)：</strong>
+        待支付明細表、收支表、報支單(15~18)、華南取款傳票總額完全吻合 ($24,500)；華南轉存郵局 5 萬元憑條無誤；宏捷維修報價單獲管委會核准；承辦人高瑞彣印戳齊備。
+      </div>
     </div>
 
-    <!-- 地腳：頁尾天地留白與標記 -->
+    <!-- 9. 地腳：頁尾天地留白與標記 -->
     <div class="doc-footer-row">
       <span>[ 財務悍將系統 ] \ [ 本月待支付費用明細表(Q) ]</span>
-      <span style="font-weight: 700; color: #0f172a;">— 頁 1 之 2 —</span>
-      <span class="footer-brand">GOOD 固德寓廈管理服務</span>
+      <span style="font-weight: 700; color: #0f172a;">— 頁 1 之 1 — (全一頁完整版)</span>
+      <span class="footer-brand">GOOD 固德寓廈管理服務 · 管委會存查聯</span>
     </div>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- 第二頁：管委會 3 位法定委員線上多重簽核審批書                            -->
-  <!-- ===================================================================== -->
-  <div class="sheet-page" id="page-2">
-    <div>
-      <!-- 天頭：公文表頭 -->
-      <div class="header-institution">
-        <span>大清天朵二期社區管理委員會 · 支出憑證線上審批專頁</span>
-        <span>依規約財務多重審核機制備查</span>
-      </div>
-
-      <!-- 主標題 -->
-      <h1 class="doc-main-title">管委會 3 位法定委員線上多重簽核審批書</h1>
-
-      <!-- 副資訊 (單行齊整) -->
-      <div class="doc-meta-row">
-        <span>表件：<strong>115年08月份待支付費用明細表</strong></span>
-        <span>核定總額：<strong>新臺幣 貳萬肆仟伍佰元整 (NT$ 24,500)</strong></span>
-        <span>核定日：2026年08月25日</span>
-      </div>
-
-      <!-- 說明文案 -->
-      <div style="font-size: 11.5px; color: #475569; line-height: 1.5; margin-bottom: 12px; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
-        本案經固德物業高瑞彣於 115.8.23 彙整一般費用報支單、發票收據、廠商報價單及華南銀行取款條提報。經管委會 <strong>主任委員、財務委員、行政委員</strong> 3 位法定權責委員線上逐筆審查核對無誤，全體審核通過，准予出納付款實施。
-      </div>
-
-      <!-- 3 位委員簽核三等分卡片 -->
-      <div class="committee-box-grid">
-        
-        <!-- 1. 主任委員 -->
-        <div class="committee-col">
-          <div>
-            <div class="comm-head">
-              <div class="comm-role">法定職掌 · 主任委員</div>
-              <div class="comm-name-row">
-                <span class="comm-name" id="comm-name-dir">陳建宏</span>
-                <span class="comm-badge">已核准同意</span>
-              </div>
-              <div style="font-size: 10px; color: #64748b; font-family: monospace; margin-top: 2px;" id="comm-time-dir">2026-08-25 09:30</div>
-            </div>
-            <div class="comm-opinion">
-              <div class="comm-opinion-title">主委簽核意見：</div>
-              <div id="comm-opinion-dir">四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。</div>
-            </div>
-          </div>
-          <div class="comm-stamp-wrap">
-            <div class="stamp-round-red">
-              <span>主任委員</span>
-              <span class="stamp-date" id="stamp-date-dir">2026-08-25</span>
-              <span id="stamp-name-dir">陳建宏</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. 財務委員 -->
-        <div class="committee-col">
-          <div>
-            <div class="comm-head">
-              <div class="comm-role">法定職掌 · 財務委員</div>
-              <div class="comm-name-row">
-                <span class="comm-name" id="comm-name-fin">林秀玲</span>
-                <span class="comm-badge">已核准同意</span>
-              </div>
-              <div style="font-size: 10px; color: #64748b; font-family: monospace; margin-top: 2px;" id="comm-time-fin">2026-08-25 10:15</div>
-            </div>
-            <div class="comm-opinion">
-              <div class="comm-opinion-title">財委簽核意見：</div>
-              <div id="comm-opinion-fin">四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。</div>
-            </div>
-          </div>
-          <div class="comm-stamp-wrap">
-            <div class="stamp-round-red">
-              <span>財務委員</span>
-              <span class="stamp-date" id="stamp-date-fin">2026-08-25</span>
-              <span id="stamp-name-fin">林秀玲</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. 行政委員 -->
-        <div class="committee-col">
-          <div>
-            <div class="comm-head">
-              <div class="comm-role">法定職掌 · 行政委員</div>
-              <div class="comm-name-row">
-                <span class="comm-name" id="comm-name-sup">王國華</span>
-                <span class="comm-badge">已核准同意</span>
-              </div>
-              <div style="font-size: 10px; color: #64748b; font-family: monospace; margin-top: 2px;" id="comm-time-sup">2026-08-25 14:00</div>
-            </div>
-            <div class="comm-opinion">
-              <div class="comm-opinion-title">行委簽核意見：</div>
-              <div id="comm-opinion-sup">宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。</div>
-            </div>
-          </div>
-          <div class="comm-stamp-wrap">
-            <div class="stamp-round-red">
-              <span>行政委員</span>
-              <span class="stamp-date" id="stamp-date-sup">2026-08-25</span>
-              <span id="stamp-name-sup">王國華</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- 四表合一智慧查核結果 -->
-      <div class="audit-summary-box">
-        <strong>🔍 四表合一勾稽查核結果 (AI 智慧會計核驗通過)：</strong><br>
-        1. <strong>表單勾稽：</strong>待支付費用明細表 ($24,500)、財務收支表 ($24,500)、一般費用報支單(15~18)、華南銀行取款條傳票總額完全一致。<br>
-        2. <strong>專款調度：</strong>8/31 華南銀行提領 $50,000 元轉存社區郵局帳戶 (存摺補登扣款結餘 $99,347 元) 憑證齊全。<br>
-        3. <strong>單據驗收：</strong>宏捷機電 $1,500 元門禁維修報價單已獲管委會核准；承辦人高瑞彣圓章印戳全數齊備，法定多重簽核程序完備有效。
-      </div>
-    </div>
-
-    <!-- 地腳：頁尾天地留白與標記 -->
-    <div class="doc-footer-row">
-      <span>大清天朵二期社區 AI 管理助手 · 數位稽核簽核聯</span>
-      <span style="font-weight: 700; color: #0f172a;">— 頁 2 之 2 —</span>
-      <span class="footer-brand">大清天朵二期社區管理委員會 存查聯</span>
-    </div>
-  </div>
 </body>
 </html>
