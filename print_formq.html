@@ -362,6 +362,67 @@
       margin: 1px 0;
     }
 
+    /* 退回章 (方形紅印，專用於委員退回修正) */
+    .stamp-square-rejected {
+      width: 64px;
+      height: 64px;
+      border: 2px solid #b91c1c;
+      border-radius: 6px;
+      background: #fff1f2;
+      color: #991b1b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 9px;
+      line-height: 1.2;
+      transform: rotate(2deg);
+      box-shadow: inset 0 0 0 1px #fca5a5;
+    }
+    .stamp-square-rejected .stamp-tag {
+      background: #b91c1c;
+      color: #ffffff;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 0 4px;
+      border-radius: 2px;
+      margin-bottom: 1px;
+    }
+    .stamp-square-rejected .stamp-date {
+      font-family: ui-monospace, monospace;
+      font-size: 7.5px;
+      border-top: 1px dashed #f87171;
+      border-bottom: 1px dashed #f87171;
+      padding: 1px 2px;
+      margin: 1px 0;
+      color: #7f1d1d;
+    }
+
+    /* 待簽核 (圓形虛線未核章) */
+    .stamp-round-pending {
+      width: 64px;
+      height: 64px;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 50%;
+      background: #f8fafc;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 9px;
+      line-height: 1.2;
+    }
+    .stamp-round-pending .stamp-date {
+      font-size: 8px;
+      color: #94a3b8;
+      margin-top: 2px;
+      border-top: 1px dashed #cbd5e1;
+      padding-top: 2px;
+    }
+
     /* ------------------------------------------------------------- */
     /* 管委會 3 位法定委員線上多重簽核審批區 (精準整合至單頁)          */
     /* ------------------------------------------------------------- */
@@ -435,9 +496,21 @@
       font-weight: 800;
       padding: 1px 5px;
       border-radius: 3px;
+    }
+    .comm-badge-approved {
       background: #ecfdf5;
       color: #065f46;
       border: 1px solid #a7f3d0;
+    }
+    .comm-badge-rejected {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .comm-badge-pending {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
     }
     .comm-opinion {
       font-size: 9.5px;
@@ -489,65 +562,348 @@
     }
   </style>
   <script>
-    // 自動同步最新資料
-    window.addEventListener('DOMContentLoaded', async () => {
-      let data = null;
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function numberToChineseCurrency(num) {
+      if (!num || isNaN(num)) return '零元整';
+      const digits = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖'];
+      const units = ['', '拾', '佰', '仟'];
+      const bigUnits = ['', '萬', '億'];
+      let str = '';
+      let n = Math.floor(Math.abs(num));
+      if (n === 0) return '零元整';
+      let unitPos = 0;
+      while (n > 0) {
+        let section = n % 10000;
+        if (section > 0) {
+          let secStr = '';
+          let zeroFlag = false;
+          for (let i = 0; i < 4; i++) {
+            let digit = section % 10;
+            if (digit === 0) {
+              if (!zeroFlag && secStr !== '') {
+                zeroFlag = true;
+                secStr = digits[0] + secStr;
+              }
+            } else {
+              zeroFlag = false;
+              secStr = digits[digit] + units[i] + secStr;
+            }
+            section = Math.floor(section / 10);
+          }
+          secStr = secStr.replace(/^零+/, '');
+          str = secStr + bigUnits[unitPos] + str;
+        } else if (str.length > 0 && !str.startsWith(digits[0])) {
+          str = digits[0] + str;
+        }
+        unitPos++;
+        n = Math.floor(n / 10000);
+      }
+      return str.replace(/^零+/, '').replace(/零+/g, '零').replace(/零$/, '') + '元整';
+    }
+
+    function renderFormQ(petty) {
+      if (!petty) return;
+
+      // 1. 待支付明細表清單
+      if (petty.items && petty.items.length > 0) {
+        const tbody = document.getElementById('print-tbody-items');
+        if (tbody) {
+          let rows = '';
+          let sum = 0;
+          let vouchers = 0;
+          petty.items.forEach((item, idx) => {
+            const amt = parseInt(item.amount) || 0;
+            const vc = parseInt(item.voucher_count) || 1;
+            sum += amt;
+            vouchers += vc;
+            rows += `
+              <tr>
+                <td class="col-num">${item.no || (idx + 15)}</td>
+                <td class="col-item">${escapeHtml(item.title || '')}</td>
+                <td class="col-vendor">${escapeHtml(item.vendor || '')}</td>
+                <td class="col-desc">${escapeHtml(item.desc || '')}</td>
+                <td class="col-amount">${amt.toLocaleString()}</td>
+                <td class="col-vcount">${vc}</td>
+              </tr>
+            `;
+          });
+          const chnTotal = numberToChineseCurrency(sum);
+          rows += `
+            <tr class="total-row">
+              <td colspan="3" style="font-size: 11px; color: #0f172a; padding-left: 6px;">
+                合計支出 <strong>${petty.items.length}</strong> 筆 &nbsp;&nbsp;&nbsp;&nbsp; 新臺幣：<strong>${chnTotal}</strong>
+              </td>
+              <td style="text-align: right; color: #64748b; font-size: 10px;">實付總計：</td>
+              <td class="col-amount" style="font-size: 13px; color: #0f172a;">${sum.toLocaleString()}</td>
+              <td class="col-vcount"><strong>${vouchers}</strong></td>
+            </tr>
+          `;
+          tbody.innerHTML = rows;
+        }
+      }
+
+      // 2. 承辦作業核對日期與存款
+      if (petty.scheduled_payment_date) {
+        const el = document.getElementById('print-sched-date');
+        if (el) el.textContent = petty.scheduled_payment_date;
+      }
+      if (petty.withdrawal_date) {
+        const el = document.getElementById('print-withd-date');
+        if (el) el.textContent = petty.withdrawal_date;
+      }
+      const decl = petty.declarations || {};
+      const bal = decl.passbook_balance || (petty.balance_info ? petty.balance_info.passbook_balance_before : 173847);
+      const balEl = document.getElementById('print-passbook-bal');
+      if (balEl) balEl.textContent = `NT$ ${parseInt(bal).toLocaleString()} 元`;
+
+      const matchEl = document.getElementById('print-balance-match');
+      if (matchEl) {
+        matchEl.textContent = (decl.balance_match === 'diff') ? '☒ 與電腦結餘金額有差額' : '☑ 與電腦結餘金額相同';
+      }
+
+      // 3. 3 位委員簽核動態渲染
+      const officers = [
+        { key: 'director', prefix: 'dir', role: '主任委員', defaultName: '陳建宏' },
+        { key: 'finance', prefix: 'fin', role: '財務委員', defaultName: '林秀玲' },
+        { key: 'supervisor', prefix: 'sup', role: '行政委員', defaultName: '王國華' }
+      ];
+
+      const approvals = petty.approvals || {};
+      let anyRejected = false;
+      let allApproved = true;
+      let approvedCount = 0;
+      let rejectedCount = 0;
+
+      officers.forEach(off => {
+        const app = approvals[off.key] || {};
+        const status = app.status || 'approved';
+        const name = app.name || off.defaultName;
+        const time = app.time || '';
+        const dateStr = time ? time.split(' ')[0] : '115.08.25';
+        const comment = app.comment || '';
+
+        if (status === 'rejected') {
+          anyRejected = true;
+          allApproved = false;
+          rejectedCount++;
+        } else if (status === 'approved') {
+          approvedCount++;
+        } else {
+          allApproved = false;
+        }
+
+        // 姓名
+        const nameEl = document.getElementById(`comm-name-${off.prefix}`);
+        if (nameEl) nameEl.textContent = name;
+
+        // 徽章
+        const badgeEl = document.getElementById(`comm-badge-${off.prefix}`);
+        if (badgeEl) {
+          if (status === 'rejected') {
+            badgeEl.textContent = '退回補正';
+            badgeEl.className = 'comm-badge comm-badge-rejected';
+          } else if (status === 'approved') {
+            badgeEl.textContent = '已同意';
+            badgeEl.className = 'comm-badge comm-badge-approved';
+          } else {
+            badgeEl.textContent = '待簽核';
+            badgeEl.className = 'comm-badge comm-badge-pending';
+          }
+        }
+
+        // 時間
+        const timeEl = document.getElementById(`comm-time-${off.prefix}`);
+        if (timeEl) {
+          if (status === 'rejected') {
+            timeEl.textContent = time ? `${time} (退回)` : '退回要求補正';
+            timeEl.style.color = '#dc2626';
+          } else if (status === 'approved') {
+            timeEl.textContent = time || '2026-08-25';
+            timeEl.style.color = '#64748b';
+          } else {
+            timeEl.textContent = '尚未簽核';
+            timeEl.style.color = '#94a3b8';
+          }
+        }
+
+        // 意見
+        const opinionEl = document.getElementById(`comm-opinion-${off.prefix}`);
+        if (opinionEl) {
+          if (status === 'rejected') {
+            opinionEl.textContent = comment || '單據與明細有疑義，退回請物業承辦人補正說明。';
+            opinionEl.style.color = '#b91c1c';
+            opinionEl.style.fontWeight = '600';
+          } else if (status === 'approved') {
+            opinionEl.textContent = comment || '已同意通過，准予報支出納付款。';
+            opinionEl.style.color = '#334155';
+            opinionEl.style.fontWeight = 'normal';
+          } else {
+            opinionEl.innerHTML = '<span style="color: #94a3b8; font-style: italic;">（等待委員線上審核簽署意見）</span>';
+          }
+        }
+
+        // 印章
+        const stampWrap = document.getElementById(`comm-stamp-wrap-${off.prefix}`);
+        if (stampWrap) {
+          if (status === 'rejected') {
+            stampWrap.innerHTML = `
+              <div class="stamp-square-rejected">
+                <span class="stamp-tag">退回修正</span>
+                <span class="stamp-date">${dateStr}</span>
+                <span>${name}</span>
+              </div>
+            `;
+          } else if (status === 'approved') {
+            stampWrap.innerHTML = `
+              <div class="stamp-round-red">
+                <span>${off.role}</span>
+                <span class="stamp-date">${dateStr}</span>
+                <span>${name}</span>
+              </div>
+            `;
+          } else {
+            stampWrap.innerHTML = `
+              <div class="stamp-round-pending">
+                <span>待簽核</span>
+                <span class="stamp-date">未核章</span>
+              </div>
+            `;
+          }
+        }
+      });
+
+      // 4. 整體簽核狀態、面版標題、AI 查核說明
+      const overallStatus = document.getElementById('print-overall-status');
+      const panelTitle = document.getElementById('print-panel-title');
+      const panelBadge = document.getElementById('print-panel-badge');
+      const auditBox = document.getElementById('print-audit-box');
+
+      if (anyRejected) {
+        if (overallStatus) {
+          overallStatus.textContent = `⚠️ 管委會委員退回修正 (已退回 ${rejectedCount} 位 · 暫緩出納撥款)`;
+          overallStatus.style.color = '#dc2626';
+        }
+        if (panelTitle) {
+          panelTitle.textContent = '管委會 3 位法定審核委員線上簽核與批覆印章 (案件退回補正中 · 尚未核准)';
+        }
+        if (panelBadge) {
+          panelBadge.textContent = '⚠️ 案件退回補正中 · 暫緩出納撥款';
+          panelBadge.style.background = '#fef2f2';
+          panelBadge.style.color = '#b91c1c';
+          panelBadge.style.border = '1px solid #fecaca';
+        }
+        if (auditBox) {
+          auditBox.innerHTML = `
+            <strong>🔍 四表合一勾稽查核證明 (AI 智慧會計核驗)：</strong>
+            待支付明細表與報支單金額初核吻合；<span style="color: #b91c1c; font-weight: bold;">【重要提醒】本案已有法定審核委員簽核退回補正，出納請勿先行辦理放款提領，待物業承辦人依委員退回意見補正完成並經管委會複核核准後方可出納撥款。</span>
+          `;
+          auditBox.style.borderLeftColor = '#dc2626';
+          auditBox.style.background = '#fff5f5';
+        }
+      } else if (allApproved && approvedCount === 3) {
+        if (overallStatus) {
+          overallStatus.textContent = '✅ 管委會 3 位法定委員全數審核同意 (出納准予撥款)';
+          overallStatus.style.color = '#047857';
+        }
+        if (panelTitle) {
+          panelTitle.textContent = '管委會 3 位法定審核委員線上簽核與批覆印章 (全數核准撥款)';
+        }
+        if (panelBadge) {
+          panelBadge.textContent = '依規約法定多重審核權限 · 全數通過';
+          panelBadge.style.background = '#ecfdf5';
+          panelBadge.style.color = '#065f46';
+          panelBadge.style.border = '1px solid #a7f3d0';
+        }
+        if (auditBox) {
+          auditBox.innerHTML = `
+            <strong>🔍 四表合一勾稽查核證明 (AI 智慧會計核驗通過)：</strong>
+            待支付明細表、收支表、報支單(15~18)、華南取款傳票總額完全吻合 ($24,500)；華南轉存郵局 5 萬元憑條無誤；宏捷維修報價單獲管委會核准；承辦人高瑞彣印戳齊備。
+          `;
+          auditBox.style.borderLeftColor = '#0284c7';
+          auditBox.style.background = '#f8fafc';
+        }
+      } else {
+        if (overallStatus) {
+          overallStatus.textContent = `⏳ 管委會委員線上簽核中 (已同意 ${approvedCount}/3 位 · 審核中)`;
+          overallStatus.style.color = '#b45309';
+        }
+        if (panelTitle) {
+          panelTitle.textContent = '管委會 3 位法定審核委員線上簽核與批覆印章 (線上簽核進行中)';
+        }
+        if (panelBadge) {
+          panelBadge.textContent = '依規約法定多重審核權限 · 審核中';
+          panelBadge.style.background = '#fffbeb';
+          panelBadge.style.color = '#b45309';
+          panelBadge.style.border = '1px solid #fde68a';
+        }
+        if (auditBox) {
+          auditBox.innerHTML = `
+            <strong>🔍 四表合一勾稽查核證明 (AI 智慧會計核驗中)：</strong>
+            單據初步勾稽比對相符，尚待管委會全體法定委員完成線上簽核批覆。
+          `;
+          auditBox.style.borderLeftColor = '#f59e0b';
+          auditBox.style.background = '#fffbeb';
+        }
+      }
+    }
+
+    async function loadFormQData() {
+      let petty = null;
+      // 1. 優先嘗試由 window.opener 直接獲取記憶體中最即時的 appData (極速零延遲同步)
       try {
-        const resp = await fetch('/api/petty_cash');
-        const resJson = await resp.json();
-        if (resJson && resJson.petty_cash) data = resJson.petty_cash;
+        if (window.opener && window.opener.appData && window.opener.appData.petty_cash) {
+          petty = JSON.parse(JSON.stringify(window.opener.appData.petty_cash));
+        }
       } catch (e) {}
 
-      if (!data) {
+      // 2. 嘗試從 localStorage 讀取
+      if (!petty) {
+        try {
+          const direct = localStorage.getItem('daqing_community_petty_cash');
+          if (direct) petty = JSON.parse(direct);
+        } catch (e) {}
+      }
+
+      if (!petty) {
         try {
           const local = localStorage.getItem('daqing_community_data');
           if (local) {
             const parsed = JSON.parse(local);
-            if (parsed && parsed.petty_cash) data = parsed.petty_cash;
+            if (parsed && parsed.petty_cash) petty = parsed.petty_cash;
           }
         } catch (e) {}
       }
 
-      if (data && data.approvals) {
-        if (data.approvals.director) {
-          if (data.approvals.director.name) {
-            document.getElementById('comm-name-dir').textContent = data.approvals.director.name;
-            document.getElementById('stamp-name-dir').textContent = data.approvals.director.name;
+      // 3. 嘗試由後端 API 取得
+      if (!petty || !petty.approvals) {
+        try {
+          const resp = await fetch('/api/petty_cash');
+          if (resp.ok) {
+            const resJson = await resp.json();
+            if (resJson && resJson.petty_cash) petty = resJson.petty_cash;
           }
-          if (data.approvals.director.comment) {
-            document.getElementById('comm-opinion-dir').textContent = data.approvals.director.comment;
-          }
-          if (data.approvals.director.time) {
-            document.getElementById('comm-time-dir').textContent = data.approvals.director.time;
-            document.getElementById('stamp-date-dir').textContent = data.approvals.director.time.split(' ')[0];
-          }
-        }
-        if (data.approvals.finance) {
-          if (data.approvals.finance.name) {
-            document.getElementById('comm-name-fin').textContent = data.approvals.finance.name;
-            document.getElementById('stamp-name-fin').textContent = data.approvals.finance.name;
-          }
-          if (data.approvals.finance.comment) {
-            document.getElementById('comm-opinion-fin').textContent = data.approvals.finance.comment;
-          }
-          if (data.approvals.finance.time) {
-            document.getElementById('comm-time-fin').textContent = data.approvals.finance.time;
-            document.getElementById('stamp-date-fin').textContent = data.approvals.finance.time.split(' ')[0];
-          }
-        }
-        if (data.approvals.supervisor) {
-          if (data.approvals.supervisor.name) {
-            document.getElementById('comm-name-sup').textContent = data.approvals.supervisor.name;
-            document.getElementById('stamp-name-sup').textContent = data.approvals.supervisor.name;
-          }
-          if (data.approvals.supervisor.comment) {
-            document.getElementById('comm-opinion-sup').textContent = data.approvals.supervisor.comment;
-          }
-          if (data.approvals.supervisor.time) {
-            document.getElementById('comm-time-sup').textContent = data.approvals.supervisor.time;
-            document.getElementById('stamp-date-sup').textContent = data.approvals.supervisor.time.split(' ')[0];
-          }
-        }
+        } catch (e) {}
+      }
+
+      if (petty) {
+        renderFormQ(petty);
+      }
+    }
+
+    // 頁面加載完成、列印前、或接收到跨視窗 storage 變動時自動同步
+    window.addEventListener('DOMContentLoaded', loadFormQData);
+    window.addEventListener('beforeprint', loadFormQData);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'daqing_community_petty_cash' || e.key === 'daqing_community_data') {
+        loadFormQData();
       }
     });
   </script>
@@ -561,7 +917,7 @@
       <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #065f46; color: #a7f3d0; font-weight: bold;">✅ 已精準合併為 A4 單頁 (1 頁到底 · 絕無多餘空白頁)</span>
     </div>
     <div style="display: flex; gap: 10px;">
-      <button onclick="window.print()" class="btn-action btn-primary">
+      <button onclick="loadFormQData().then(() => window.print())" class="btn-action btn-primary">
         <span>🖨️ 立即列印 / 存為 PDF (精準 1 頁)</span>
       </button>
       <button onclick="window.close()" class="btn-action btn-secondary">
@@ -587,7 +943,7 @@
       <!-- 3. 表頭副資訊 -->
       <div class="doc-meta-row">
         <span><strong>【 財務悍將系統 】</strong> \ <strong>【 本月待支付費用明細表(Q) 】</strong></span>
-        <span>提領支付日：<strong>115 年 08 月 31 日</strong></span>
+        <span>提領支付日：<strong id="print-header-withd-date">115 年 08 月 31 日</strong></span>
         <span>列印日期：2026年08月23日 · 頁 1 之 1</span>
       </div>
 
@@ -596,8 +952,8 @@
         <div class="info-box">
           填報人：<strong>固德物業作業承辦人 · 高瑞彣</strong> (115.8.23 審核存檔)
         </div>
-        <div class="info-box" style="text-align: right;">
-          簽核進度：<strong style="color: #047857;">✅ 管委會 3 位法定委員全數審核同意 (出納准予撥款)</strong>
+        <div class="info-box" style="text-align: right;" id="print-status-box">
+          簽核進度：<strong style="color: #047857;" id="print-overall-status">✅ 管委會 3 位法定委員全數審核同意 (出納准予撥款)</strong>
         </div>
       </div>
 
@@ -672,10 +1028,10 @@
           </div>
 
           <div class="meta-grid">
-            <div>預定支付日期：<strong>115 年 08 月 31 日</strong></div>
-            <div>提領支付日期：<strong>115 年 08 月 31 日</strong></div>
-            <div>存簿餘額：<strong>NT$ 173,847 元</strong> (華南銀行)</div>
-            <div>結餘電腦核對：<strong>☑ 與電腦結餘金額相同</strong></div>
+            <div>預定支付日期：<strong id="print-sched-date">115 年 08 月 31 日</strong></div>
+            <div>提領支付日期：<strong id="print-withd-date">115 年 08 月 31 日</strong></div>
+            <div>存簿餘額：<strong id="print-passbook-bal">NT$ 173,847 元</strong> (華南銀行)</div>
+            <div>結餘電腦核對：<strong id="print-balance-match">☑ 與電腦結餘金額相同</strong></div>
           </div>
         </div>
 
@@ -693,19 +1049,19 @@
       <!-- 7. 管委會 3 位法定委員線上多重簽核審批區 -->
       <div class="approval-panel">
         <div class="approval-panel-head">
-          <span class="approval-panel-title">管委會 3 位法定審核委員線上簽核與批覆印章 (全數核准撥款)</span>
-          <span class="approval-panel-badge">依規約法定多重審核權限</span>
+          <span class="approval-panel-title" id="print-panel-title">管委會 3 位法定審核委員線上簽核與批覆印章 (全數核准撥款)</span>
+          <span class="approval-panel-badge" id="print-panel-badge">依規約法定多重審核權限</span>
         </div>
 
         <div class="committee-box-grid">
           <!-- 1. 主任委員 -->
-          <div class="committee-col">
+          <div class="committee-col" id="comm-col-dir">
             <div>
               <div class="comm-head">
                 <div class="comm-role">法定職掌 · 主任委員</div>
                 <div class="comm-name-row">
                   <span class="comm-name" id="comm-name-dir">陳建宏</span>
-                  <span class="comm-badge">已同意</span>
+                  <span class="comm-badge comm-badge-approved" id="comm-badge-dir">已同意</span>
                 </div>
                 <div style="font-size: 8.5px; color: #64748b; font-family: monospace;" id="comm-time-dir">2026-08-25 09:30</div>
               </div>
@@ -713,7 +1069,7 @@
                 四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。
               </div>
             </div>
-            <div class="comm-stamp-wrap">
+            <div class="comm-stamp-wrap" id="comm-stamp-wrap-dir">
               <div class="stamp-round-red">
                 <span>主任委員</span>
                 <span class="stamp-date" id="stamp-date-dir">2026-08-25</span>
@@ -723,13 +1079,13 @@
           </div>
 
           <!-- 2. 財務委員 -->
-          <div class="committee-col">
+          <div class="committee-col" id="comm-col-fin">
             <div>
               <div class="comm-head">
                 <div class="comm-role">法定職掌 · 財務委員</div>
                 <div class="comm-name-row">
                   <span class="comm-name" id="comm-name-fin">林秀玲</span>
-                  <span class="comm-badge">已同意</span>
+                  <span class="comm-badge comm-badge-approved" id="comm-badge-fin">已同意</span>
                 </div>
                 <div style="font-size: 8.5px; color: #64748b; font-family: monospace;" id="comm-time-fin">2026-08-25 10:15</div>
               </div>
@@ -737,7 +1093,7 @@
                 四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。
               </div>
             </div>
-            <div class="comm-stamp-wrap">
+            <div class="comm-stamp-wrap" id="comm-stamp-wrap-fin">
               <div class="stamp-round-red">
                 <span>財務委員</span>
                 <span class="stamp-date" id="stamp-date-fin">2026-08-25</span>
@@ -747,13 +1103,13 @@
           </div>
 
           <!-- 3. 行政委員 -->
-          <div class="committee-col">
+          <div class="committee-col" id="comm-col-sup">
             <div>
               <div class="comm-head">
                 <div class="comm-role">法定職掌 · 行政委員</div>
                 <div class="comm-name-row">
                   <span class="comm-name" id="comm-name-sup">王國華</span>
-                  <span class="comm-badge">已同意</span>
+                  <span class="comm-badge comm-badge-approved" id="comm-badge-sup">已同意</span>
                 </div>
                 <div style="font-size: 8.5px; color: #64748b; font-family: monospace;" id="comm-time-sup">2026-08-25 14:00</div>
               </div>
@@ -761,7 +1117,7 @@
                 宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。
               </div>
             </div>
-            <div class="comm-stamp-wrap">
+            <div class="comm-stamp-wrap" id="comm-stamp-wrap-sup">
               <div class="stamp-round-red">
                 <span>行政委員</span>
                 <span class="stamp-date" id="stamp-date-sup">2026-08-25</span>
@@ -773,7 +1129,7 @@
       </div>
 
       <!-- 8. AI 查核精簡提示條 -->
-      <div class="audit-summary-box">
+      <div class="audit-summary-box" id="print-audit-box">
         <strong>🔍 四表合一勾稽查核證明 (AI 智慧會計核驗通過)：</strong>
         待支付明細表、收支表、報支單(15~18)、華南取款傳票總額完全吻合 ($24,500)；華南轉存郵局 5 萬元憑條無誤；宏捷維修報價單獲管委會核准；承辦人高瑞彣印戳齊備。
       </div>

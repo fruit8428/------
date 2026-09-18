@@ -1507,8 +1507,15 @@
     }
 
     function saveLocal() {
-      if (isStandalone && appData) {
-        localStorage.setItem('daqing_community_data', JSON.stringify(appData));
+      if (appData) {
+        try {
+          localStorage.setItem('daqing_community_data', JSON.stringify(appData));
+          if (appData.petty_cash) {
+            localStorage.setItem('daqing_community_petty_cash', JSON.stringify(appData.petty_cash));
+          }
+        } catch (e) {
+          console.warn('saveLocal error:', e);
+        }
       }
     }
 
@@ -2125,6 +2132,7 @@
           if (res.ok) {
             await fetchStatusAndData();
             renderPettyCash();
+            populateFormQ();
             alert('簽核狀態已即時更新並存檔！');
             return;
           }
@@ -2142,6 +2150,7 @@
 
       saveLocal();
       renderPettyCash();
+      populateFormQ();
       alert(`已將【${appData.petty_cash.approvals[offKey].role}】更新為【${dec === 'approved' ? '同意通過' : '退回補正'}】！`);
     }
 
@@ -2518,7 +2527,7 @@
     function signFormQ(officer, decision) {
       if (!appData || !appData.petty_cash) return;
       const commentBox = document.getElementById(`formq-comment-${officer}`);
-      const comment = commentBox ? commentBox.value.trim() : '';
+      let comment = commentBox ? commentBox.value.trim() : '';
 
       const officerNames = { director: '主任委員 陳建宏', finance: '財務委員 林秀玲', supervisor: '行政委員 王國華' };
       const officerName = officerNames[officer] || officer;
@@ -2528,8 +2537,34 @@
         appData.petty_cash.approvals[officer] = { role: officer, name: officerName, status: decision };
       }
 
+      if (decision === 'rejected') {
+        const defaultApprovedTexts = [
+          '四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。',
+          '四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。',
+          '宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。',
+          '已同意通過，准予報支出納付款。',
+          '已同意通過'
+        ];
+        if (!comment || defaultApprovedTexts.includes(comment)) {
+          const reason = prompt(`請輸入【${officerName}】退回補正意見：`, '單據內容或金額有疑義，退回請物業承辦人補正說明。');
+          if (reason === null) return; // 使用者取消操作
+          comment = reason.trim() || '單據有疑義，退回請物業承辦人補正說明。';
+          if (commentBox) commentBox.value = comment;
+        }
+      } else {
+        if (!comment || comment.includes('退回')) {
+          const defaultAcceptTexts = {
+            director: '四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。',
+            finance: '四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。',
+            supervisor: '宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。'
+          };
+          comment = defaultAcceptTexts[officer] || '已同意通過，准予報支出納付款。';
+          if (commentBox) commentBox.value = comment;
+        }
+      }
+
       appData.petty_cash.approvals[officer].status = decision;
-      appData.petty_cash.approvals[officer].comment = comment || (decision === 'approved' ? '已同意通過，准予報支出納付款。' : '退回請物業補正說明。');
+      appData.petty_cash.approvals[officer].comment = comment;
       
       const now = new Date();
       const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
@@ -2576,6 +2611,15 @@
     function printFormQArea() {
       // 儲存目前最新表單數據
       saveFormQData(false);
+      // 同步最新 petty_cash 與 appData 到 localStorage，保證新視窗立刻讀到
+      if (appData && appData.petty_cash) {
+        try {
+          localStorage.setItem('daqing_community_data', JSON.stringify(appData));
+          localStorage.setItem('daqing_community_petty_cash', JSON.stringify(appData.petty_cash));
+        } catch (e) {
+          console.warn('printFormQArea localStorage sync error:', e);
+        }
+      }
       // 開啟標準天地校準的公文列印專頁
       const printWin = window.open('print_formq.html', '_blank');
       if (printWin) {
