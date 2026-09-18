@@ -518,68 +518,7 @@
         </div>
       </div>
 
-      <!-- 三位委員簽核狀態列 (大字體、外框鮮明、可點擊互動切換) -->
-      <div>
-        <div class="text-xs font-bold text-slate-400 mb-2">管委會 3 位法定審核委員簽核狀態：</div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-          <!-- 1. 主任委員 -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-400">法定職掌 · 主任委員</span>
-                <span id="badge-director" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
-              </div>
-              <div class="text-lg font-bold text-slate-900 mt-1">陳建宏</div>
-              <div class="text-xs text-slate-400 font-mono mt-0.5" id="time-director">2026-08-25 09:30</div>
-              <div class="text-xs sm:text-sm text-slate-600 mt-2 p-2.5 bg-slate-50 rounded-xl border border-slate-100" id="comment-director">
-                四項單據與華南取款條核對相符，准予出納付款，同意專款存入郵局。
-              </div>
-            </div>
-            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
-              <button onclick="approvePettyCash('director', 'approved')" class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">設為同意</button>
-              <button onclick="promptReject('director')" class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">退回補正</button>
-            </div>
-          </div>
 
-          <!-- 2. 財務委員 -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-400">法定職掌 · 財務委員</span>
-                <span id="badge-finance" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
-              </div>
-              <div class="text-lg font-bold text-slate-900 mt-1">林秀玲</div>
-              <div class="text-xs text-slate-400 font-mono mt-0.5" id="time-finance">2026-08-25 10:15</div>
-              <div class="text-xs sm:text-sm text-slate-600 mt-2 p-2.5 bg-slate-50 rounded-xl border border-slate-100" id="comment-finance">
-                四表金額勾稽一致無誤，存簿餘額核算正確，同意報支。
-              </div>
-            </div>
-            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
-              <button onclick="approvePettyCash('finance', 'approved')" class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">設為同意</button>
-              <button onclick="promptReject('finance')" class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">退回補正</button>
-            </div>
-          </div>
-
-          <!-- 3. 行政/監察委員 -->
-          <div class="bg-white p-4 sm:p-5 rounded-2xl border-2 border-slate-200 shadow-xs flex flex-col justify-between space-y-3">
-            <div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-400">法定職掌 · 行政委員</span>
-                <span id="badge-supervisor" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">已同意</span>
-              </div>
-              <div class="text-lg font-bold text-slate-900 mt-1">王國華</div>
-              <div class="text-xs text-slate-400 font-mono mt-0.5" id="time-supervisor">2026-08-25 14:00</div>
-              <div class="text-xs sm:text-sm text-slate-600 mt-2 p-2.5 bg-slate-50 rounded-xl border border-slate-100" id="comment-supervisor">
-                宏捷門禁及鼎聖弱電出勤已驗收確認，同意簽核。
-              </div>
-            </div>
-            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
-              <button onclick="approvePettyCash('supervisor', 'approved')" class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">設為同意</button>
-              <button onclick="promptReject('supervisor')" class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">退回補正</button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- AI 智能勾稽檢核卡 -->
       <div class="bg-emerald-50/60 p-4 sm:p-5 rounded-2xl border-2 border-emerald-200 shadow-xs space-y-2.5">
