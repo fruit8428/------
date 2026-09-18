@@ -628,6 +628,56 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             save_data(data)
             self.send_json({"success": True, "petty_cash": data["petty_cash"]})
 
+        elif path == "/api/petty_cash/upload_receipt":
+            import base64
+            image_base64 = body.get("image_base64", "")
+            item_idx = body.get("item_idx")
+            custom_title = body.get("title", "")
+
+            if image_base64:
+                try:
+                    if "," in image_base64:
+                        header, b64_data = image_base64.split(",", 1)
+                    else:
+                        header, b64_data = "", image_base64
+
+                    file_bytes = base64.b64decode(b64_data)
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                    ext = ".png" if "png" in header.lower() else ".jpg"
+                    idx_str = f"項目{int(item_idx)+1}_" if item_idx is not None else ""
+                    filename = f"現場拍照單據_{idx_str}{timestamp}{ext}"
+                    filepath = os.path.join(BASE_DIR, filename)
+                    with open(filepath, "wb") as f:
+                        f.write(file_bytes)
+
+                    # Update specific item if item_idx given
+                    if item_idx is not None and 0 <= int(item_idx) < len(data["petty_cash"]["items"]):
+                        data["petty_cash"]["items"][int(item_idx)]["attachment"] = filename
+                        data["petty_cash"]["items"][int(item_idx)]["is_uploaded"] = True
+
+                    # Append to attachments database list
+                    new_att = {
+                        "id": f"att-upload-{timestamp}",
+                        "title": custom_title or f"現場拍照單據 ({filename})",
+                        "type": "jpg" if ext == ".jpg" else "png",
+                        "file": filename,
+                        "category": "拍照上傳",
+                        "desc": f"於 {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')} 現場手機拍照上傳之原始憑證"
+                    }
+                    data["petty_cash"]["attachments"].append(new_att)
+                    save_data(data)
+
+                    self.send_json({
+                        "success": True,
+                        "filename": filename,
+                        "attachment": new_att,
+                        "petty_cash": data["petty_cash"]
+                    })
+                except Exception as e:
+                    self.send_json({"error": f"Upload failed: {str(e)}"}, 500)
+            else:
+                self.send_json({"error": "No image data provided"}, 400)
+
         elif path == "/api/chat":
             user_msg = body.get("message", "").strip()
             role = body.get("role", "resident")

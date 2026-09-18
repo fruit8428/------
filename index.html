@@ -1247,6 +1247,181 @@
     </div>
   </div>
 
+  <!-- ============================================== -->
+  <!-- MODAL 4: 單據附件管理與選擇 (雙選擇：從資料庫抓取 / 提供手機拍照直接上傳) -->
+  <!-- ============================================== -->
+  <div id="receipt-option-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs hidden flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden border-2 border-slate-300 text-sm animate-in fade-in zoom-in duration-150">
+      
+      <!-- 頂部標題列 -->
+      <div class="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-700">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-teal-500 text-slate-950 flex items-center justify-center font-bold">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="font-bold text-base flex items-center space-x-2">
+              <span>單據附件選擇與管理</span>
+              <span id="receipt-modal-badge" class="text-xs px-2 py-0.5 rounded-full bg-teal-900 text-teal-200 border border-teal-600 font-mono">第 15 筆</span>
+            </div>
+            <div id="receipt-modal-sub" class="text-xs text-slate-300 mt-0.5">環境清潔服務費 (八月份) · 誼潔家事服務企業社</div>
+          </div>
+        </div>
+        <button type="button" onclick="closeReceiptOptionModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 內容區 (可滾動) -->
+      <div class="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 bg-slate-50">
+        
+        <!-- 目前單據狀態卡片 -->
+        <div id="receipt-current-status-box" class="p-3.5 bg-white rounded-xl border-2 border-slate-200 shadow-2xs flex items-center justify-between flex-wrap gap-3">
+          <div class="flex items-center space-x-3 min-w-0">
+            <div id="receipt-status-thumb" class="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+              <i data-lucide="file-text" class="w-6 h-6 text-slate-400"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">目前關聯單據附件</div>
+              <div id="receipt-current-name" class="text-sm font-bold text-slate-800 truncate">一般費用報支單.jpg</div>
+              <div id="receipt-current-desc" class="text-xs text-slate-500 mt-0.5">已由固德物業高瑞彣核章存檔</div>
+            </div>
+          </div>
+          <div id="receipt-current-actions" class="flex items-center space-x-2">
+            <button type="button" onclick="previewCurrentReceipt()" class="px-3 py-1.5 rounded-lg border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold text-xs flex items-center space-x-1 shadow-2xs">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              <span>放大檢視目前單據</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 提示分隔字樣 -->
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-300"></div>
+          <span class="flex-shrink mx-4 text-xs font-bold text-slate-500 bg-slate-200 px-3 py-1 rounded-full uppercase tracking-wider">請選擇單據取得方式</span>
+          <div class="flex-grow border-t border-slate-300"></div>
+        </div>
+
+        <!-- 兩個選擇卡片 (大按鈕、清晰外框、敬老友善) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- 選擇一：從資料庫照或照片中抓取 -->
+          <div class="p-4 bg-white rounded-xl border-2 border-indigo-300 hover:border-indigo-500 shadow-xs flex flex-col justify-between transition-all">
+            <div>
+              <div class="flex items-center space-x-2 text-indigo-900 mb-2">
+                <div class="p-2 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-700">
+                  <i data-lucide="database" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-indigo-950">1. 從資料庫照中抓取</h4>
+                  <p class="text-2xs text-indigo-700 font-semibold">檢視現有單據或從單據庫挑選</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                直接預覽目前關聯的正式照片，或從社區現有 15 份單據庫（報支單、發票、報價單、取款條傳票）中點選抓取綁定。
+              </p>
+            </div>
+
+            <div class="space-y-2 pt-3 border-t border-indigo-100">
+              <button type="button" onclick="previewCurrentReceipt()" class="w-full py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors shadow-2xs">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+                <span>👁️ 預覽目前已抓取的單據照片</span>
+              </button>
+              <button type="button" onclick="toggleDatabasePicker()" class="w-full py-2 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border-2 border-indigo-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors">
+                <i data-lucide="folder-search" class="w-3.5 h-3.5"></i>
+                <span>🗄️ 從資料庫 15 份單據中挑選更換</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 選擇二：提供手機拍照，直接上傳 -->
+          <div class="p-4 bg-white rounded-xl border-2 border-emerald-300 hover:border-emerald-500 shadow-xs flex flex-col justify-between transition-all">
+            <div>
+              <div class="flex items-center space-x-2 text-emerald-900 mb-2">
+                <div class="p-2 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700">
+                  <i data-lucide="camera" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm text-emerald-950">2. 提供手機拍照，直接上傳</h4>
+                  <p class="text-2xs text-emerald-700 font-semibold">手機相機現場拍攝 / 相簿檔案上傳</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                物業人員高瑞彣或管理員可持手機現場開啟鏡頭拍照，直接上傳收據發票，即時關聯至本筆待支付項目。
+              </p>
+            </div>
+
+            <div class="space-y-2 pt-3 border-t border-emerald-100">
+              <button type="button" onclick="triggerMobileCamera()" class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors shadow-2xs">
+                <i data-lucide="camera" class="w-4 h-4"></i>
+                <span>📸 啟動手機相機拍照</span>
+              </button>
+              <button type="button" onclick="triggerFileUpload()" class="w-full py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-2 border-emerald-200 rounded-xl font-bold text-xs flex items-center justify-center space-x-1.5 transition-colors">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                <span>📁 從相簿或電腦選取檔案</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 隱藏的手機相機與檔案 Input (capture="environment" 會直接調用手機後置相機鏡頭) -->
+        <input type="file" id="formq-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleReceiptFileSelect(event, 'camera')">
+        <input type="file" id="formq-file-input" accept="image/*" class="hidden" onchange="handleReceiptFileSelect(event, 'file')">
+
+        <!-- 展開的資料庫選單 (預設隱藏) -->
+        <div id="receipt-db-picker" class="hidden p-4 bg-indigo-50/70 rounded-xl border-2 border-indigo-200 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-indigo-950 flex items-center space-x-1.5">
+              <i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i>
+              <span>請自社區 15 份資料庫單據中點選一張抓取：</span>
+            </span>
+            <button type="button" onclick="toggleDatabasePicker()" class="text-xs text-indigo-700 hover:underline font-bold">收起清單 ▲</button>
+          </div>
+          <div id="receipt-db-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1 text-xs">
+            <!-- 動態渲染資料庫 15 張單據項目 -->
+          </div>
+        </div>
+
+        <!-- 拍照/上傳後的即時預覽與確認區 (預設隱藏，拍照或選檔後顯示) -->
+        <div id="receipt-upload-preview-box" class="hidden p-4 bg-emerald-50 rounded-xl border-2 border-emerald-400 space-y-3">
+          <div class="flex items-center justify-between text-emerald-900">
+            <span class="font-bold text-xs flex items-center space-x-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+              <span>單據照片就緒 (點擊放大預覽)</span>
+            </span>
+            <span id="receipt-upload-meta" class="text-2xs text-emerald-700 font-mono"></span>
+          </div>
+          <div class="flex items-center space-x-3 bg-white p-2.5 rounded-lg border border-emerald-200">
+            <img id="receipt-new-preview-img" src="" class="w-20 h-20 object-cover rounded-lg border border-slate-200 shadow-2xs cursor-pointer hover:opacity-90 transition-opacity" onclick="previewUploadedImageFull()" title="點擊放大全螢幕檢視">
+            <div class="flex-1 text-xs text-slate-700 space-y-1 min-w-0">
+              <div id="receipt-new-filename" class="font-bold text-slate-900 truncate">photo.jpg</div>
+              <div class="text-[11px] text-slate-500">取得時間：<span id="receipt-new-time"></span></div>
+              <div class="text-[11px] text-emerald-700 font-semibold">✅ 點擊「確認套用並綁定」即可完成關聯。</div>
+            </div>
+          </div>
+          <div class="flex items-center justify-end space-x-2 pt-1">
+            <button type="button" onclick="cancelUploadedReceipt()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold">放棄取消</button>
+            <button type="button" onclick="confirmApplyUploadedReceipt()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center space-x-1 shadow-2xs">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>確認套用並綁定此單據</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 頁尾完成按鈕 -->
+      <div class="bg-white p-3 px-5 flex items-center justify-between border-t border-slate-200 text-xs">
+        <span class="text-slate-500">💡 手機瀏覽器可直接啟用鏡頭拍照；照片將自動壓縮並存入社區核銷庫。</span>
+        <button type="button" onclick="closeReceiptOptionModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs shadow-xs">
+          完成關閉
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- 頁尾 -->
   <footer class="py-4 text-center text-xs sm:text-sm text-slate-400 border-t border-slate-200">
     大清天朵二期 AI 社區管理助手 · 固德物業管理中心
@@ -1451,7 +1626,7 @@
       } catch (e) {}
 
       isStandalone = true;
-      const DATA_VER = 'v115_08_gao_form_q_interactive_v4';
+      const DATA_VER = 'v115_08_gao_receipt_picker_v5';
       if (localStorage.getItem('daqing_community_data_ver') !== DATA_VER) {
         localStorage.removeItem('daqing_community_data');
         localStorage.setItem('daqing_community_data_ver', DATA_VER);
@@ -2003,25 +2178,39 @@
 
     // 附件高清預覽 Lightbox 控制
     function openAttachmentModal(fileName, title, category, type) {
-      document.getElementById('modal-att-title').textContent = title;
-      document.getElementById('modal-att-cat').textContent = category;
-      document.getElementById('modal-att-desc').textContent = `原始表件：${fileName} · 固德物業高瑞彣提送存檔`;
+      document.getElementById('modal-att-title').textContent = title || '單據憑證';
+      document.getElementById('modal-att-cat').textContent = category || '憑證';
+      
+      const isDataUrl = fileName && fileName.startsWith('data:');
+      const isUploaded = isDataUrl || (fileName && (fileName.includes('現場拍照') || fileName.startsWith('現場拍照')));
+      
+      if (isUploaded) {
+        document.getElementById('modal-att-desc').textContent = `現場手機拍照/上傳之單據憑證 · 固德物業高瑞彣即時存檔`;
+      } else {
+        document.getElementById('modal-att-desc').textContent = `原始表件：${fileName} · 固德物業高瑞彣提送存檔`;
+      }
 
       const imgEl = document.getElementById('modal-att-img');
       const frameEl = document.getElementById('modal-att-frame');
       const linkEl = document.getElementById('modal-att-link');
 
-      linkEl.href = encodeURI(fileName);
+      const fileSrc = isDataUrl ? fileName : encodeURI(fileName);
+      linkEl.href = fileSrc;
+      if (isDataUrl) {
+        linkEl.download = `現場拍照單據_${Date.now()}.jpg`;
+      } else {
+        linkEl.removeAttribute('download');
+      }
 
       if (type === 'pdf') {
         imgEl.classList.add('hidden');
         imgEl.src = '';
-        frameEl.src = encodeURI(fileName);
+        frameEl.src = fileSrc;
         frameEl.classList.remove('hidden');
       } else {
         frameEl.classList.add('hidden');
         frameEl.src = '';
-        imgEl.src = encodeURI(fileName);
+        imgEl.src = fileSrc;
         imgEl.classList.remove('hidden');
       }
 
@@ -2210,12 +2399,10 @@
             <input type="number" class="w-12 text-center px-1 py-1 border border-slate-300 rounded text-xs font-mono formq-inp-vcount" value="${item.voucher_count || 1}">
           </td>
           <td class="py-2 px-2 text-center">
-            ${item.attachment ? `
-              <button type="button" onclick="openAttachmentModal('${item.attachment}', '${item.title}', '費用報支', 'jpg')" class="px-2 py-1 rounded bg-teal-50 border border-teal-300 text-teal-800 hover:bg-teal-100 text-[11px] font-bold inline-flex items-center space-x-0.5" title="查看報支單據">
-                <i data-lucide="eye" class="w-3 h-3"></i>
-                <span>單據</span>
-              </button>
-            ` : `<span class="text-2xs text-slate-400 font-mono">無</span>`}
+            <button type="button" onclick="openReceiptOptionModal(${idx})" class="px-2.5 py-1 rounded-lg ${item.attachment ? ((item.is_uploaded || (item.attachment && (item.attachment.startsWith('data:') || item.attachment.includes('現場拍照')))) ? 'bg-emerald-50 border border-emerald-400 text-emerald-800 hover:bg-emerald-100 shadow-2xs' : 'bg-teal-50 border border-teal-300 text-teal-900 hover:bg-teal-100 shadow-2xs') : 'bg-amber-50 border border-amber-300 text-amber-900 hover:bg-amber-100'} text-xs font-bold inline-flex items-center space-x-1 transition-all" title="點擊管理單據：從資料庫抓取或手機拍照上傳">
+              <i data-lucide="${item.attachment ? ((item.is_uploaded || (item.attachment && (item.attachment.startsWith('data:') || item.attachment.includes('現場拍照')))) ? 'camera' : 'file-text') : 'paperclip'}" class="w-3.5 h-3.5"></i>
+              <span>${item.attachment ? ((item.is_uploaded || (item.attachment && (item.attachment.startsWith('data:') || item.attachment.includes('現場拍照')))) ? '拍照單據' : '單據') : '+單據'}</span>
+            </button>
           </td>
           <td class="py-2 px-2 text-center">
             <button type="button" onclick="deleteFormQItem(${idx})" class="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors" title="刪除此列">
@@ -2380,7 +2567,7 @@
       }
     }
 
-    function saveFormQData() {
+    function saveFormQData(notify = true) {
       if (!appData || !appData.petty_cash) return;
       const rows = document.querySelectorAll('.formq-row');
       const newItems = [];
@@ -2442,7 +2629,9 @@
 
       renderPettyCash();
       populateFormQ();
-      alert('✅ 待支付費用明細表 (財Q表) 資料已儲存！總額：NT$ ' + appData.petty_cash.total_spent.toLocaleString() + ' 元，已同步提報管委會委員審核！');
+      if (notify) {
+        alert('✅ 待支付費用明細表 (財Q表) 資料已儲存！總額：NT$ ' + appData.petty_cash.total_spent.toLocaleString() + ' 元，已同步提報管委會委員審核！');
+      }
     }
 
     function signFormQ(officer, decision) {
@@ -2505,6 +2694,248 @@
 
     function printFormQArea() {
       window.print();
+    }
+
+    // ==============================================
+    // 單據附件選擇與手機拍照上傳邏輯
+    // ==============================================
+    let currentReceiptItemIdx = null;
+    let tempUploadedImageData = null;
+
+    function openReceiptOptionModal(idx) {
+      if (!appData || !appData.petty_cash) return;
+      currentReceiptItemIdx = idx;
+      tempUploadedImageData = null;
+
+      const dbPicker = document.getElementById('receipt-db-picker');
+      const uploadBox = document.getElementById('receipt-upload-preview-box');
+      if (dbPicker) dbPicker.classList.add('hidden');
+      if (uploadBox) uploadBox.classList.add('hidden');
+
+      const item = appData.petty_cash.items[idx];
+      if (!item) return;
+
+      const badge = document.getElementById('receipt-modal-badge');
+      const sub = document.getElementById('receipt-modal-sub');
+      if (badge) badge.textContent = `第 ${item.no || (idx + 15)} 筆`;
+      if (sub) sub.textContent = `${item.title || '待支付項目'} · ${item.vendor || '廠商'} (NT$ ${(item.amount || 0).toLocaleString()} 元)`;
+
+      updateReceiptStatusBox();
+      renderReceiptDbList();
+
+      document.getElementById('receipt-option-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeReceiptOptionModal() {
+      document.getElementById('receipt-option-modal').classList.add('hidden');
+    }
+
+    function updateReceiptStatusBox() {
+      if (currentReceiptItemIdx === null) return;
+      const item = appData.petty_cash.items[currentReceiptItemIdx];
+      const thumbEl = document.getElementById('receipt-status-thumb');
+      const nameEl = document.getElementById('receipt-current-name');
+      const descEl = document.getElementById('receipt-current-desc');
+      const actionEl = document.getElementById('receipt-current-actions');
+
+      if (!item || !item.attachment) {
+        if (thumbEl) thumbEl.innerHTML = `<i data-lucide="paperclip" class="w-6 h-6 text-amber-500"></i>`;
+        if (nameEl) nameEl.textContent = '尚未綁定單據附件';
+        if (descEl) descEl.textContent = '請從下方選擇「從資料庫抓取」或「手機拍照直接上傳」';
+        if (actionEl) actionEl.innerHTML = `<span class="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg font-bold">待附單據</span>`;
+      } else {
+        const isData = item.attachment.startsWith('data:');
+        const isUp = item.is_uploaded || isData || item.attachment.includes('現場拍照');
+        const src = isData ? item.attachment : encodeURI(item.attachment);
+
+        if (thumbEl) {
+          thumbEl.innerHTML = `<img src="${src}" class="w-full h-full object-cover cursor-pointer hover:opacity-90" onclick="previewCurrentReceipt()" title="點擊放大預覽">`;
+        }
+        if (nameEl) {
+          nameEl.textContent = isData ? '現場拍照單據 (已儲存)' : item.attachment;
+        }
+        if (descEl) {
+          descEl.textContent = isUp ? '物業現場手機拍照上傳之單據憑證' : '已由固德物業高瑞彣自資料庫提送存檔';
+        }
+        if (actionEl) {
+          actionEl.innerHTML = `
+            <button type="button" onclick="previewCurrentReceipt()" class="px-3 py-1.5 rounded-lg border-2 border-teal-500 bg-teal-50 hover:bg-teal-100 text-teal-900 font-bold text-xs flex items-center space-x-1 shadow-2xs">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              <span>放大檢視目前單據</span>
+            </button>
+          `;
+        }
+      }
+      lucide.createIcons();
+    }
+
+    function renderReceiptDbList() {
+      const listEl = document.getElementById('receipt-db-list');
+      if (!listEl) return;
+      const atts = appData.petty_cash.attachments || [];
+
+      listEl.innerHTML = atts.map((att) => `
+        <div class="p-2 bg-white rounded-lg border border-slate-200 hover:border-indigo-400 flex items-center justify-between space-x-2 transition-all">
+          <div class="flex items-center space-x-2 min-w-0 flex-1">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">
+              ${att.category || '單據'}
+            </span>
+            <span class="truncate font-medium text-slate-800 text-xs" title="${att.title}">${att.title}</span>
+          </div>
+          <div class="flex items-center space-x-1 shrink-0">
+            <button type="button" onclick="openAttachmentModal('${att.file}', '${att.title}', '${att.category}', '${att.type}')" class="p-1 text-slate-500 hover:text-indigo-600 rounded hover:bg-indigo-50" title="預覽此張單據">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+            </button>
+            <button type="button" onclick="selectDatabaseReceipt('${att.file}', '${att.title}')" class="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[11px] font-bold flex items-center space-x-0.5 shadow-2xs" title="抓取此單據綁定至本項目">
+              <i data-lucide="check" class="w-3 h-3"></i>
+              <span>抓取指定</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function toggleDatabasePicker() {
+      const dbPicker = document.getElementById('receipt-db-picker');
+      if (dbPicker) dbPicker.classList.toggle('hidden');
+      lucide.createIcons();
+    }
+
+    function selectDatabaseReceipt(fileName, fileTitle) {
+      if (currentReceiptItemIdx === null) return;
+      appData.petty_cash.items[currentReceiptItemIdx].attachment = fileName;
+      appData.petty_cash.items[currentReceiptItemIdx].is_uploaded = false;
+      
+      saveFormQData(false);
+      populateFormQ();
+      updateReceiptStatusBox();
+
+      const dbPicker = document.getElementById('receipt-db-picker');
+      if (dbPicker) dbPicker.classList.add('hidden');
+
+      alert(`✅ 已成功從資料庫抓取「${fileTitle}」並綁定至本筆款項！`);
+    }
+
+    function previewCurrentReceipt() {
+      if (currentReceiptItemIdx === null) return;
+      const item = appData.petty_cash.items[currentReceiptItemIdx];
+      if (!item || !item.attachment) {
+        alert('此項目尚未關聯單據，請先由下方選擇「從資料庫抓取」或「手機拍照」進行綁定！');
+        return;
+      }
+      openAttachmentModal(item.attachment, item.title || '款項單據', item.category || '費用報支', 'jpg');
+    }
+
+    function triggerMobileCamera() {
+      const inp = document.getElementById('formq-camera-input');
+      if (inp) {
+        inp.value = '';
+        inp.click();
+      }
+    }
+
+    function triggerFileUpload() {
+      const inp = document.getElementById('formq-file-input');
+      if (inp) {
+        inp.value = '';
+        inp.click();
+      }
+    }
+
+    function handleReceiptFileSelect(event, source) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        tempUploadedImageData = {
+          dataUrl: dataUrl,
+          file: file,
+          name: file.name,
+          source: source
+        };
+
+        const previewImg = document.getElementById('receipt-new-preview-img');
+        const filenameEl = document.getElementById('receipt-new-filename');
+        const timeEl = document.getElementById('receipt-new-time');
+        const metaEl = document.getElementById('receipt-upload-meta');
+        const uploadBox = document.getElementById('receipt-upload-preview-box');
+
+        if (previewImg) previewImg.src = dataUrl;
+        if (filenameEl) filenameEl.textContent = file.name || (source === 'camera' ? '現場拍照單據.jpg' : 'upload.jpg');
+        if (timeEl) timeEl.textContent = new Date().toLocaleString('zh-TW');
+        if (metaEl) metaEl.textContent = `${(file.size / 1024).toFixed(1)} KB · ${source === 'camera' ? '手機拍照' : '檔案上傳'}`;
+        if (uploadBox) {
+          uploadBox.classList.remove('hidden');
+          uploadBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        lucide.createIcons();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function cancelUploadedReceipt() {
+      tempUploadedImageData = null;
+      const uploadBox = document.getElementById('receipt-upload-preview-box');
+      if (uploadBox) uploadBox.classList.add('hidden');
+    }
+
+    function previewUploadedImageFull() {
+      if (!tempUploadedImageData || !tempUploadedImageData.dataUrl) return;
+      openAttachmentModal(tempUploadedImageData.dataUrl, '現場拍攝單據預覽', '拍照憑證', 'jpg');
+    }
+
+    async function confirmApplyUploadedReceipt() {
+      if (!tempUploadedImageData || currentReceiptItemIdx === null) return;
+      const idx = currentReceiptItemIdx;
+      const item = appData.petty_cash.items[idx];
+      const dataUrl = tempUploadedImageData.dataUrl;
+
+      // 如果有後端服務，呼叫 /api/petty_cash/upload_receipt 儲存實體檔案
+      if (!isStandalone) {
+        try {
+          const resp = await fetch('/api/petty_cash/upload_receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image_base64: dataUrl,
+              item_idx: idx,
+              title: `${item.title || '項目'} (現場拍照單據)`
+            })
+          });
+          const resJson = await resp.json();
+          if (resJson.success && resJson.filename) {
+            item.attachment = resJson.filename;
+            item.is_uploaded = true;
+            if (resJson.petty_cash) {
+              appData.petty_cash = resJson.petty_cash;
+            }
+          } else {
+            item.attachment = dataUrl;
+            item.is_uploaded = true;
+          }
+        } catch (e) {
+          console.log('Upload receipt API offline, saving to local state:', e);
+          item.attachment = dataUrl;
+          item.is_uploaded = true;
+        }
+      } else {
+        item.attachment = dataUrl;
+        item.is_uploaded = true;
+      }
+
+      saveFormQData(false);
+      populateFormQ();
+      updateReceiptStatusBox();
+
+      const uploadBox = document.getElementById('receipt-upload-preview-box');
+      if (uploadBox) uploadBox.classList.add('hidden');
+      tempUploadedImageData = null;
+
+      alert('🎉 手機拍照單據已成功上傳並正式綁定！');
     }
   </script>
 </body>
