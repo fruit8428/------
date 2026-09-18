@@ -848,19 +848,13 @@
           </div>
         </div>
         
-        <!-- 分頁切換器：電子表單 vs 原始掃描照 -->
+        <!-- 頂部操作：電子填單與簽核標籤 + 關閉按鈕 -->
         <div class="flex items-center space-x-2">
-          <div class="inline-flex rounded-lg border border-slate-700 bg-slate-800 p-1">
-            <button id="formq-tab-btn-form" onclick="switchFormQTab('form')" class="px-3 py-1 text-xs font-bold rounded-md bg-teal-500 text-slate-950 shadow-xs flex items-center space-x-1">
-              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-              <span>電子填單與簽核</span>
-            </button>
-            <button id="formq-tab-btn-scan" onclick="switchFormQTab('scan')" class="px-3 py-1 text-xs font-bold rounded-md text-slate-300 hover:text-white flex items-center space-x-1">
-              <i data-lucide="image" class="w-3.5 h-3.5"></i>
-              <span>原始紙本照片對照</span>
-            </button>
-          </div>
-          <button onclick="closeFormQModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800">
+          <span class="px-3 py-1.5 text-xs font-bold rounded-lg bg-teal-500 text-slate-950 shadow-xs flex items-center space-x-1">
+            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+            <span>電子填單與簽核</span>
+          </span>
+          <button onclick="closeFormQModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors" title="關閉視窗">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
@@ -869,21 +863,7 @@
       <!-- 滾動內容主體 -->
       <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 bg-slate-50">
         
-        <!-- 視圖 1: 原始紙本照片對照 (預設隱藏) -->
-        <div id="formq-view-scan" class="hidden space-y-3">
-          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <i data-lucide="info" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
-              <span>此為固德物業高瑞彣於 115.8.23 提送之「八月份待支付費用明細表 (財Q表)」原始紙本掃描檔案。</span>
-            </div>
-            <a href="八月份待支付費用明細表.jpg" target="_blank" class="font-bold underline text-amber-800 hover:text-amber-950">在新分頁開啟全圖</a>
-          </div>
-          <div class="flex justify-center bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
-            <img src="八月份待支付費用明細表.jpg" alt="八月份待支付費用明細表 (財Q表)" class="max-h-[70vh] object-contain rounded border">
-          </div>
-        </div>
-
-        <!-- 視圖 2: 電子化可點選鍵入表單與三委員簽核 (預設顯示) -->
+        <!-- 電子化可點選鍵入表單與三委員簽核 -->
         <div id="formq-view-form" class="space-y-5">
           
           <!-- 表單公文主區 (支援列印) -->
@@ -1176,7 +1156,7 @@
         <div class="flex items-center space-x-2">
           <button type="button" onclick="printFormQArea()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center space-x-1 shadow-xs">
             <i data-lucide="printer" class="w-4 h-4"></i>
-            <span>列印本表 / 存為 PDF (精準 2 頁)</span>
+            <span>列印本表 / 存為 PDF</span>
           </button>
           <button type="button" onclick="closeFormQModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs sm:text-sm rounded-xl transition-all">
             關閉
