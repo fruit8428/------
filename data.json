@@ -57,11 +57,16 @@
       "location": "健身房",
       "reporter": "住戶（A棟8樓之1 · 饒先生）",
       "description": "住戶手機拍照通報：健身房跑步機面板觸控異常",
-      "status": "處理中",
+      "status": "處理完成",
       "target_team": "物業機電/修繕組",
       "image_url": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60",
       "notified_management": true,
-      "management_push_time": "2026-09-19 16:41:15"
+      "management_push_time": "2026-09-19 16:41:15",
+      "completed": true,
+      "completed_by": "管委會委員",
+      "completed_time": "2026-09-19 17:16",
+      "completed_timestamp": 1789809362745,
+      "auto_close_time": "2026-09-20 17:16"
     },
     {
       "id": "DISP-20260919-004",

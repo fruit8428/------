@@ -469,6 +469,12 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             else:
                 self.send_json({"residents": data["residents"]})
         elif path == "/api/dispatches":
+            now_ts = int(datetime.datetime.now().timestamp() * 1000)
+            data["dispatches"] = [
+                d for d in data.get("dispatches", [])
+                if not (d.get("completed") and d.get("completed_timestamp") and (now_ts - d.get("completed_timestamp", 0) >= 24 * 3600 * 1000))
+            ]
+            save_data(data)
             self.send_json({"dispatches": data["dispatches"]})
         elif path == "/api/petty_cash":
             self.send_json({"petty_cash": data["petty_cash"]})
@@ -687,6 +693,46 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                     "time": disp_time
                 }
             })
+
+        elif path == "/api/vision_dispatch_complete":
+            disp_id = body.get("id")
+            found = None
+            for d in data.get("dispatches", []):
+                if d.get("id") == disp_id:
+                    d["status"] = "處理完成"
+                    d["completed"] = True
+                    d["completed_by"] = body.get("completed_by", "管委會委員")
+                    d["completed_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                    d["completed_timestamp"] = int(datetime.datetime.now().timestamp() * 1000)
+                    d["auto_close_time"] = (datetime.datetime.now() + datetime.timedelta(hours=24)).strftime("%Y-%m-%d %H:%M")
+                    found = d
+                    break
+            if found:
+                save_data(data)
+                source = body.get("client_type", "web")
+                record_sync_event(
+                    action_type="dispatch_completed",
+                    title="工單已處理完成",
+                    message=f"委員已確認【{found.get('location')}】異常通報處理完成，將於24小時後主動結案刪除。",
+                    source=source,
+                    details=found
+                )
+            self.send_json({"success": True, "dispatch": found})
+
+        elif path == "/api/vision_dispatch_delete":
+            disp_id = body.get("id")
+            prev_len = len(data.get("dispatches", []))
+            data["dispatches"] = [d for d in data.get("dispatches", []) if d.get("id") != disp_id]
+            if len(data["dispatches"]) != prev_len:
+                save_data(data)
+                record_sync_event(
+                    action_type="dispatch_deleted",
+                    title="工單已結案刪除",
+                    message=f"工單 #{disp_id} 已結案並自畫面刪除。",
+                    source=body.get("client_type", "web"),
+                    details={"id": disp_id}
+                )
+            self.send_json({"success": True})
 
         elif path == "/api/reconcile":
             amount = float(body.get("amount", 0))
