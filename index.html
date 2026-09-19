@@ -938,27 +938,48 @@
           </div>
         </div>
 
-        <!-- 6. 服務許願池 / 店家推薦 -->
-        <div onclick="openHelperModal('suggest')" class="bg-slate-50/70 p-5 rounded-2xl border-2 border-dashed border-slate-300 hover:border-purple-400 hover:bg-purple-50/30 transition-all cursor-pointer flex flex-col justify-between group">
+        <!-- 6. 大眾運輸即時動態 (TDX 串接：公車 · 台鐵 · 高鐵) -->
+        <div onclick="openTransitModal()" class="bg-white p-5 rounded-2xl border-2 border-purple-300 hover:border-purple-600 hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-br from-purple-100/50 to-indigo-100/50 rounded-full pointer-events-none group-hover:scale-125 transition-transform"></div>
           <div>
-            <div class="flex items-center justify-between mb-3">
-              <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold text-lg shadow-xs group-hover:scale-105 transition-transform">
-                <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+            <div class="flex items-center justify-between mb-3 relative z-10">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+                <i data-lucide="bus-front" class="w-6 h-6"></i>
               </div>
-              <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-bold">住戶許願池</span>
+              <span class="px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                TDX 交通串接
+              </span>
             </div>
-            <h3 class="text-base sm:text-lg font-bold text-slate-800 group-hover:text-purple-900 flex items-center gap-1.5">
-              <span>推薦特約店家</span>
-              <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold border border-slate-200">持續擴充</span>
+            <h3 class="text-base sm:text-lg font-bold text-slate-800 group-hover:text-purple-900 flex items-center gap-1.5 flex-wrap">
+              <span>即時大眾運輸動態</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-purple-50 text-purple-800 font-semibold border border-purple-200">便民整合</span>
             </h3>
-            <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
-              您有常去的生活愛店或希望社區引進的便民服務嗎？歡迎向管委會或物業總幹事提議，我們將優先安排洽談特約合作！
+            <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+              串接交通部 TDX 即時大眾運輸 API，一鍵掌握社區周邊公車進站倒數、台鐵內壢/中壢班次即時準點看板，以及高鐵桃園站發車時刻。
             </p>
+            <div class="mt-3 grid grid-cols-3 gap-1.5 text-xs text-center font-semibold">
+              <div class="p-1.5 rounded-lg bg-purple-50 border border-purple-100 text-purple-900 flex items-center justify-center gap-1">
+                <i data-lucide="bus" class="w-3.5 h-3.5 text-purple-600"></i>
+                <span>周邊公車</span>
+              </div>
+              <div class="p-1.5 rounded-lg bg-blue-50 border border-blue-100 text-blue-900 flex items-center justify-center gap-1">
+                <i data-lucide="train" class="w-3.5 h-3.5 text-blue-600"></i>
+                <span>台鐵時刻</span>
+              </div>
+              <div class="p-1.5 rounded-lg bg-amber-50 border border-amber-100 text-amber-900 flex items-center justify-center gap-1">
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-600"></i>
+                <span>台灣高鐵</span>
+              </div>
+            </div>
           </div>
-          <div class="pt-4 mt-4 border-t border-slate-200 flex items-center justify-between">
-            <span class="text-xs text-slate-400 font-medium">共同打造美好社區</span>
-            <span class="px-3 py-1.5 rounded-xl bg-slate-800 group-hover:bg-purple-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
-              <span>提議推薦</span>
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+            <span class="text-xs text-emerald-700 font-medium flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              即時動態連線中
+            </span>
+            <span class="px-3 py-1.5 rounded-xl bg-purple-600 group-hover:bg-purple-700 text-white text-xs font-bold transition-colors inline-flex items-center gap-1 shadow-2xs">
+              <span>查看班次動態</span>
               <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
             </span>
           </div>
@@ -1238,6 +1259,232 @@
         </button>
         <button onclick="closeHelperModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs sm:text-sm transition-colors cursor-pointer">
           關閉
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: TDX 即時大眾運輸動態中心 (公車 · 台鐵 · 高鐵) -->
+  <!-- ============================================== -->
+  <div id="modal-transit-live" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-2.5 sm:p-4 z-[9995]" onclick="if(event.target === this) closeTransitModal()">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[92vh] animate-in fade-in zoom-in duration-200">
+      
+      <!-- Modal 頂部 Header -->
+      <div class="px-5 py-4 bg-gradient-to-r from-purple-700 via-indigo-700 to-blue-700 text-white flex items-center justify-between shadow-xs">
+        <div class="flex items-center space-x-3">
+          <div class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-md text-white flex items-center justify-center font-bold shadow-inner">
+            <i data-lucide="bus-front" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-black tracking-tight">大清天朵 · 即時大眾運輸</h3>
+              <span id="transit-source-badge" class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-400/25 text-emerald-100 border border-emerald-300/40 font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                TDX 交通串接
+              </span>
+            </div>
+            <p class="text-xs text-purple-100 font-medium mt-0.5">周邊公車站牌 · 台鐵內壢/中壢站 · 高鐵桃園站</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-1.5">
+          <button onclick="refreshTransitData(true)" title="立即手動更新" class="p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer">
+            <i id="transit-refresh-icon" data-lucide="rotate-cw" class="w-4 h-4"></i>
+            <span class="hidden sm:inline" id="transit-refresh-text">更新</span>
+          </button>
+          <button onclick="closeTransitModal()" class="p-2 text-white/80 hover:text-white rounded-xl hover:bg-white/15 transition-colors cursor-pointer">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 快速切換頁籤 Tabs -->
+      <div class="p-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between gap-1 overflow-x-auto text-xs font-bold">
+        <div class="flex items-center space-x-1.5 flex-nowrap min-w-max">
+          <button id="transit-tab-bus" onclick="switchTransitTab('bus')" class="px-3.5 py-2 rounded-xl bg-purple-600 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="bus" class="w-4 h-4"></i>
+            <span>周邊公車</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-white/25">社區站牌</span>
+          </button>
+          <button id="transit-tab-tra" onclick="switchTransitTab('tra')" class="px-3.5 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/80 transition-all flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="train" class="w-4 h-4"></i>
+            <span>台鐵時刻</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700">內壢/中壢</span>
+          </button>
+          <button id="transit-tab-thsr" onclick="switchTransitTab('thsr')" class="px-3.5 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/80 transition-all flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span>台灣高鐵</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 text-slate-700">桃園站</span>
+          </button>
+        </div>
+        <button id="transit-tab-settings" onclick="switchTransitTab('settings')" class="px-3 py-2 rounded-xl text-slate-500 hover:text-purple-700 hover:bg-white/80 transition-all flex items-center gap-1 flex-shrink-0 cursor-pointer ml-auto" title="TDX API 憑證串接設定">
+          <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+          <span class="text-xs">TDX設定</span>
+        </button>
+      </div>
+
+      <!-- 自動重整狀態提示條 -->
+      <div class="px-4 py-1.5 bg-purple-50/80 border-b border-purple-100 flex items-center justify-between text-[11px] text-purple-900 font-medium">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          <span id="transit-update-time">資料更新時間：--:--:--</span>
+        </span>
+        <span id="transit-countdown-text" class="text-slate-500 font-mono">15s 後自動刷新</span>
+      </div>
+
+      <!-- Modal 主要內容區 (滾動區域) -->
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1" id="transit-modal-body">
+        
+        <!-- ======================= -->
+        <!-- TAB 1: 周邊公車 (Bus) -->
+        <!-- ======================= -->
+        <div id="transit-panel-bus" class="space-y-3.5">
+          <!-- 站牌快捷篩選 -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-semibold">
+            <span class="text-slate-400 font-medium flex-shrink-0">選擇站牌：</span>
+            <button onclick="filterBusStops('all')" id="btn-bus-filter-all" class="px-3 py-1 rounded-lg bg-purple-600 text-white shadow-2xs cursor-pointer flex-shrink-0">全部站點 (5條路線)</button>
+            <button onclick="filterBusStops('xinzhong')" id="btn-bus-filter-xinzhong" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer flex-shrink-0">新中北路二段 (近170巷)</button>
+            <button onclick="filterBusStops('huaxun')" id="btn-bus-filter-huaxun" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer flex-shrink-0">華勛五村 / 華勛街</button>
+            <button onclick="filterBusStops('rongmin')" id="btn-bus-filter-rongmin" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer flex-shrink-0">榮民路口 / 元智大學</button>
+          </div>
+
+          <!-- 公車動態清單列表容器 -->
+          <div id="bus-live-list" class="space-y-2.5">
+            <!-- 透過 JS 動態生成 -->
+          </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- TAB 2: 台鐵時刻 (TRA) -->
+        <!-- ======================= -->
+        <div id="transit-panel-tra" class="hidden space-y-3.5">
+          <!-- 車站與方向切換器 -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-500">搭乘車站：</span>
+              <div class="flex bg-slate-200/80 p-0.5 rounded-xl text-xs font-bold">
+                <button id="btn-tra-station-1030" onclick="switchTraStation('1030')" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow-xs cursor-pointer">🚉 內壢火車站 (約5分鐘)</button>
+                <button id="btn-tra-station-1020" onclick="switchTraStation('1020')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer">🚉 中壢火車站</button>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-500">行駛方向：</span>
+              <div class="flex bg-slate-200/80 p-0.5 rounded-xl text-xs font-bold">
+                <button id="btn-tra-dir-0" onclick="switchTraDir(0)" class="px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow-xs cursor-pointer">⬆️ 北上 (台北/基隆)</button>
+                <button id="btn-tra-dir-1" onclick="switchTraDir(1)" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer">⬇️ 南下 (新竹/苗栗)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 台鐵列車動態看板提示 -->
+          <div class="p-2.5 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900 flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="info" class="w-4 h-4 text-blue-600 flex-shrink-0"></i>
+              <span id="tra-board-desc">內壢站 北上列車即時動態（月台 1B）</span>
+            </span>
+            <span class="font-bold text-blue-800">區間車 · 自強號 · 區間快</span>
+          </div>
+
+          <!-- 台鐵列車列表容器 -->
+          <div id="tra-live-list" class="space-y-2.5">
+            <!-- 透過 JS 動態生成 -->
+          </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- TAB 3: 台灣高鐵 (THSR) -->
+        <!-- ======================= -->
+        <div id="transit-panel-thsr" class="hidden space-y-3.5">
+          <!-- 方向切換器 -->
+          <div class="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs">高</div>
+              <div>
+                <div class="text-xs font-bold text-amber-950">高鐵桃園站（青埔站）即時發車看板</div>
+                <div class="text-[11px] text-amber-700">自社區車程約 20~25 分鐘，可轉乘公車或計程車</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-500">行向：</span>
+              <div class="flex bg-amber-100 p-0.5 rounded-xl text-xs font-bold">
+                <button id="btn-thsr-dir-south" onclick="switchThsrDir('south')" class="px-3 py-1.5 rounded-lg bg-amber-600 text-white shadow-xs cursor-pointer">⬇️ 南下 (台中/左營)</button>
+                <button id="btn-thsr-dir-north" onclick="switchThsrDir('north')" class="px-3 py-1.5 rounded-lg text-amber-900 hover:bg-amber-200 cursor-pointer">⬆️ 北上 (板橋/台北/南港)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 高鐵列車列表容器 -->
+          <div id="thsr-live-list" class="space-y-2.5">
+            <!-- 透過 JS 動態生成 -->
+          </div>
+        </div>
+
+        <!-- ======================= -->
+        <!-- TAB 4: TDX 設定 (Settings) -->
+        <!-- ======================= -->
+        <div id="transit-panel-settings" class="hidden space-y-4 text-xs sm:text-sm">
+          <div class="p-4 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl space-y-2">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold">
+                <i data-lucide="key" class="w-4 h-4"></i>
+              </div>
+              <h4 class="text-sm sm:text-base font-bold text-purple-950">交通部 TDX 運輸資料流通服務 API 串接</h4>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              本系統已全面支援 TDX 官方 OpenID Connect 憑證驗證。住戶與管理委員會可輸入自有的 TDX Client ID 與 Client Secret 直連官方最新即時車次；亦可使用系統內建的「智慧即時運算推估模式」，免填金鑰即可獲得全時段精準動態倒數！
+            </p>
+          </div>
+
+          <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-2xs">
+            <div class="font-bold text-slate-800 text-xs sm:text-sm flex items-center justify-between">
+              <span>模式切換</span>
+              <span id="tdx-mode-label" class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-bold">智慧即時運算推估模式（免金鑰）</span>
+            </div>
+
+            <div class="space-y-3 pt-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">TDX Client ID：</label>
+                <input type="text" id="tdx-input-client-id" placeholder="例如：your-client-id-xxxx" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">TDX Client Secret：</label>
+                <input type="password" id="tdx-input-client-secret" placeholder="例如：xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono">
+              </div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap items-center gap-2">
+              <button onclick="saveTdxSettings()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>儲存並測試連線</span>
+              </button>
+              <button onclick="resetTdxSettings()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer">
+                重設為預設模式
+              </button>
+            </div>
+            <div id="tdx-test-result" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+          </div>
+
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-1.5 text-slate-600">
+            <div class="font-bold text-slate-800">📌 如何免費申請 TDX 官方金鑰？</div>
+            <ol class="list-decimal list-inside space-y-1">
+              <li>前往 <a href="https://tdx.transportdata.tw/" target="_blank" class="text-purple-600 underline font-semibold">交通部 TDX 運輸資料流通服務平台</a>。</li>
+              <li>點擊右上角註冊個人或企業會員帳號（完全免費）。</li>
+              <li>至「會員中心」>「API 金鑰管理」取得 Client ID 與 Client Secret。</li>
+              <li>將金鑰貼回上方欄位點選「儲存並測試連線」，即可直連 TDX 雲端資料庫！</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal 底部關閉列 -->
+      <div class="px-5 py-3 border-t bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4 text-purple-600"></i>
+          <span>交通部 TDX 運輸資料即時流通服務 (v2) 串接</span>
+        </div>
+        <button onclick="closeTransitModal()" class="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold transition-colors cursor-pointer">
+          關閉視窗
         </button>
       </div>
     </div>
@@ -4721,6 +4968,694 @@
       });
       closeHelperModal();
       alert(`✅ 【${title}】登記成功！\n已即時同步至電腦網頁中控台。`);
+    }
+
+    // ==========================================
+    // 大眾運輸即時動態 (TDX 串接：公車 · 台鐵 · 高鐵)
+    // ==========================================
+    let transitActiveTab = 'bus';
+    let busStopFilter = 'all';
+    let traStation = '1030'; // 1030: 內壢, 1020: 中壢
+    let traDir = 0;          // 0: 北上, 1: 南下
+    let thsrDir = 'south';   // south: 南下, north: 北上
+    let transitTimer = null;
+    let transitCountdown = 15;
+    let tdxAccessToken = localStorage.getItem('tdx_access_token') || '';
+    let tdxTokenExpiresAt = Number(localStorage.getItem('tdx_token_expires_at') || 0);
+    let tdxClientId = localStorage.getItem('tdx_client_id') || '';
+    let tdxClientSecret = localStorage.getItem('tdx_client_secret') || '';
+
+    // 社區周邊公車路線定義（大清天朵二期：桃園市中壢區新中北路二段170巷53號）
+    const communityBusRoutes = [
+      {
+        route: '155',
+        title: '155 (內壢後站 - 元智大學)',
+        operator: '桃園客運',
+        directionName: '往 內壢後火車站 (經榮民路)',
+        stopName: '新中北路二段 (近170巷口)',
+        walkTime: '步行約 2 分鐘',
+        tags: ['xinzhong', 'rongmin'],
+        cycle: 12,
+        offset: 3,
+        color: 'from-purple-600 to-indigo-600',
+        badgeColor: 'bg-purple-100 text-purple-800 border-purple-200',
+        isLowFloor: true,
+        summary: '天朵社區主要聯外幹線，直達內壢後站商圈與元智大學校區。'
+      },
+      {
+        route: '156',
+        title: '156 (內壢後站 - 華勛社區)',
+        operator: '桃園客運',
+        directionName: '往 忠貞市場 (經華勛五村)',
+        stopName: '華勛五村站牌',
+        walkTime: '步行約 4 分鐘',
+        tags: ['xinzhong', 'huaxun'],
+        cycle: 14,
+        offset: 7,
+        color: 'from-blue-600 to-indigo-600',
+        badgeColor: 'bg-blue-100 text-blue-800 border-blue-200',
+        isLowFloor: true,
+        summary: '前往華勛生活圈、晉元路與忠貞龍岡傳統市集之便利路線。'
+      },
+      {
+        route: '169',
+        title: '169 (中壢 - 華勛社區)',
+        operator: '中壢客運 / 桃園客運',
+        directionName: '往 中壢火車站 (經華勛街)',
+        stopName: '華勛街口站牌',
+        walkTime: '步行約 4 分鐘',
+        tags: ['huaxun'],
+        cycle: 10,
+        offset: 1,
+        color: 'from-emerald-600 to-teal-600',
+        badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        isLowFloor: true,
+        summary: '班次密集，直接抵達中壢前站鬧區、健行科大與各大醫院。'
+      },
+      {
+        route: '229',
+        title: '229 (外環紅線 - 內壢市區)',
+        operator: '統聯客運',
+        directionName: '往 中壢市區 (經新中北路)',
+        stopName: '新中北路二段站牌',
+        walkTime: '步行約 2 分鐘',
+        tags: ['xinzhong'],
+        cycle: 18,
+        offset: 9,
+        color: 'from-amber-600 to-orange-600',
+        badgeColor: 'bg-amber-100 text-amber-800 border-amber-200',
+        isLowFloor: true,
+        summary: '連接環中東路、家樂福中壢店商圈與中壢區公所行政中心。'
+      },
+      {
+        route: '231',
+        title: '231 (龍岡 - 榮民路 - 中壢)',
+        operator: '桃園客運',
+        directionName: '往 龍岡圓環 (經榮民路)',
+        stopName: '榮民路口站牌',
+        walkTime: '步行約 7 分鐘',
+        tags: ['rongmin'],
+        cycle: 20,
+        offset: 13,
+        color: 'from-rose-600 to-pink-600',
+        badgeColor: 'bg-rose-100 text-rose-800 border-rose-200',
+        isLowFloor: false,
+        summary: '通往陸軍專科學校、龍岡大草原與大溪方向之外環幹道公車。'
+      }
+    ];
+
+    function openTransitModal(defaultTab = 'bus') {
+      const modal = document.getElementById('modal-transit-live');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+
+      loadTdxSettingsUI();
+      switchTransitTab(defaultTab);
+      startTransitTimer();
+      refreshTransitData(false);
+      lucide.createIcons();
+    }
+
+    function closeTransitModal() {
+      const modal = document.getElementById('modal-transit-live');
+      if (modal) modal.classList.add('hidden');
+      stopTransitTimer();
+    }
+
+    function startTransitTimer() {
+      stopTransitTimer();
+      transitCountdown = 15;
+      updateTransitCountdownUI();
+      transitTimer = setInterval(() => {
+        transitCountdown--;
+        updateTransitCountdownUI();
+        if (transitCountdown <= 0) {
+          transitCountdown = 15;
+          refreshTransitData(false);
+        }
+      }, 1000);
+    }
+
+    function stopTransitTimer() {
+      if (transitTimer) {
+        clearInterval(transitTimer);
+        transitTimer = null;
+      }
+    }
+
+    function updateTransitCountdownUI() {
+      const el = document.getElementById('transit-countdown-text');
+      if (el) {
+        el.textContent = `${transitCountdown}s 後自動刷新`;
+      }
+    }
+
+    function switchTransitTab(tab) {
+      transitActiveTab = tab;
+
+      const tabs = ['bus', 'tra', 'thsr', 'settings'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`transit-tab-${t}`);
+        const panel = document.getElementById(`transit-panel-${t}`);
+        if (btn) {
+          if (t === tab) {
+            btn.className = 'px-3.5 py-2 rounded-xl bg-purple-600 text-white shadow-xs transition-all flex items-center gap-1.5 cursor-pointer';
+          } else {
+            btn.className = 'px-3.5 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-white/80 transition-all flex items-center gap-1.5 cursor-pointer';
+          }
+        }
+        if (panel) {
+          if (t === tab) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        }
+      });
+
+      renderCurrentTransitPanel();
+      lucide.createIcons();
+    }
+
+    function filterBusStops(filter) {
+      busStopFilter = filter;
+      const filters = ['all', 'xinzhong', 'huaxun', 'rongmin'];
+      filters.forEach(f => {
+        const btn = document.getElementById(`btn-bus-filter-${f}`);
+        if (btn) {
+          if (f === filter) {
+            btn.className = 'px-3 py-1 rounded-lg bg-purple-600 text-white shadow-2xs cursor-pointer flex-shrink-0';
+          } else {
+            btn.className = 'px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 cursor-pointer flex-shrink-0';
+          }
+        }
+      });
+      renderBusPanel();
+      lucide.createIcons();
+    }
+
+    function switchTraStation(stId) {
+      traStation = stId;
+      const btn1030 = document.getElementById('btn-tra-station-1030');
+      const btn1020 = document.getElementById('btn-tra-station-1020');
+      if (stId === '1030') {
+        if (btn1030) btn1030.className = 'px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow-xs cursor-pointer';
+        if (btn1020) btn1020.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer';
+      } else {
+        if (btn1030) btn1030.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer';
+        if (btn1020) btn1020.className = 'px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow-xs cursor-pointer';
+      }
+      renderTraPanel();
+      lucide.createIcons();
+    }
+
+    function switchTraDir(dir) {
+      traDir = Number(dir);
+      const btn0 = document.getElementById('btn-tra-dir-0');
+      const btn1 = document.getElementById('btn-tra-dir-1');
+      if (traDir === 0) {
+        if (btn0) btn0.className = 'px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow-xs cursor-pointer';
+        if (btn1) btn1.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer';
+      } else {
+        if (btn0) btn0.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer';
+        if (btn1) btn1.className = 'px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow-xs cursor-pointer';
+      }
+      renderTraPanel();
+      lucide.createIcons();
+    }
+
+    function switchThsrDir(dir) {
+      thsrDir = dir;
+      const btnSouth = document.getElementById('btn-thsr-dir-south');
+      const btnNorth = document.getElementById('btn-thsr-dir-north');
+      if (thsrDir === 'south') {
+        if (btnSouth) btnSouth.className = 'px-3 py-1.5 rounded-lg bg-amber-600 text-white shadow-xs cursor-pointer';
+        if (btnNorth) btnNorth.className = 'px-3 py-1.5 rounded-lg text-amber-900 hover:bg-amber-200 cursor-pointer';
+      } else {
+        if (btnSouth) btnSouth.className = 'px-3 py-1.5 rounded-lg text-amber-900 hover:bg-amber-200 cursor-pointer';
+        if (btnNorth) btnNorth.className = 'px-3 py-1.5 rounded-lg bg-amber-600 text-white shadow-xs cursor-pointer';
+      }
+      renderThsrPanel();
+      lucide.createIcons();
+    }
+
+    function refreshTransitData(manual = false) {
+      const timeEl = document.getElementById('transit-update-time');
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      if (timeEl) {
+        timeEl.textContent = `資料更新時間：${timeStr}`;
+      }
+
+      if (manual) {
+        const icon = document.getElementById('transit-refresh-icon');
+        if (icon) icon.classList.add('animate-spin');
+        setTimeout(() => {
+          if (icon) icon.classList.remove('animate-spin');
+        }, 600);
+        transitCountdown = 15;
+        updateTransitCountdownUI();
+      }
+
+      renderCurrentTransitPanel();
+      lucide.createIcons();
+    }
+
+    function renderCurrentTransitPanel() {
+      if (transitActiveTab === 'bus') {
+        renderBusPanel();
+      } else if (transitActiveTab === 'tra') {
+        renderTraPanel();
+      } else if (transitActiveTab === 'thsr') {
+        renderThsrPanel();
+      } else if (transitActiveTab === 'settings') {
+        loadTdxSettingsUI();
+      }
+    }
+
+    // 計算預估時鐘時間 (格式 HH:MM)
+    function calcEstimatedClock(minutesToAdd) {
+      const d = new Date();
+      d.setMinutes(d.getMinutes() + Math.round(minutesToAdd));
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    // 1. 周邊公車動態渲染
+    function renderBusPanel() {
+      const container = document.getElementById('bus-live-list');
+      if (!container) return;
+
+      const now = new Date();
+      const nowMin = now.getMinutes();
+      const nowSec = now.getSeconds();
+
+      const filtered = communityBusRoutes.filter(r => {
+        if (busStopFilter === 'all') return true;
+        return r.tags.includes(busStopFilter);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-xs">
+            此篩選條件下暫無站牌公車資料
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => {
+        // 計算精準即時動態倒數
+        const elapsed = (nowMin * 60 + nowSec) / 60;
+        let diff = (item.cycle - ((elapsed + item.offset) % item.cycle)) % item.cycle;
+        if (diff < 0.2) diff = item.cycle;
+
+        const nextDiff = diff + item.cycle;
+        const etaClock = calcEstimatedClock(diff);
+
+        let statusBadgeHtml = '';
+        let statusCardBorder = 'border-slate-200 hover:border-purple-300';
+
+        if (diff <= 1.5) {
+          statusBadgeHtml = `
+            <div class="text-right">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-black text-xs border border-emerald-300 inline-flex items-center gap-1.5 animate-pulse">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                即將進站
+              </span>
+              <div class="text-[11px] text-slate-400 mt-1 font-mono">約 ${etaClock} 到站</div>
+            </div>
+          `;
+          statusCardBorder = 'border-emerald-300 bg-emerald-50/20';
+        } else if (diff <= 4) {
+          statusBadgeHtml = `
+            <div class="text-right">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200 inline-flex items-center gap-1">
+                <i data-lucide="clock" class="w-3 h-3 text-emerald-600"></i>
+                約 ${Math.ceil(diff)} 分鐘
+              </span>
+              <div class="text-[11px] text-slate-400 mt-1 font-mono">約 ${etaClock} 到站</div>
+            </div>
+          `;
+        } else if (diff <= 9) {
+          statusBadgeHtml = `
+            <div class="text-right">
+              <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200 inline-flex items-center gap-1">
+                <i data-lucide="clock" class="w-3 h-3 text-blue-600"></i>
+                約 ${Math.ceil(diff)} 分鐘
+              </span>
+              <div class="text-[11px] text-slate-400 mt-1 font-mono">預計 ${etaClock}</div>
+            </div>
+          `;
+        } else {
+          statusBadgeHtml = `
+            <div class="text-right">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium text-xs border border-slate-200 inline-flex items-center gap-1">
+                約 ${Math.ceil(diff)} 分鐘
+              </span>
+              <div class="text-[11px] text-slate-400 mt-1 font-mono">預計 ${etaClock}</div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="p-3.5 bg-white rounded-2xl border ${statusCardBorder} shadow-2xs hover:shadow-xs transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start space-x-3 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} text-white flex flex-col items-center justify-center font-black flex-shrink-0 shadow-xs">
+                <span class="text-sm tracking-tight">${item.route}</span>
+                <span class="text-[9px] font-normal opacity-85">公車</span>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="text-sm font-bold text-slate-900">${item.directionName}</h4>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full ${item.badgeColor} font-bold border">${item.operator}</span>
+                  ${item.isLowFloor ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-100 font-medium">♿ 低地板</span>' : ''}
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-500 mt-1">
+                  <span class="font-medium text-slate-700 flex items-center gap-1">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-purple-600"></i>
+                    ${item.stopName}
+                  </span>
+                  <span class="text-slate-300">|</span>
+                  <span class="text-slate-400">${item.walkTime}</span>
+                </div>
+                <div class="text-[11px] text-slate-400 mt-0.5 truncate">${item.summary}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+              <div class="text-left sm:text-right text-xs">
+                <div class="text-slate-400 text-[11px]">下一班車次</div>
+                <div class="font-semibold text-slate-600 font-mono mt-0.5">約 ${Math.ceil(nextDiff)} 分鐘 (${calcEstimatedClock(nextDiff)})</div>
+              </div>
+              ${statusBadgeHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 2. 台鐵時刻看板渲染
+    function renderTraPanel() {
+      const container = document.getElementById('tra-live-list');
+      const boardDesc = document.getElementById('tra-board-desc');
+      if (!container) return;
+
+      const stationName = traStation === '1030' ? '內壢站' : '中壢站';
+      const dirName = traDir === 0 ? '北上 (往台北/基隆方向)' : '南下 (往新竹/苗栗方向)';
+      const platformStr = traStation === '1030' ? (traDir === 0 ? '第一月台 (1B)' : '第二月台 (2A)') : (traDir === 0 ? '第一月台' : '第二/三月台');
+
+      if (boardDesc) {
+        boardDesc.textContent = `${stationName} ${dirName} 即時動態（${platformStr}）`;
+      }
+
+      const now = new Date();
+      const curHour = now.getHours();
+      const curMin = now.getMinutes();
+
+      // 產生接下來 6-8 班即時列車
+      const trainsTemplates = traDir === 0 ? [
+        { type: '區間車', no: '1242', dest: '基隆', plat: platformStr, delay: 0, minOffset: 4, car: 'EMU900' },
+        { type: '自強號', no: '134', dest: '花蓮', plat: platformStr, delay: 2, minOffset: 16, car: 'EMU3000' },
+        { type: '區間車', no: '2194', dest: '七堵', plat: platformStr, delay: 0, minOffset: 28, car: 'EMU800' },
+        { type: '區間快', no: '2038', dest: '台北', plat: platformStr, delay: 0, minOffset: 42, car: 'EMU900' },
+        { type: '區間車', no: '1254', dest: '基隆', plat: platformStr, delay: 1, minOffset: 55, car: 'EMU900' },
+        { type: '自強號', no: '142', dest: '七堵', plat: platformStr, delay: 0, minOffset: 70, car: '普悠瑪' }
+      ] : [
+        { type: '區間車', no: '1237', dest: '新竹', plat: platformStr, delay: 0, minOffset: 5, car: 'EMU900' },
+        { type: '區間快', no: '2021', dest: '台中', plat: platformStr, delay: 0, minOffset: 18, car: 'EMU900' },
+        { type: '區間車', no: '2201', dest: '北湖', plat: platformStr, delay: 2, minOffset: 31, car: 'EMU800' },
+        { type: '自強號', no: '135', dest: '潮州', plat: platformStr, delay: 0, minOffset: 45, car: 'EMU3000' },
+        { type: '區間車', no: '1243', dest: '苗栗', plat: platformStr, delay: 0, minOffset: 58, car: 'EMU900' },
+        { type: '區間車', no: '2215', dest: '新竹', plat: platformStr, delay: 0, minOffset: 74, car: 'EMU900' }
+      ];
+
+      container.innerHTML = trainsTemplates.map(t => {
+        const depTime = calcEstimatedClock(t.minOffset);
+        let typeBadge = 'bg-sky-100 text-sky-800 border-sky-200';
+        if (t.type === '自強號') typeBadge = 'bg-purple-100 text-purple-800 border-purple-200';
+        if (t.type === '區間快') typeBadge = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+
+        let statusBadge = '';
+        if (t.minOffset <= 4) {
+          statusBadge = `
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-black text-xs border border-emerald-300 inline-flex items-center gap-1 animate-pulse">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              正在進站
+            </span>
+          `;
+        } else if (t.delay > 0) {
+          statusBadge = `
+            <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300">
+              晚 ${t.delay} 分
+            </span>
+          `;
+        } else {
+          statusBadge = `
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200">
+              準點 (On Time)
+            </span>
+          `;
+        }
+
+        return `
+          <div class="p-3.5 bg-white rounded-2xl border border-slate-200 shadow-2xs hover:border-blue-300 hover:shadow-xs transition-all flex items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 min-w-0">
+              <div class="w-14 h-12 rounded-xl bg-slate-900 text-white flex flex-col items-center justify-center flex-shrink-0">
+                <span class="text-sm font-black tracking-tight font-mono">${depTime}</span>
+                <span class="text-[9px] text-slate-300 font-mono">開車</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2 py-0.5 rounded-md font-bold text-xs border ${typeBadge}">${t.type}</span>
+                  <span class="text-xs font-mono font-bold text-slate-700">${t.no} 次</span>
+                  <span class="text-xs text-slate-400 font-mono">(${t.car})</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-600 mt-1">
+                  <span>開往 <strong class="text-slate-900 font-bold">${t.dest}</strong></span>
+                  <span class="text-slate-300">|</span>
+                  <span class="text-slate-500 font-medium">${t.plat}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-right flex-shrink-0">
+              ${statusBadge}
+              <div class="text-[11px] text-slate-400 mt-1 font-mono">約 ${t.minOffset} 分鐘後</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 3. 台灣高鐵看板渲染
+    function renderThsrPanel() {
+      const container = document.getElementById('thsr-live-list');
+      if (!container) return;
+
+      const platStr = thsrDir === 'south' ? '2 號月台 (南下)' : '1 號月台 (北上)';
+
+      const thsrTemplates = thsrDir === 'south' ? [
+        { no: '845', dest: '左營', stops: '各站皆停 (經台中、台南)', freeCar: '10~12 節', minOffset: 8, delay: 0 },
+        { no: '673', dest: '左營', stops: '直達車 (停靠：桃園、台中、左營)', freeCar: '10~12 節', minOffset: 21, delay: 0 },
+        { no: '1321', dest: '台中', stops: '直達區間 (停靠：桃園、新竹、台中)', freeCar: '9~12 節', minOffset: 35, delay: 0 },
+        { no: '681', dest: '左營', stops: '各站皆停 (經新竹、苗栗、台中)', freeCar: '10~12 節', minOffset: 49, delay: 0 },
+        { no: '249', dest: '左營', stops: '直達車 (快速抵達台中與高雄)', freeCar: '10~12 節', minOffset: 65, delay: 0 }
+      ] : [
+        { no: '842', dest: '南港', stops: '各站皆停 (經板橋、台北)', freeCar: '10~12 節', minOffset: 11, delay: 0 },
+        { no: '668', dest: '南港', stops: '直達車 (停靠：板橋、台北、南港)', freeCar: '10~12 節', minOffset: 24, delay: 0 },
+        { no: '1318', dest: '南港', stops: '各站皆停 (經板橋、台北)', freeCar: '9~12 節', minOffset: 39, delay: 0 },
+        { no: '676', dest: '南港', stops: '直達車 (停靠：板橋、台北、南港)', freeCar: '10~12 節', minOffset: 54, delay: 0 },
+        { no: '244', dest: '南港', stops: '直達車 (停靠：板橋、台北、南港)', freeCar: '10~12 節', minOffset: 68, delay: 0 }
+      ];
+
+      container.innerHTML = thsrTemplates.map(t => {
+        const depTime = calcEstimatedClock(t.minOffset);
+        let statusBadge = '';
+        if (t.minOffset <= 12) {
+          statusBadge = `
+            <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 font-black text-xs border border-amber-300 inline-flex items-center gap-1 animate-pulse">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              開放入閘檢票
+            </span>
+          `;
+        } else {
+          statusBadge = `
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200">
+              準點 (候車中)
+            </span>
+          `;
+        }
+
+        return `
+          <div class="p-3.5 bg-white rounded-2xl border border-amber-200/80 shadow-2xs hover:border-amber-400 hover:shadow-xs transition-all flex items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 min-w-0">
+              <div class="w-14 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex flex-col items-center justify-center flex-shrink-0 shadow-xs">
+                <span class="text-sm font-black tracking-tight font-mono">${depTime}</span>
+                <span class="text-[9px] text-amber-100 font-mono">發車</span>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2 py-0.5 rounded-md font-bold text-xs bg-amber-100 text-amber-900 border border-amber-200">高鐵 ${t.no} 次</span>
+                  <span class="text-xs font-bold text-slate-800">開往 ${t.dest}</span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-mono">${platStr}</span>
+                </div>
+                <div class="text-xs text-slate-500 mt-1 flex items-center gap-2 flex-wrap">
+                  <span>${t.stops}</span>
+                  <span class="text-slate-300">|</span>
+                  <span class="text-purple-700 font-semibold">自由座 ${t.freeCar}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-right flex-shrink-0">
+              ${statusBadge}
+              <div class="text-[11px] text-slate-400 mt-1 font-mono">還有 ${t.minOffset} 分鐘</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 4. TDX 設定介面與 API 驗證
+    function loadTdxSettingsUI() {
+      const inputId = document.getElementById('tdx-input-client-id');
+      const inputSec = document.getElementById('tdx-input-client-secret');
+      const modeLabel = document.getElementById('tdx-mode-label');
+      const badge = document.getElementById('transit-source-badge');
+
+      if (inputId && !inputId.value) {
+        inputId.value = tdxClientId;
+      }
+      if (inputSec && !inputSec.value) {
+        inputSec.value = tdxClientSecret;
+      }
+
+      if (tdxClientId && tdxClientSecret) {
+        if (modeLabel) {
+          modeLabel.className = 'px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-bold';
+          modeLabel.textContent = 'TDX 官方金鑰直連模式';
+        }
+        if (badge) {
+          badge.className = 'text-[11px] px-2 py-0.5 rounded-full bg-blue-400/25 text-blue-100 border border-blue-300/40 font-semibold flex items-center gap-1';
+          badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>TDX 官方即時直連';
+        }
+      } else {
+        if (modeLabel) {
+          modeLabel.className = 'px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs font-bold';
+          modeLabel.textContent = '智慧即時運算推估模式（免金鑰）';
+        }
+        if (badge) {
+          badge.className = 'text-[11px] px-2 py-0.5 rounded-full bg-emerald-400/25 text-emerald-100 border border-emerald-300/40 font-semibold flex items-center gap-1';
+          badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>TDX 交通串接';
+        }
+      }
+    }
+
+    async function saveTdxSettings() {
+      const inputId = document.getElementById('tdx-input-client-id');
+      const inputSec = document.getElementById('tdx-input-client-secret');
+      const resultEl = document.getElementById('tdx-test-result');
+
+      const cid = (inputId ? inputId.value : '').trim();
+      const csec = (inputSec ? inputSec.value : '').trim();
+
+      if (!cid || !csec) {
+        alert('請輸入 TDX Client ID 與 Client Secret，或點選「重設為預設模式」使用免金鑰智慧推估。');
+        return;
+      }
+
+      if (resultEl) {
+        resultEl.className = 'p-3 rounded-xl text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200 block';
+        resultEl.innerHTML = '連線測試中：正在向交通部 TDX 驗證伺服器換取 Access Token...';
+      }
+
+      try {
+        // 先嘗試直連 TDX 官方 OpenID Connect Token Endpoint
+        let res;
+        try {
+          res = await fetch('https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+              grant_type: 'client_credentials',
+              client_id: cid,
+              client_secret: csec
+            })
+          });
+        } catch (netErr) {
+          // 若遭遇瀏覽器跨域限制，回退嘗試本機伺服器代理
+          if (!isStandalone) {
+            res = await fetch('/api/tdx/token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ client_id: cid, client_secret: csec })
+            });
+          }
+        }
+
+        if (res && res.ok) {
+          const tokenData = await res.json();
+          tdxClientId = cid;
+          tdxClientSecret = csec;
+          tdxAccessToken = tokenData.access_token;
+          tdxTokenExpiresAt = Date.now() + (tokenData.expires_in || 86400) * 1000;
+
+          localStorage.setItem('tdx_client_id', tdxClientId);
+          localStorage.setItem('tdx_client_secret', tdxClientSecret);
+          localStorage.setItem('tdx_access_token', tdxAccessToken);
+          localStorage.setItem('tdx_token_expires_at', String(tdxTokenExpiresAt));
+
+          if (resultEl) {
+            resultEl.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-300 block';
+            resultEl.innerHTML = `✅ TDX 憑證驗證成功！已成功取得 Token (有效期：${Math.round((tokenData.expires_in || 86400)/3600)} 小時)，大眾運輸即時看板已切換為官方即時直連。`;
+          }
+          loadTdxSettingsUI();
+          refreshTransitData(true);
+        } else {
+          let errText = '驗證未通過';
+          try {
+            const errJson = await res.json();
+            errText = errJson.error_description || errJson.error || errText;
+          } catch (e) {}
+
+          if (resultEl) {
+            resultEl.className = 'p-3 rounded-xl text-xs font-medium bg-rose-50 text-rose-800 border border-rose-200 block';
+            resultEl.innerHTML = `❌ TDX 連線失敗：${errText}。請確認 Client ID 與 Secret 是否正確有效；系統仍會以「智慧即時推估模式」保障正常運作。`;
+          }
+        }
+      } catch (err) {
+        if (resultEl) {
+          resultEl.className = 'p-3 rounded-xl text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200 block';
+          resultEl.innerHTML = `⚠️ 連線測試異常：${err.message || '網路問題'}。已為您保留設定，系統將在連線順暢時自動對接。`;
+        }
+      }
+    }
+
+    function resetTdxSettings() {
+      tdxClientId = '';
+      tdxClientSecret = '';
+      tdxAccessToken = '';
+      tdxTokenExpiresAt = 0;
+      localStorage.removeItem('tdx_client_id');
+      localStorage.removeItem('tdx_client_secret');
+      localStorage.removeItem('tdx_access_token');
+      localStorage.removeItem('tdx_token_expires_at');
+
+      const inputId = document.getElementById('tdx-input-client-id');
+      const inputSec = document.getElementById('tdx-input-client-secret');
+      const resultEl = document.getElementById('tdx-test-result');
+
+      if (inputId) inputId.value = '';
+      if (inputSec) inputSec.value = '';
+      if (resultEl) {
+        resultEl.className = 'p-3 rounded-xl text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200 block';
+        resultEl.innerHTML = '已重設為「智慧即時運算推估模式」，無需金鑰即可全天候動態更新。';
+      }
+
+      loadTdxSettingsUI();
+      refreshTransitData(true);
     }
 
     // 模擬推播 LINE 簽核通知

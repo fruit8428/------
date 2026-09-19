@@ -17,6 +17,7 @@ import datetime
 import socket
 from http.server import HTTPServer, SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
+import urllib.request
 
 PORT = 8080
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -503,6 +504,18 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             })
         elif path == "/api/helper_bookings":
             self.send_json({"helper_bookings": data.get("helper_bookings", [])})
+        elif path == "/api/tdx/status":
+            self.send_json({
+                "status": "ready",
+                "community_name": data.get("community_name", "大清天朵二期社區"),
+                "community_address": "桃園市中壢區新中北路二段170巷53號",
+                "nearby_stations": {
+                    "bus": ["新中北路二段", "華勛五村", "榮民路口"],
+                    "tra": [{"id": "1030", "name": "內壢車站"}, {"id": "1020", "name": "中壢車站"}],
+                    "thsr": [{"id": "04", "name": "高鐵桃園站"}]
+                },
+                "mode": "hybrid_smart_and_tdx_v2"
+            })
         else:
             self.send_json({"error": "Endpoint not found"}, 404)
 
@@ -1049,6 +1062,30 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             current_unit = body.get("unit", "A-8F-1")
             reply = generate_ai_response(user_msg, role, current_unit, data)
             self.send_json({"reply": reply})
+
+        elif path == "/api/tdx/token":
+            client_id = body.get("client_id", "").strip()
+            client_secret = body.get("client_secret", "").strip()
+            if not client_id or not client_secret:
+                self.send_json({"error": "缺少 client_id 或 client_secret"}, 400)
+                return
+            try:
+                token_url = "https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token"
+                form_data = urllib.parse.urlencode({
+                    "grant_type": "client_credentials",
+                    "client_id": client_id,
+                    "client_secret": client_secret
+                }).encode("utf-8")
+                req = urllib.request.Request(
+                    token_url,
+                    data=form_data,
+                    headers={"Content-Type": "application/x-www-form-urlencoded"}
+                )
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    res_json = json.loads(resp.read().decode("utf-8"))
+                    self.send_json(res_json)
+            except Exception as e:
+                self.send_json({"error": str(e)}, 502)
 
         else:
             self.send_json({"error": "Endpoint not found"}, 404)
