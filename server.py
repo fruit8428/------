@@ -14,7 +14,8 @@ import os
 import json
 import mimetypes
 import datetime
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+import socket
+from http.server import HTTPServer, SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
 PORT = 8080
@@ -339,6 +340,60 @@ def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
+def get_lan_ip():
+    """取得當前主機在區網的 IP，方便手機連線使用"""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0.5)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        try:
+            return socket.gethostbyname(socket.gethostname())
+        except Exception:
+            return "127.0.0.1"
+
+# 手機與網頁雙向即時同步狀態紀錄
+SYNC_STATE = {
+    "version": 1,
+    "last_updated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "latest_event": {
+        "version": 1,
+        "time": datetime.datetime.now().strftime("%H:%M:%S"),
+        "full_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "action_type": "system_init",
+        "title": "手機·網頁即時同步連線就緒",
+        "message": "大清天朵二期社區手機與網頁即時雙向同步中樞已就緒",
+        "source": "server",
+        "details": {}
+    },
+    "events": []
+}
+
+def record_sync_event(action_type, title, message, source="mobile", details=None):
+    """記錄手機端或網頁端完成的動作，並遞增全域同步版本號"""
+    SYNC_STATE["version"] += 1
+    now_str = datetime.datetime.now().strftime("%H:%M:%S")
+    now_full = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    SYNC_STATE["last_updated"] = now_full
+    event = {
+        "version": SYNC_STATE["version"],
+        "time": now_str,
+        "full_time": now_full,
+        "action_type": action_type,
+        "title": title,
+        "message": message,
+        "source": source,
+        "details": details or {}
+    }
+    SYNC_STATE["latest_event"] = event
+    SYNC_STATE["events"].insert(0, event)
+    if len(SYNC_STATE["events"]) > 50:
+        SYNC_STATE["events"] = SYNC_STATE["events"][:50]
+    return event
+
 class CommunityAppHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -425,6 +480,23 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             self.send_json({"bylaws": data["bylaws"]})
         elif path == "/api/flood_system":
             self.send_json({"flood_system": data["flood_system"]})
+        elif path == "/api/sync_status":
+            try:
+                client_ver = int(query_params.get("version", ["0"])[0])
+            except Exception:
+                client_ver = 0
+            lan_ip = get_lan_ip()
+            self.send_json({
+                "current_version": SYNC_STATE["version"],
+                "has_update": client_ver < SYNC_STATE["version"],
+                "latest_event": SYNC_STATE["latest_event"],
+                "recent_events": SYNC_STATE["events"][:20],
+                "lan_ip": lan_ip,
+                "port": PORT,
+                "mobile_url": f"http://{lan_ip}:{PORT}"
+            })
+        elif path == "/api/helper_bookings":
+            self.send_json({"helper_bookings": data.get("helper_bookings", [])})
         else:
             self.send_json({"error": "Endpoint not found"}, 404)
 
@@ -595,6 +667,14 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             }
             data["dispatches"].insert(0, new_disp)
             save_data(data)
+            source = body.get("client_type", "mobile")
+            record_sync_event(
+                action_type="dispatch_created",
+                title="住戶手機異常拍照通報",
+                message=f"住戶（{reporter}）於手機完成【{location}】異常拍照通報：「{description}」",
+                source=source,
+                details={"id": disp_id, "location": location, "reporter": reporter, "category": cat_name, "image_url": image_url}
+            )
             self.send_json({
                 "success": True, 
                 "dispatch": new_disp,
@@ -622,6 +702,14 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             
             if matched:
                 save_data(data)
+                source = body.get("client_type", "mobile")
+                record_sync_event(
+                    action_type="reconciled",
+                    title="管理費繳費自動銷帳",
+                    message=f"住戶（{matched['unit']} · {matched['name']}）完成管理費 NT$ {matched['fee']:,} 元入帳銷帳",
+                    source=source,
+                    details={"unit": matched["unit"], "fee": matched["fee"]}
+                )
                 masked_account = "***" + account_suffix[-2:] if len(account_suffix) >= 2 else "***"
                 receipt = {
                     "receipt_no": f"REC-{datetime.datetime.now().strftime('%Y%m')}-{matched['unit'].replace('-', '')}",
@@ -663,6 +751,17 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                     data["petty_cash"]["final_status"] = "in_review"
 
                 save_data(data)
+                source = body.get("client_type", "mobile")
+                role_names = {"director": "主任委員（陳建宏）", "finance": "財務委員（林秀玲）", "supervisor": "行政委員（王國華）"}
+                officer_name = role_names.get(officer, officer)
+                action_zh = "同意簽核" if decision == "approved" else "退回補正"
+                record_sync_event(
+                    action_type="petty_approved",
+                    title=f"委員費用審核：{action_zh}",
+                    message=f"{officer_name}於手機完成115年八月份報支簽核（{action_zh}）",
+                    source=source,
+                    details={"officer": officer, "decision": decision, "comment": comment}
+                )
                 self.send_json({"success": True, "petty_cash": data["petty_cash"]})
             else:
                 self.send_json({"error": "Invalid officer"}, 400)
@@ -729,6 +828,17 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                     data["financial_statement_i"]["final_status"] = "in_review"
 
                 save_data(data)
+                source = body.get("client_type", "mobile")
+                role_names = {"director": "主任委員（陳建宏）", "finance": "財務委員（林秀玲）", "supervisor": "行政委員（王國華）"}
+                officer_name = role_names.get(officer, officer)
+                action_zh = "同意簽核" if decision == "approved" else "退回補正"
+                record_sync_event(
+                    action_type="form_i_approved",
+                    title=f"財務收支表審核：{action_zh}",
+                    message=f"{officer_name}於手機完成八月份財務收支表(I)簽核（{action_zh}）",
+                    source=source,
+                    details={"officer": officer, "decision": decision, "comment": comment}
+                )
                 self.send_json({"success": True, "financial_statement_i": data["financial_statement_i"]})
             else:
                 self.send_json({"error": "Invalid officer"}, 400)
@@ -787,6 +897,14 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                     }
                     data["petty_cash"]["attachments"].append(new_att)
                     save_data(data)
+                    source = body.get("client_type", "mobile")
+                    record_sync_event(
+                        action_type="receipt_uploaded",
+                        title="現場單據照片上傳",
+                        message=f"現場人員於手機拍照上傳憑證照片（{filename}）",
+                        source=source,
+                        details={"filename": filename}
+                    )
 
                     self.send_json({
                         "success": True,
@@ -813,6 +931,13 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                         else:
                             item_ref["attachment"] = ""
                         save_data(data)
+                        source = body.get("client_type", "mobile")
+                        record_sync_event(
+                            action_type="receipt_deleted",
+                            title="現場單據憑證更新",
+                            message=f"現場單據憑證已更新刪除（{removed}）",
+                            source=source
+                        )
                         self.send_json({
                             "success": True,
                             "removed": removed,
@@ -830,6 +955,47 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
                     })
             else:
                 self.send_json({"error": "Invalid item_idx"}, 400)
+
+        elif path == "/api/sync_event":
+            action_type = body.get("action_type", "custom_action")
+            title = body.get("title", "手機端操作同步")
+            message = body.get("message", "手機端完成操作並同步至網頁")
+            source = body.get("source", "mobile")
+            details = body.get("details", {})
+            evt = record_sync_event(action_type, title, message, source, details)
+            self.send_json({"success": True, "event": evt, "current_version": SYNC_STATE["version"]})
+
+        elif path == "/api/helper_booking":
+            service_key = body.get("service_key", "water_electric")
+            service_title = body.get("service_title", "水電維修")
+            unit = body.get("unit", "A-8F-1")
+            resident_name = body.get("resident_name", "饒先生")
+            remark = body.get("remark", "需要到府檢修服務")
+            source = body.get("client_type", "mobile")
+            booking_id = f"BK-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+            now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            booking = {
+                "id": booking_id,
+                "time": now_str,
+                "service_key": service_key,
+                "service_title": service_title,
+                "unit": unit,
+                "resident_name": resident_name,
+                "remark": remark,
+                "status": "已登記預約，物業中心即時接單"
+            }
+            if "helper_bookings" not in data:
+                data["helper_bookings"] = []
+            data["helper_bookings"].insert(0, booking)
+            save_data(data)
+            evt = record_sync_event(
+                action_type="helper_booked",
+                title=f"生活小幫手預約：{service_title}",
+                message=f"住戶（{unit} · {resident_name}）於手機預約【{service_title}】：「{remark}」",
+                source=source,
+                details=booking
+            )
+            self.send_json({"success": True, "booking": booking})
 
         elif path == "/api/chat":
             user_msg = body.get("message", "").strip()
@@ -942,10 +1108,13 @@ def generate_ai_response(msg, role, unit, data):
 if __name__ == "__main__":
     os.chdir(BASE_DIR)
     load_data()
-    server = HTTPServer(("127.0.0.1", PORT), CommunityAppHandler)
+    lan_ip = get_lan_ip()
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), CommunityAppHandler)
     print(f"==================================================")
-    print(f"大清天朵二期社區 AI 管理助手 網頁版伺服器已啟動！")
-    print(f"請在瀏覽器打開: http://127.0.0.1:{PORT}")
+    print(f"大清天朵二期社區 AI 管理助手（支援手機與網頁即時雙向同步）")
+    print(f"電腦本機訪問: http://127.0.0.1:{PORT}")
+    print(f"手機連線訪問: http://{lan_ip}:{PORT}")
+    print(f"雙向同步模式: 毫秒級事件廣播 + 增量版本同步")
     print(f"==================================================")
     try:
         server.serve_forever()

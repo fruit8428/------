@@ -59,9 +59,20 @@
         </div>
       </div>
 
-      <!-- 右側：身分切換按鈕組 (加大字體、獨立外框、彩色按鈕質感) -->
-      <div class="flex items-center gap-2">
-        <span class="text-xs font-semibold text-slate-400 hidden sm:inline">切換身分：</span>
+      <!-- 右側：手機同步連線按鈕 + 身分切換按鈕組 -->
+      <div class="flex items-center flex-wrap gap-2">
+        <!-- 📱 手機與網頁即時同步連線按鈕 -->
+        <button onclick="openMobileSyncModal()" id="btn-mobile-sync-hub" class="px-3 py-1.5 rounded-xl border-2 border-emerald-400 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-xs cursor-pointer group" title="查看手機與網頁同步狀態 / 取得手機掃碼連線 QR Code">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <i data-lucide="smartphone" class="w-4 h-4 text-emerald-700 group-hover:scale-110 transition-transform"></i>
+          <span class="hidden sm:inline">手機·網頁即時同步</span>
+          <span class="sm:hidden">手機同步</span>
+        </button>
+
+        <span class="text-xs font-semibold text-slate-400 hidden lg:inline">切換身分：</span>
         <button id="btn-role-resident" onclick="switchRole('resident')" class="px-3.5 py-1.5 rounded-xl border-2 text-sm font-bold transition-all shadow-xs flex items-center space-x-1.5 bg-emerald-600 text-white border-emerald-600">
           <i data-lucide="home" class="w-4 h-4"></i>
           <span>住戶</span>
@@ -75,6 +86,15 @@
           <span>委員</span>
         </button>
       </div>
+    </div>
+
+    <!-- 手機端操作模式提示列 (若為手機視窗或手機模式時自動顯示) -->
+    <div id="mobile-mode-banner" class="hidden bg-gradient-to-r from-emerald-600 via-teal-700 to-emerald-800 text-white px-4 py-2 text-xs font-bold flex items-center justify-between shadow-xs">
+      <div class="flex items-center gap-2">
+        <span class="p-1 bg-white/20 rounded-lg"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i></span>
+        <span>📱 當前為手機端操作：完成之動作（拍照通報、簽核、生活預約）將即時同步至電腦網頁！</span>
+      </div>
+      <button onclick="openMobileSyncModal()" class="underline text-[11px] text-emerald-100 hover:text-white cursor-pointer">查看連線</button>
     </div>
 
     <!-- 頁籤功能按鈕群 (字大、多行自適應換行、每個功能都有獨立外框按鈕色系) -->
@@ -1204,9 +1224,168 @@
         </div>
       </div>
 
-      <div class="p-4 border-t bg-slate-50 flex items-center justify-end gap-2">
-        <button onclick="closeHelperModal()" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors">
-          我瞭解了
+      <div class="p-4 border-t bg-slate-50 flex flex-wrap items-center justify-between gap-2">
+        <button onclick="bookCurrentHelperService()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="smartphone" class="w-4 h-4"></i>
+          <span>📱 手機線上登記預約（即時同步）</span>
+        </button>
+        <button onclick="closeHelperModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs sm:text-sm transition-colors cursor-pointer">
+          關閉
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 浮動即時同步推播提示 (手機端操作，電腦網頁即時彈出) -->
+  <!-- ============================================== -->
+  <div id="sync-live-toast" class="fixed top-5 right-5 z-[9999] max-w-sm sm:max-w-md w-full bg-white border-2 border-emerald-500 shadow-2xl rounded-2xl p-4 transition-all duration-300 transform -translate-y-16 opacity-0 pointer-events-none flex items-start space-x-3.5">
+    <div id="sync-toast-icon-box" class="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-md">
+      <i data-lucide="smartphone" class="w-6 h-6"></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center justify-between gap-2">
+        <span id="sync-toast-badge" class="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">📱 手機動作已同步</span>
+        <span id="sync-toast-time" class="text-[11px] text-slate-400 font-mono">16:30</span>
+      </div>
+      <div id="sync-toast-title" class="text-sm font-black text-slate-900 mt-1 leading-snug">住戶於手機完成異常通報</div>
+      <div id="sync-toast-msg" class="text-xs text-slate-600 mt-0.5 leading-relaxed">現場存證照片已入庫，工單清單已自動置頂更新！</div>
+    </div>
+    <button onclick="dismissSyncToast()" class="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer">
+      <i data-lucide="x" class="w-4 h-4"></i>
+    </button>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 手機與網頁即時雙向同步中心 (QR Code 與連線指南) -->
+  <!-- ============================================== -->
+  <div id="mobile-sync-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs hidden flex items-center justify-center p-3 sm:p-4 z-[9998]" onclick="if(event.target === this) closeMobileSyncModal()">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border-2 border-emerald-500 flex flex-col max-h-[92vh]">
+      <!-- 頂部標題列 -->
+      <div class="p-5 bg-gradient-to-r from-emerald-600 via-teal-700 to-slate-900 text-white flex-shrink-0 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-white shadow-inner">
+            <i data-lucide="smartphone" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-black text-white">手機與網頁即時雙向同步中心</h3>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-400 text-emerald-950 font-black text-[10px] animate-pulse">LIVE SYNC</span>
+            </div>
+            <div class="text-xs text-emerald-100">手機上完成的動作，網頁端毫秒級自動同步！</div>
+          </div>
+        </div>
+        <button onclick="closeMobileSyncModal()" class="p-2 text-white/80 hover:text-white rounded-xl hover:bg-white/20 transition-colors cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 滾動內容 -->
+      <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 bg-slate-50">
+        
+        <!-- 步驟 1: 手機掃碼開啟 -->
+        <div class="bg-white rounded-2xl p-5 border-2 border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center">1</span>
+              <h4 class="font-black text-slate-900 text-sm sm:text-base">拿出手機掃描 QR Code 開啟系統</h4>
+            </div>
+            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">同 Wi-Fi 即可連線</span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center gap-5 pt-2">
+            <!-- QR Code 圖片展示 -->
+            <div class="w-40 h-40 bg-white rounded-2xl border-2 border-dashed border-emerald-300 p-2 flex flex-col items-center justify-center flex-shrink-0 shadow-inner relative">
+              <img id="sync-qrcode-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://192.168.0.27:8080" class="w-full h-full object-contain rounded-xl" alt="手機連線 QR Code" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'160\' height=\'160\'><rect width=\'100%\' height=\'100%\' fill=\'%23f1f5f9\'/><text x=\'50%\' y=\'50%\' font-size=\'14\' text-anchor=\'middle\' fill=\'%2364748b\' dy=\'.3em\'>請用下方網址</text></svg>'">
+            </div>
+
+            <!-- 連線網址與一鍵複製按鈕 -->
+            <div class="flex-1 space-y-2.5 w-full text-left">
+              <div class="text-xs text-slate-600 font-bold">手機連線專屬網址（iPhone / Android 相機直接照）：</div>
+              <div class="flex items-center gap-2">
+                <input id="sync-mobile-url-input" type="text" readonly value="http://192.168.0.27:8080" class="flex-1 px-3 py-2.5 bg-slate-100 border border-slate-300 rounded-xl text-xs sm:text-sm font-mono text-slate-800 font-bold select-all focus:outline-none">
+                <button onclick="copyMobileUrl()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition-all shadow-xs flex items-center gap-1 cursor-pointer">
+                  <i data-lucide="copy" class="w-4 h-4"></i>
+                  <span id="copy-url-btn-text">複製</span>
+                </button>
+              </div>
+              <div class="text-[11px] text-slate-500 leading-relaxed">
+                💡 說明：手機開啟相機對準上方 QR Code，即可直接打開「大清天朵二期社區 AI 管理助手」手機版！
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 步驟 2: 電腦端一鍵開模擬視窗 -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-5 border-2 border-indigo-200 shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-black text-xs flex items-center justify-center">2</span>
+              <h4 class="font-black text-slate-900 text-sm sm:text-base">電腦本機快速測試：開啟獨立手機版視窗</h4>
+            </div>
+            <span class="text-[11px] font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-md">左右即時對照</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            您可以一鍵在當前電腦上彈出「手機規格尺寸獨立視窗」，並排於當前螢幕旁邊。在手機視窗內進行通報、簽核、生活小幫手預約，當前網頁中控台將<b>瞬間 0 延遲自動同步</b>！
+          </p>
+          <button onclick="openMobileSimWindow()" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+            <span>以獨立手機視窗開啟 (左右同步對照)</span>
+          </button>
+        </div>
+
+        <!-- 支援的同步動作清單 -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 space-y-2.5">
+          <div class="text-xs font-black text-slate-800 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+            <span>手機完成下列動作時，網頁端將自動同步：</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+            <div class="p-2.5 rounded-xl bg-rose-50/60 border border-rose-200 flex items-start gap-2">
+              <span class="text-rose-600 font-black">①</span>
+              <div><b>住戶拍照通報：</b>手機拍照通報，網頁中控台發出提示音、工單自動置頂高亮！</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-purple-50/60 border border-purple-200 flex items-start gap-2">
+              <span class="text-purple-600 font-black">②</span>
+              <div><b>三委員多重簽核：</b>委員手機點擊同意，網頁端簽核印章、進度條即時更新！</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-start gap-2">
+              <span class="text-emerald-600 font-black">③</span>
+              <div><b>現場單據拍照上傳：</b>物業手機拍照發票收據，網頁附件庫即刻同步高清預覽！</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-blue-50/60 border border-blue-200 flex items-start gap-2">
+              <span class="text-blue-600 font-black">④</span>
+              <div><b>管理費對帳核銷：</b>完成繳費銷帳，網頁收繳名冊即刻翻轉為已繳納！</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-amber-50/60 border border-amber-200 flex items-start gap-2 col-span-1 sm:col-span-2">
+              <span class="text-amber-600 font-black">⑤</span>
+              <div><b>生活小幫手預約：</b>住戶手機預約水電、餐館或生鮮，管理室網頁即刻收到通知！</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 即時同步日誌紀錄 -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
+              <span>即時同步動態紀錄</span>
+            </span>
+            <span id="sync-hub-version" class="text-[11px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-bold">同步版本 #1</span>
+          </div>
+          <div id="sync-hub-log-list" class="space-y-1.5 max-h-44 overflow-y-auto text-xs font-mono">
+            <div class="p-2.5 rounded-xl bg-slate-50 text-slate-500 border border-slate-200 text-center">
+              🟢 手機與網頁雙向即時同步中樞運作中
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 底部按鈕 -->
+      <div class="p-4 bg-white border-t border-slate-200 flex items-center justify-end gap-2 flex-shrink-0">
+        <button onclick="closeMobileSyncModal()" class="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer">
+          關閉
         </button>
       </div>
     </div>
@@ -2354,6 +2533,17 @@
     let currentTab = 'chat';
     let appData = null;
 
+    // 手機與網頁即時同步中樞全域變數
+    const myClientId = 'client_' + Math.random().toString(36).substring(2, 9);
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientMode = urlParams.get('mode'); // 'mobile' | 'web' | null
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobileClient = clientMode === 'mobile' || (clientMode !== 'web' && (isMobileDevice || window.innerWidth < 768));
+    let mySyncVersion = 0;
+    let syncChannel = null;
+    let syncPollTimer = null;
+    let currentHelperServiceKey = 'plumbing';
+
     // 每個頁籤按鈕的專業專屬色系 (Active 與 Inactive)
     const tabColorThemes = {
       chat: {
@@ -2430,7 +2620,313 @@
       if (window.location.hash === '#open-formq' || new URLSearchParams(window.location.search).get('modal') === 'formq') {
         openFormQModal();
       }
+      // 初始化手機與網頁即時雙向同步引擎
+      initSyncEngine();
     });
+
+    // ==========================================
+    // 手機與網頁雙向即時同步核心引擎 (Realtime Sync Engine)
+    // ==========================================
+    function initSyncEngine() {
+      // 1. 如果是手機模式或小螢幕手機，顯示手機模式專屬提示列
+      if (isMobileClient) {
+        const banner = document.getElementById('mobile-mode-banner');
+        if (banner) banner.classList.remove('hidden');
+        const syncHubBtn = document.getElementById('btn-mobile-sync-hub');
+        if (syncHubBtn) {
+          syncHubBtn.classList.remove('border-emerald-400', 'bg-emerald-50', 'text-emerald-950');
+          syncHubBtn.classList.add('border-emerald-600', 'bg-emerald-600', 'text-white');
+        }
+      }
+
+      // 2. 本地跨分頁/跨視窗毫秒級廣播通道 (BroadcastChannel)
+      if (typeof BroadcastChannel !== 'undefined') {
+        try {
+          syncChannel = new BroadcastChannel('daqing_realtime_sync_channel');
+          syncChannel.onmessage = (e) => {
+            if (e && e.data) {
+              handleSyncUpdate(e.data, false);
+            }
+          };
+        } catch (e) {
+          console.log('BroadcastChannel not available:', e);
+        }
+      }
+
+      // 3. localStorage 同步監聽 (作為跨分頁相容備援)
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'daqing_sync_signal' && e.newValue) {
+          try {
+            const data = JSON.parse(e.newValue);
+            handleSyncUpdate(data, false);
+          } catch (err) {}
+        }
+      });
+
+      // 4. 定期與伺服器比對最新同步版本 (跨實體裝置手機與網頁通訊)
+      pollSyncStatus();
+      if (syncPollTimer) clearInterval(syncPollTimer);
+      syncPollTimer = setInterval(pollSyncStatus, 1200);
+    }
+
+    // 輪詢伺服器最新同步狀態與版本
+    async function pollSyncStatus() {
+      try {
+        const res = await fetch(`/api/sync_status?version=${mySyncVersion}&client_id=${myClientId}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // 動態注入手機連線專屬網址與 QR Code
+        if (data.mobile_url) {
+          const urlInput = document.getElementById('sync-mobile-url-input');
+          if (urlInput && urlInput.value !== data.mobile_url) {
+            urlInput.value = data.mobile_url;
+          }
+          const qrImg = document.getElementById('sync-qrcode-img');
+          const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.mobile_url)}`;
+          if (qrImg && qrImg.getAttribute('data-src') !== qrSrc) {
+            qrImg.setAttribute('data-src', qrSrc);
+            qrImg.src = qrSrc;
+          }
+        }
+
+        // 更新同步面板版本與日誌
+        const verBadge = document.getElementById('sync-hub-version');
+        if (verBadge && data.current_version) verBadge.textContent = `同步版本 #${data.current_version}`;
+        if (data.recent_events) renderSyncHubLogs(data.recent_events);
+
+        // 比對是否有手機端或其他端的新動作
+        if (data.has_update && data.latest_event) {
+          if (data.latest_event.version > mySyncVersion) {
+            mySyncVersion = data.latest_event.version;
+            handleSyncUpdate(data.latest_event, true);
+          }
+        } else if (mySyncVersion === 0 && data.current_version) {
+          mySyncVersion = data.current_version;
+        }
+      } catch (e) {
+        // 離線靜態展示時忽略
+      }
+    }
+
+    // 處理同步更新事件 (重載資料、網頁端音效提示、高亮動畫)
+    async function handleSyncUpdate(event, isFromRemote = true) {
+      if (!event) return;
+
+      // 重新拉取資料並渲染各視圖
+      await fetchStatusAndData();
+      renderAllViews();
+
+      // 若事件來自手機端或是其他客戶端發起，在網頁中控台發出推播提醒與音效
+      if (event.source === 'mobile' || (event.client_id && event.client_id !== myClientId)) {
+        showSyncToast(event.title, event.message, event.source, event.action_type);
+        playSyncChime();
+
+        // 視覺即時聚光效果
+        if (event.action_type === 'dispatch_created') {
+          const topCard = document.querySelector('#dispatch-list > div:first-child');
+          if (topCard) {
+            topCard.classList.add('ring-4', 'ring-rose-500', 'animate-pulse');
+            setTimeout(() => topCard.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse'), 3500);
+          }
+        } else if (event.action_type === 'petty_approved' || event.action_type === 'form_i_approved') {
+          const petEl = document.getElementById('view-petty');
+          if (petEl) {
+            petEl.classList.add('ring-4', 'ring-purple-400');
+            setTimeout(() => petEl.classList.remove('ring-4', 'ring-purple-400'), 3000);
+          }
+        } else if (event.action_type === 'reconciled') {
+          const finEl = document.getElementById('view-finance');
+          if (finEl) {
+            finEl.classList.add('ring-4', 'ring-emerald-400');
+            setTimeout(() => finEl.classList.remove('ring-4', 'ring-emerald-400'), 3000);
+          }
+        }
+      }
+    }
+
+    // 廣播同步事件給所有裝置與視窗
+    function broadcastSync(eventData) {
+      eventData.client_id = myClientId;
+      eventData.source = isMobileClient ? 'mobile' : 'web';
+      eventData.time = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+      
+      // 1. 本地廣播 (同電腦跨視窗 0 毫秒)
+      if (syncChannel) {
+        try { syncChannel.postMessage(eventData); } catch (e) {}
+      }
+      try {
+        localStorage.setItem('daqing_sync_signal', JSON.stringify({ ...eventData, _ts: Date.now() }));
+      } catch (e) {}
+
+      // 2. 伺服器廣播 (跨實體手機與電腦)
+      if (!isStandalone) {
+        fetch('/api/sync_event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventData)
+        }).then(r => r.json()).then(d => {
+          if (d && d.current_version) mySyncVersion = d.current_version;
+        }).catch(() => {});
+      }
+    }
+
+    // 合成提示鈴聲 (Web Audio API，無須外部音檔，跨裝置即時播放)
+    function playSyncChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        if (ctx.state === 'suspended') ctx.resume();
+        const now = ctx.currentTime;
+
+        // 第一音 (D5)
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now);
+        osc1.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+        gain1.gain.setValueAtTime(0.2, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.5);
+
+        // 第二音 (D6)
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880, now + 0.1);
+        osc2.frequency.exponentialRampToValueAtTime(1174.66, now + 0.35);
+        gain2.gain.setValueAtTime(0.25, now + 0.1);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.1);
+        osc2.stop(now + 0.7);
+      } catch (e) {}
+    }
+
+    // 顯示浮動即時推播橫幅
+    let syncToastTimeout = null;
+    function showSyncToast(title, msg, source = 'mobile', actionType = '') {
+      const toast = document.getElementById('sync-live-toast');
+      if (!toast) return;
+
+      const tagEl = document.getElementById('sync-toast-badge');
+      const timeEl = document.getElementById('sync-toast-time');
+      const titleEl = document.getElementById('sync-toast-title');
+      const msgEl = document.getElementById('sync-toast-msg');
+
+      if (tagEl) {
+        tagEl.textContent = source === 'mobile' ? '📱 手機動作已同步' : '💻 網頁動作已同步';
+        tagEl.className = source === 'mobile' 
+          ? 'text-[10px] font-black uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 shadow-2xs'
+          : 'text-[10px] font-black uppercase tracking-wider text-sky-900 bg-sky-100 px-2 py-0.5 rounded border border-sky-300 shadow-2xs';
+      }
+      if (timeEl) timeEl.textContent = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+      if (titleEl) titleEl.textContent = title || '手機端完成新動作';
+      if (msgEl) msgEl.textContent = msg || '資料已即時同步至當前介面！';
+
+      toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-16');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      if (syncToastTimeout) clearTimeout(syncToastTimeout);
+      syncToastTimeout = setTimeout(() => {
+        dismissSyncToast();
+      }, 5500);
+    }
+
+    function dismissSyncToast() {
+      const toast = document.getElementById('sync-live-toast');
+      if (toast) {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-16');
+      }
+    }
+
+    // 渲染同步中心日誌
+    function renderSyncHubLogs(events) {
+      const listEl = document.getElementById('sync-hub-log-list');
+      if (!listEl) return;
+      if (!events || events.length === 0) {
+        listEl.innerHTML = '<div class="p-2.5 rounded-xl bg-slate-50 text-slate-500 border border-slate-200 text-center">🟢 手機與網頁雙向即時同步中樞運作中</div>';
+        return;
+      }
+      listEl.innerHTML = events.slice(0, 10).map(evt => {
+        const isMobile = evt.source === 'mobile';
+        const badgeClass = isMobile ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-sky-100 text-sky-800 border-sky-300';
+        const icon = isMobile ? '📱 手機' : '💻 網頁';
+        return `
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-1 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">${icon}</span>
+                <span class="font-black text-slate-800">${evt.title}</span>
+              </div>
+              <span class="text-[11px] text-slate-400 font-mono">${evt.time || ''}</span>
+            </div>
+            <div class="text-slate-600 text-[11px] pl-1 leading-relaxed">${evt.message}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 開啟手機同步中心彈窗
+    function openMobileSyncModal() {
+      const modal = document.getElementById('mobile-sync-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        lucide.createIcons();
+      }
+      pollSyncStatus();
+    }
+
+    // 關閉手機同步中心彈窗
+    function closeMobileSyncModal() {
+      const modal = document.getElementById('mobile-sync-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // 一鍵複製手機連線網址
+    function copyMobileUrl() {
+      const input = document.getElementById('sync-mobile-url-input');
+      if (!input) return;
+      input.select();
+      input.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btnText = document.getElementById('copy-url-btn-text');
+        if (btnText) btnText.textContent = '已複製！';
+        setTimeout(() => {
+          if (btnText) btnText.textContent = '複製';
+        }, 2000);
+      }).catch(() => {
+        document.execCommand('copy');
+        alert('網址已複製到剪貼簿！可在手機瀏覽器貼上開啟。');
+      });
+    }
+
+    // 開啟手機端獨立視窗 (供電腦上左右對照測試)
+    function openMobileSimWindow() {
+      const w = 414;
+      const h = 896;
+      const left = Math.max(10, (window.screen.width / 2) + 50);
+      const top = 50;
+      const mobileUrl = `${window.location.origin}${window.location.pathname}?mode=mobile`;
+      window.open(mobileUrl, 'daqing_mobile_preview', `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+    }
+
+    // 一鍵重新渲染所有視圖
+    function renderAllViews() {
+      renderDispatches();
+      renderPettyCash();
+      renderResidentsTable();
+      if (typeof renderFloodSystem === 'function') renderFloodSystem();
+      if (typeof populateFormQ === 'function') populateFormQ();
+      if (typeof populateFormI === 'function') populateFormI();
+      lucide.createIcons();
+    }
 
     function toggleElement(id) {
       const el = document.getElementById(id);
@@ -3156,7 +3652,9 @@
         target_team: '物業管理室 / 總幹事',
         image_url: currentVisionPhotoData,
         is_new: true,
-        notified_management: true
+        notified_management: true,
+        client_type: isMobileClient ? 'mobile' : 'web',
+        client_id: myClientId
       };
 
       if (!isStandalone) {
@@ -3181,6 +3679,14 @@
       if (!appData.dispatches) appData.dispatches = [];
       appData.dispatches.unshift(newDisp);
       saveLocal();
+
+      // 廣播給其他視窗/實體裝置即時同步
+      broadcastSync({
+        action_type: 'dispatch_created',
+        title: '住戶手機異常拍照通報',
+        message: `住戶於手機完成【${newDisp.location}】異常拍照通報：「${newDisp.description}」`,
+        details: newDisp
+      });
 
       // 更新右側清單
       renderDispatches();
@@ -3260,14 +3766,20 @@
           const res = await fetch('/api/reconcile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount, account_suffix: suffix })
+            body: JSON.stringify({ amount, account_suffix: suffix, client_type: isMobileClient ? 'mobile' : 'web', client_id: myClientId })
           });
           if (res.ok) {
             const data = await res.json();
             if (data.success && data.matched) {
               await fetchStatusAndData();
               renderResidentsTable();
-              alert(`戶別【${data.receipt.unit}】管理費 NT$ ${amount.toLocaleString()} 已完成銷帳！`);
+              broadcastSync({
+                action_type: 'reconciled',
+                title: '管理費繳費自動銷帳',
+                message: `住戶（${data.receipt.unit}）管理費 NT$ ${amount.toLocaleString()} 已完成銷帳！`,
+                details: { unit: data.receipt.unit, amount: amount }
+              });
+              alert(`戶別【${data.receipt.unit}】管理費 NT$ ${amount.toLocaleString()} 已完成銷帳！網頁端已即時同步更新。`);
               return;
             }
           }
@@ -3280,7 +3792,13 @@
         matched.payment_date = new Date().toISOString().substring(0, 10);
         saveLocal();
         renderResidentsTable();
-        alert(`戶別【${matched.unit}】管理費 NT$ ${amount.toLocaleString()} 已完成自動銷帳！`);
+        broadcastSync({
+          action_type: 'reconciled',
+          title: '管理費繳費自動銷帳',
+          message: `住戶（${matched.unit}）管理費 NT$ ${amount.toLocaleString()} 已完成自動銷帳！`,
+          details: { unit: matched.unit, amount: amount }
+        });
+        alert(`戶別【${matched.unit}】管理費 NT$ ${amount.toLocaleString()} 已完成自動銷帳！網頁端已即時同步。`);
       } else {
         alert('未找到吻合的待繳戶別。');
       }
@@ -3574,6 +4092,7 @@
     };
 
     function openHelperModal(serviceKey) {
+      currentHelperServiceKey = serviceKey;
       const info = helperServicesData[serviceKey];
       if (!info) return;
 
@@ -3598,6 +4117,62 @@
     function closeHelperModal() {
       const modal = document.getElementById('helper-modal');
       if (modal) modal.classList.add('hidden');
+    }
+
+    async function bookCurrentHelperService() {
+      const info = helperServicesData[currentHelperServiceKey];
+      const title = info ? info.title : '生活便民服務';
+      const defaultNotes = {
+        plumbing: '水管微漏水檢修，請安排師傅到府',
+        restaurant: '預約本週五晚間18:30四位保留席',
+        grocery: '訂購有機當季蔬菜箱 1 組',
+        hair: '預約週末下午洗剪燙髮',
+        laundry: '送洗羊毛大衣與被單各 1 件',
+        suggest: '推薦私房水電優質商家'
+      };
+      const def = defaultNotes[currentHelperServiceKey] || '住戶線上登記預約';
+      const note = prompt(`【大清天朵二期 · 生活小幫手】\n請輸入您要登記預約【${title}】的備註需求或希望時段：`, def);
+      if (note === null) return;
+
+      const bookingData = {
+        service_key: currentHelperServiceKey,
+        service_title: title,
+        unit: currentUnit,
+        resident_name: currentRole === 'resident' ? '饒先生' : '住戶',
+        remark: note.trim() || def,
+        client_type: isMobileClient ? 'mobile' : 'web',
+        client_id: myClientId
+      };
+
+      if (!isStandalone) {
+        try {
+          const res = await fetch('/api/helper_booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+          });
+          if (res.ok) {
+            closeHelperModal();
+            broadcastSync({
+              action_type: 'helper_booked',
+              title: `生活小幫手預約：${title}`,
+              message: `住戶（${bookingData.unit}）於手機登記預約【${title}】：「${bookingData.remark}」`,
+              details: bookingData
+            });
+            alert(`✅ 【${title}】已線上登記成功！\n已即時推播通知物業管理室中控台，網頁端已同步更新。`);
+            return;
+          }
+        } catch (e) {}
+      }
+
+      broadcastSync({
+        action_type: 'helper_booked',
+        title: `生活小幫手預約：${title}`,
+        message: `住戶（${bookingData.unit}）於手機登記預約【${title}】：「${bookingData.remark}」`,
+        details: bookingData
+      });
+      closeHelperModal();
+      alert(`✅ 【${title}】登記成功！\n已即時同步至電腦網頁中控台。`);
     }
 
     // 模擬推播 LINE 簽核通知
@@ -3625,13 +4200,19 @@
           const res = await fetch('/api/petty_cash/approve', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ officer: offKey, decision: dec, comment })
+            body: JSON.stringify({ officer: offKey, decision: dec, comment, client_type: isMobileClient ? 'mobile' : 'web', client_id: myClientId })
           });
           if (res.ok) {
             await fetchStatusAndData();
             renderPettyCash();
             populateFormQ();
-            alert('簽核狀態已即時更新並存檔！');
+            broadcastSync({
+              action_type: 'petty_approved',
+              title: `委員費用審核：${dec === 'approved' ? '同意簽核' : '退回補正'}`,
+              message: `【${appData.petty_cash.approvals[offKey]?.role || offKey}】於手機完成八月份費用報支簽核（${dec === 'approved' ? '同意通過' : '退回補正'}）`,
+              details: { officer: offKey, decision: dec }
+            });
+            alert('簽核狀態已即時更新並存檔！網頁端中控台已同步更新。');
             return;
           }
         } catch (e) {}
@@ -3649,7 +4230,13 @@
       saveLocal();
       renderPettyCash();
       populateFormQ();
-      alert(`已將【${appData.petty_cash.approvals[offKey].role}】更新為【${dec === 'approved' ? '同意通過' : '退回補正'}】！`);
+      broadcastSync({
+        action_type: 'petty_approved',
+        title: `委員費用審核：${dec === 'approved' ? '同意簽核' : '退回補正'}`,
+        message: `【${appData.petty_cash.approvals[offKey].role}】於手機完成八月份費用報支簽核（${dec === 'approved' ? '同意通過' : '退回補正'}）`,
+        details: { officer: offKey, decision: dec }
+      });
+      alert(`已將【${appData.petty_cash.approvals[offKey].role}】更新為【${dec === 'approved' ? '同意通過' : '退回補正'}】！已即時同步至電腦網頁。`);
     }
 
     function promptReject(k) {
@@ -4077,17 +4664,24 @@
         fetch('/api/petty_cash/approve', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ officer, decision, comment: appData.petty_cash.approvals[officer].comment })
+          body: JSON.stringify({ officer, decision, comment: appData.petty_cash.approvals[officer].comment, client_type: isMobileClient ? 'mobile' : 'web', client_id: myClientId })
         }).catch(e => console.log('Approve Form Q offline:', e));
       }
+
+      broadcastSync({
+        action_type: 'petty_approved',
+        title: `財Q表審核：${decision === 'approved' ? '同意簽核' : '退回補正'}`,
+        message: `【${officerName}】於手機完成財Q表線上簽核（${decision === 'approved' ? '同意通過' : '退回補正'}）`,
+        details: { officer, decision }
+      });
 
       populateFormQ();
       renderPettyCash();
 
       if (decision === 'approved') {
-        alert(`✅ 【${officerName}】已在「待支付費用明細表 (財Q表)」完成線上簽核同意！`);
+        alert(`✅ 【${officerName}】已在「待支付費用明細表 (財Q表)」完成線上簽核同意！已即時同步至電腦網頁。`);
       } else {
-        alert(`⚠️ 【${officerName}】已退回本案件要求補正說明。`);
+        alert(`⚠️ 【${officerName}】已退回本案件要求補正說明。已即時同步至電腦網頁。`);
       }
     }
 
@@ -4537,16 +5131,23 @@
         fetch('/api/financial_statement_i/approve', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ officer, decision, comment: fi.approvals[officer].comment })
+          body: JSON.stringify({ officer, decision, comment: fi.approvals[officer].comment, client_type: isMobileClient ? 'mobile' : 'web', client_id: myClientId })
         }).catch(e => console.log('Approve Form I offline:', e));
       }
+
+      broadcastSync({
+        action_type: 'form_i_approved',
+        title: `財I表審核：${decision === 'approved' ? '同意簽核' : '退回補正'}`,
+        message: `【${officerName}】於手機完成財I表線上簽核（${decision === 'approved' ? '同意通過' : '退回補正'}）`,
+        details: { officer, decision }
+      });
 
       populateFormI();
 
       if (decision === 'approved') {
-        alert(`✅ 【${officerName}】已在「八月份財務收支表 (財I表)」完成線上簽核同意！`);
+        alert(`✅ 【${officerName}】已在「八月份財務收支表 (財I表)」完成線上簽核同意！已即時同步至電腦網頁。`);
       } else {
-        alert(`⚠️ 【${officerName}】已退回本案件要求補正說明。`);
+        alert(`⚠️ 【${officerName}】已退回本案件要求補正說明。已即時同步至電腦網頁。`);
       }
     }
 
@@ -4913,7 +5514,9 @@
             body: JSON.stringify({
               image_base64: dataUrl,
               item_idx: idx,
-              title: `${item.title || '項目'} (單據照片)`
+              title: `${item.title || '項目'} (單據照片)`,
+              client_type: isMobileClient ? 'mobile' : 'web',
+              client_id: myClientId
             })
           });
           const resJson = await resp.json();
@@ -4947,12 +5550,18 @@
       saveFormQData(false);
       populateFormQ();
       updateReceiptStatusBox();
+      broadcastSync({
+        action_type: 'receipt_uploaded',
+        title: '現場單據照片上傳',
+        message: `現場人員於手機拍照上傳【${item.title}】之原始單據憑證！`,
+        details: { item_title: item.title }
+      });
 
       const uploadBox = document.getElementById('receipt-upload-preview-box');
       if (uploadBox) uploadBox.classList.add('hidden');
       tempUploadedImageData = null;
 
-      alert('🎉 單據照片已成功新增並加入本項目畫廊！');
+      alert('🎉 單據照片已成功新增並加入本項目！已即時同步至電腦網頁。');
     }
   </script>
 </body>
