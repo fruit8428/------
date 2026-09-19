@@ -465,6 +465,9 @@
                 <span id="vision-photo-status-badge" class="px-2 py-0.5 text-[11px] font-bold rounded-md bg-rose-600 text-white shadow-xs backdrop-blur-xs">
                   待確認上傳
                 </span>
+                <button type="button" id="vision-reset-photo-btn" onclick="event.stopPropagation(); resetVisionPhoto()" class="hidden px-2 py-0.5 text-[11px] font-bold rounded-md bg-slate-800/80 hover:bg-slate-800 text-white shadow-xs backdrop-blur-xs cursor-pointer" title="清除自拍照片並還原預設">
+                  重設照片
+                </button>
               </div>
               <div id="vision-timestamp-badge" class="absolute bottom-2 right-2 px-2 py-0.5 text-[11px] font-mono rounded bg-slate-900/70 text-slate-200 backdrop-blur-xs">
                 2026-09-19 15:48
@@ -482,7 +485,7 @@
 
         <!-- 步驟 3：確認上傳並自動派單按鈕 -->
         <div class="pt-2">
-          <button type="button" onclick="submitVisionDispatch()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm sm:text-base font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <button type="button" id="btn-submit-vision-dispatch" onclick="submitVisionDispatch()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm sm:text-base font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
             <i data-lucide="send" class="w-4 h-4"></i>
             <span>確認拍照上傳 · 自動派單推播管理室</span>
           </button>
@@ -497,17 +500,21 @@
       <!-- 右側：即時派單工單清單 (佔 7 欄) -->
       <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col justify-between">
         <div>
-          <div class="flex items-center justify-between pb-3 mb-3 border-b-2 border-slate-100">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b-2 border-slate-100">
             <div class="flex items-center space-x-2">
               <i data-lucide="clipboard-list" class="w-5 h-5 text-rose-600"></i>
               <span class="font-bold text-slate-900 text-base sm:text-lg">即時派單工單清單</span>
             </div>
             <div class="flex items-center space-x-2">
-              <span class="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1">
+              <button type="button" onclick="pollCloudRecentDispatches(true)" id="btn-refresh-dispatches" class="px-2.5 py-1 text-xs font-bold rounded-lg border-2 border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-900 flex items-center gap-1 transition-all shadow-2xs cursor-pointer" title="手動同步手機最新通報照片">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-rose-600"></i>
+                <span>同步手機照片</span>
+              </button>
+              <span class="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg flex items-center gap-1">
                 <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
-                <span>管理室連線中</span>
+                <span id="sync-cloud-status-text">雲端已連線</span>
               </span>
-              <span class="text-sm font-bold text-slate-500" id="dispatch-count-text">共 2 筆</span>
+              <span class="text-xs sm:text-sm font-bold text-slate-500" id="dispatch-count-text">共 2 筆</span>
             </div>
           </div>
           <div id="dispatch-list" class="space-y-3 flex-1 overflow-y-auto max-h-[520px] pr-1"></div>
@@ -2627,6 +2634,9 @@
     // ==========================================
     // 手機與網頁雙向即時同步核心引擎 (Realtime Sync Engine)
     // ==========================================
+    let cloudEventSource = null;
+    let cloudSyncPollTimer = null;
+
     function initSyncEngine() {
       // 1. 如果是手機模式或小螢幕手機，顯示手機模式專屬提示列
       if (isMobileClient) {
@@ -2663,10 +2673,176 @@
         }
       });
 
-      // 4. 定期與伺服器比對最新同步版本 (跨實體裝置手機與網頁通訊)
+      // 4. 定期與伺服器比對最新同步版本 (本地 server.py 運行環境)
       pollSyncStatus();
       if (syncPollTimer) clearInterval(syncPollTimer);
       syncPollTimer = setInterval(pollSyncStatus, 1200);
+
+      // 5. 雲端跨實體裝置 (手機 4G/5G 與電腦網頁 / GitHub Pages) 即時同步推播 (SSE + 輪詢)
+      initCloudSSE();
+      pollCloudRecentDispatches(false);
+      if (cloudSyncPollTimer) clearInterval(cloudSyncPollTimer);
+      cloudSyncPollTimer = setInterval(() => pollCloudRecentDispatches(false), 3000);
+    }
+
+    function initCloudSSE() {
+      if (typeof EventSource === 'undefined') return;
+      try {
+        if (cloudEventSource) {
+          try { cloudEventSource.close(); } catch (e) {}
+        }
+        cloudEventSource = new EventSource('https://ntfy.sh/daqing_tianduo2_sync_v2/sse');
+        cloudEventSource.onopen = () => {
+          const syncStatusEl = document.getElementById('sync-cloud-status-text');
+          if (syncStatusEl) syncStatusEl.textContent = '雲端已連線';
+        };
+        cloudEventSource.onmessage = (e) => {
+          if (!e || !e.data) return;
+          try {
+            const raw = JSON.parse(e.data);
+            if (raw && raw.message) {
+              const eventData = JSON.parse(raw.message);
+              if (eventData.client_id === myClientId) return;
+              handleCloudSyncMessage(eventData);
+            }
+          } catch (err) {}
+        };
+        cloudEventSource.onerror = () => {
+          const syncStatusEl = document.getElementById('sync-cloud-status-text');
+          if (syncStatusEl) syncStatusEl.textContent = '雲端連線中';
+        };
+      } catch (e) {
+        console.warn('initCloudSSE error:', e);
+      }
+    }
+
+    async function pollCloudRecentDispatches(isManual = false) {
+      const statusEl = document.getElementById('sync-cloud-status-text');
+      const refreshBtn = document.getElementById('btn-refresh-dispatches');
+      if (isManual && refreshBtn) {
+        refreshBtn.classList.add('animate-pulse');
+      }
+      try {
+        const res = await fetch('https://ntfy.sh/daqing_tianduo2_sync_v2/json?poll=1', { cache: 'no-store' });
+        if (!res.ok) return;
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        let newDispatchCount = 0;
+        let hasOtherUpdates = false;
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const item = JSON.parse(line);
+            if (item && item.message) {
+              const evt = JSON.parse(item.message);
+              if (!evt) continue;
+
+              if (evt.action_type === 'dispatch_created' && evt.details) {
+                const disp = evt.details;
+                if (!appData.dispatches) appData.dispatches = [];
+                const existingIdx = appData.dispatches.findIndex(d => d.id === disp.id);
+                if (existingIdx === -1) {
+                  appData.dispatches.unshift(disp);
+                  newDispatchCount++;
+                } else if (appData.dispatches[existingIdx].image_url !== disp.image_url) {
+                  appData.dispatches[existingIdx] = disp;
+                  newDispatchCount++;
+                }
+              } else if (evt.action_type === 'petty_approved' && evt.details) {
+                if (appData.petty_cash && appData.petty_cash.approvals && evt.details.officer_key) {
+                  appData.petty_cash.approvals[evt.details.officer_key] = evt.details.approval;
+                  if (evt.details.final_status) appData.petty_cash.final_status = evt.details.final_status;
+                  hasOtherUpdates = true;
+                }
+              } else if (evt.action_type === 'reconciled' && evt.details) {
+                if (appData.residents) {
+                  const m = appData.residents.find(r => r.unit === evt.details.unit);
+                  if (m && !m.paid) {
+                    m.paid = true;
+                    m.payment_date = new Date().toISOString().substring(0, 10);
+                    hasOtherUpdates = true;
+                  }
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
+        if (newDispatchCount > 0 || hasOtherUpdates) {
+          saveLocal();
+          renderDispatches();
+          if (hasOtherUpdates) {
+            renderResidentsTable();
+            renderPettyCash();
+          }
+          if (newDispatchCount > 0) {
+            playSyncChime();
+            showSyncToast('📱 手機照片通報已同步', `成功同步 ${newDispatchCount} 筆手機最新通報！`, 'mobile', 'dispatch_created');
+            const topCard = document.querySelector('#dispatch-list > div:first-child');
+            if (topCard) {
+              topCard.classList.add('ring-4', 'ring-rose-500', 'animate-pulse');
+              setTimeout(() => topCard.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse'), 3500);
+            }
+          }
+        } else if (isManual) {
+          showSyncToast('狀態確認', '目前工單清單已是最新狀態，與手機端照片完全一致！', 'web', 'sync_check');
+        }
+      } catch (err) {
+        console.warn('pollCloudRecentDispatches error:', err);
+      } finally {
+        if (statusEl) statusEl.textContent = '雲端已連線';
+        if (refreshBtn) refreshBtn.classList.remove('animate-pulse');
+      }
+    }
+
+    function handleCloudSyncMessage(evt) {
+      if (!evt || !evt.action_type) return;
+
+      if (evt.action_type === 'dispatch_created' && evt.details) {
+        const disp = evt.details;
+        if (!appData.dispatches) appData.dispatches = [];
+        const existingIdx = appData.dispatches.findIndex(d => d.id === disp.id);
+        if (existingIdx >= 0) {
+          appData.dispatches[existingIdx] = disp;
+        } else {
+          appData.dispatches.unshift(disp);
+        }
+        saveLocal();
+        renderDispatches();
+
+        showSyncToast(evt.title || '住戶手機異常拍照通報', evt.message || `住戶已完成【${disp.location}】異常照片通報`, 'mobile', 'dispatch_created');
+        playSyncChime();
+
+        const topCard = document.querySelector('#dispatch-list > div:first-child');
+        if (topCard) {
+          topCard.classList.add('ring-4', 'ring-rose-500', 'animate-pulse');
+          setTimeout(() => topCard.classList.remove('ring-4', 'ring-rose-500', 'animate-pulse'), 3500);
+        }
+        return;
+      }
+
+      if (evt.action_type === 'petty_approved' && evt.details) {
+        if (appData.petty_cash && appData.petty_cash.approvals && evt.details.officer_key) {
+          appData.petty_cash.approvals[evt.details.officer_key] = evt.details.approval;
+          if (evt.details.final_status) appData.petty_cash.final_status = evt.details.final_status;
+          saveLocal();
+          renderPettyCash();
+        }
+      } else if (evt.action_type === 'reconciled' && evt.details) {
+        if (appData.residents) {
+          const m = appData.residents.find(r => r.unit === evt.details.unit);
+          if (m) {
+            m.paid = true;
+            m.payment_date = new Date().toISOString().substring(0, 10);
+            saveLocal();
+            renderResidentsTable();
+          }
+        }
+      }
+
+      showSyncToast(evt.title, evt.message, evt.source || 'mobile', evt.action_type);
+      playSyncChime();
     }
 
     // 輪詢伺服器最新同步狀態與版本
@@ -2759,7 +2935,7 @@
         localStorage.setItem('daqing_sync_signal', JSON.stringify({ ...eventData, _ts: Date.now() }));
       } catch (e) {}
 
-      // 2. 伺服器廣播 (跨實體手機與電腦)
+      // 2. 伺服器廣播 (跨實體手機與電腦 - 本地 server.py)
       if (!isStandalone) {
         fetch('/api/sync_event', {
           method: 'POST',
@@ -2769,6 +2945,15 @@
           if (d && d.current_version) mySyncVersion = d.current_version;
         }).catch(() => {});
       }
+
+      // 3. 雲端公網即時廣播 (跨手機 4G/5G 與電腦網頁 / GitHub Pages 0秒同步)
+      try {
+        fetch('https://ntfy.sh/daqing_tianduo2_sync_v2', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventData)
+        }).catch(e => console.log('Cloud sync broadcast error:', e));
+      } catch (e) {}
     }
 
     // 合成提示鈴聲 (Web Audio API，無須外部音檔，跨裝置即時播放)
@@ -3311,7 +3496,6 @@
 
     function selectVisionLocation(loc) {
       currentVisionLocation = loc;
-      isCustomPhotoTaken = false;
 
       // 更新按鈕選中樣式
       VISION_LOCATIONS.forEach(l => {
@@ -3355,29 +3539,58 @@
         }
       }
 
-      // 切換預設照片
-      if (loc === '健身房') {
+      // 注意：若使用者已經拍照或選取自訂照片，絕不強制覆蓋使用者的真實照片！
+      if (!isCustomPhotoTaken) {
+        if (loc === '健身房') {
+          currentVisionPhotoData = visionPresetPhotos['健身房'];
+        } else if (loc === 'KTV室') {
+          currentVisionPhotoData = visionPresetPhotos['KTV室'];
+        } else {
+          currentVisionPhotoData = visionPresetPhotos['floor_corridor'];
+        }
+
+        const imgEl = document.getElementById('vision-preview-img');
+        if (imgEl) imgEl.src = currentVisionPhotoData;
+
+        const statusBadge = document.getElementById('vision-photo-status-badge');
+        if (statusBadge) {
+          statusBadge.textContent = '待確認上傳';
+          statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-rose-600 text-white shadow-xs backdrop-blur-xs';
+        }
+
+        const tipEl = document.getElementById('vision-photo-tip');
+        if (tipEl) tipEl.textContent = `已選定【${loc}】，請拍照或選取照片`;
+      } else {
+        const tipEl = document.getElementById('vision-photo-tip');
+        if (tipEl) tipEl.textContent = `已選定【${loc}】，現場照片已就緒，請確認上傳！`;
+      }
+
+      const timeBadge = document.getElementById('vision-timestamp-badge');
+      if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+    }
+
+    function resetVisionPhoto() {
+      isCustomPhotoTaken = false;
+      if (currentVisionLocation === '健身房') {
         currentVisionPhotoData = visionPresetPhotos['健身房'];
-      } else if (loc === 'KTV室') {
+      } else if (currentVisionLocation === 'KTV室') {
         currentVisionPhotoData = visionPresetPhotos['KTV室'];
       } else {
         currentVisionPhotoData = visionPresetPhotos['floor_corridor'];
       }
-
       const imgEl = document.getElementById('vision-preview-img');
       if (imgEl) imgEl.src = currentVisionPhotoData;
+
+      const resetBtn = document.getElementById('vision-reset-photo-btn');
+      if (resetBtn) resetBtn.classList.add('hidden');
 
       const statusBadge = document.getElementById('vision-photo-status-badge');
       if (statusBadge) {
         statusBadge.textContent = '待確認上傳';
         statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-rose-600 text-white shadow-xs backdrop-blur-xs';
       }
-
       const tipEl = document.getElementById('vision-photo-tip');
-      if (tipEl) tipEl.textContent = `已選定【${loc}】，請拍照或選取照片`;
-
-      const timeBadge = document.getElementById('vision-timestamp-badge');
-      if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+      if (tipEl) tipEl.textContent = `已選定【${currentVisionLocation}】，請拍照或選取照片`;
     }
 
     let cameraStream = null;
@@ -3482,8 +3695,22 @@
         return;
       }
 
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      // 限制最大解析度 960px，兼顧極致畫質與微秒級傳輸
+      let w = video.videoWidth;
+      let h = video.videoHeight;
+      const maxDim = 960;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext('2d');
 
       if (currentCameraFacing === 'user') {
@@ -3495,16 +3722,16 @@
       // 繪製現場存證浮水印
       ctx.restore();
       ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-      ctx.fillRect(20, canvas.height - 80, Math.min(canvas.width - 40, 560), 60);
+      ctx.fillRect(15, canvas.height - 70, Math.min(canvas.width - 30, 480), 55);
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 22px sans-serif';
+      ctx.font = 'bold 18px sans-serif';
       const timeStr = new Date().toLocaleString();
-      ctx.fillText(`大清天朵二期 · 現場存證 · 📍 ${currentVisionLocation}`, 35, canvas.height - 48);
-      ctx.font = '16px monospace';
+      ctx.fillText(`大清天朵二期 · 現場存證 · 📍 ${currentVisionLocation}`, 25, canvas.height - 42);
+      ctx.font = '14px monospace';
       ctx.fillStyle = '#fca5a5';
-      ctx.fillText(`${timeStr} (住戶線上通報存證)`, 35, canvas.height - 26);
+      ctx.fillText(`${timeStr} (住戶線上通報存證)`, 25, canvas.height - 22);
 
-      tempSnapshotData = canvas.toDataURL('image/jpeg', 0.88);
+      tempSnapshotData = canvas.toDataURL('image/jpeg', 0.82);
 
       // 凍結預覽影像
       const snapshotImg = document.getElementById('camera-snapshot-img');
@@ -3538,6 +3765,9 @@
 
       const imgEl = document.getElementById('vision-preview-img');
       if (imgEl) imgEl.src = currentVisionPhotoData;
+
+      const resetBtn = document.getElementById('vision-reset-photo-btn');
+      if (resetBtn) resetBtn.classList.remove('hidden');
 
       const statusBadge = document.getElementById('vision-photo-status-badge');
       if (statusBadge) {
@@ -3577,19 +3807,72 @@
       if (input) input.click();
     }
 
-    function handleVisionPhotoUpload(e) {
+    function dataURLtoBlob(dataurl) {
+      const arr = dataurl.split(',');
+      const mimeMatch = arr[0].match(/:(.*?);/);
+      const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    }
+
+    function compressImageFile(file, maxDim = 960, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            let w = img.width;
+            let h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = () => resolve(e.target.result);
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleVisionPhotoUpload(e) {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        currentVisionPhotoData = evt.target.result;
+      const statusBadge = document.getElementById('vision-photo-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = '⏳ 照片壓縮處理中...';
+        statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-amber-600 text-white shadow-xs backdrop-blur-xs animate-pulse';
+      }
+
+      try {
+        const compressedDataUrl = await compressImageFile(file, 960, 0.82);
+        currentVisionPhotoData = compressedDataUrl;
         isCustomPhotoTaken = true;
 
         const imgEl = document.getElementById('vision-preview-img');
         if (imgEl) imgEl.src = currentVisionPhotoData;
 
-        const statusBadge = document.getElementById('vision-photo-status-badge');
+        const resetBtn = document.getElementById('vision-reset-photo-btn');
+        if (resetBtn) resetBtn.classList.remove('hidden');
+
         if (statusBadge) {
           statusBadge.textContent = '✅ 已拍照／上傳完成';
           statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-600 text-white shadow-xs backdrop-blur-xs';
@@ -3600,8 +3883,9 @@
 
         const timeBadge = document.getElementById('vision-timestamp-badge');
         if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('Photo processing error:', err);
+      }
       e.target.value = ''; // 重置以確保再次選擇同檔名時仍能觸發
     }
 
@@ -3611,6 +3895,9 @@
 
       const imgEl = document.getElementById('vision-preview-img');
       if (imgEl) imgEl.src = currentVisionPhotoData;
+
+      const resetBtn = document.getElementById('vision-reset-photo-btn');
+      if (resetBtn) resetBtn.classList.remove('hidden');
 
       const descInput = document.getElementById('vision-desc');
       if (descInput) {
@@ -3640,6 +3927,40 @@
       const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
       const isFacility = loc === '健身房' || loc === 'KTV室';
 
+      const submitBtn = document.getElementById('btn-submit-vision-dispatch');
+      let origBtnHtml = '';
+      if (submitBtn) {
+        origBtnHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i><span>正在上傳通報與相片...</span>`;
+        lucide.createIcons();
+      }
+
+      // 如果有拍照或上傳真實圖片，先轉存至雲端取得永久公網 HTTPS 照片網址
+      let finalPhotoUrl = currentVisionPhotoData;
+      if (currentVisionPhotoData && currentVisionPhotoData.startsWith('data:image/')) {
+        try {
+          const blob = dataURLtoBlob(currentVisionPhotoData);
+          const uploadRes = await fetch('https://ntfy.sh/daqing_tianduo2_photos_sync', {
+            method: 'PUT',
+            headers: {
+              'Filename': `dispatch_${Date.now()}.jpg`,
+              'Content-Type': 'image/jpeg'
+            },
+            body: blob
+          });
+          if (uploadRes.ok) {
+            const uploadJson = await uploadRes.json();
+            if (uploadJson && uploadJson.attachment && uploadJson.attachment.url) {
+              finalPhotoUrl = uploadJson.attachment.url;
+              currentVisionPhotoData = finalPhotoUrl;
+            }
+          }
+        } catch (err) {
+          console.warn('Cloud photo upload error, keeping local data:', err);
+        }
+      }
+
       const newDisp = {
         id: `DISP-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 900) + 100)}`,
         time: nowStr,
@@ -3650,7 +3971,7 @@
         description: desc,
         status: '處理中',
         target_team: '物業管理室 / 總幹事',
-        image_url: currentVisionPhotoData,
+        image_url: finalPhotoUrl,
         is_new: true,
         notified_management: true,
         client_type: isMobileClient ? 'mobile' : 'web',
@@ -3680,7 +4001,7 @@
       appData.dispatches.unshift(newDisp);
       saveLocal();
 
-      // 廣播給其他視窗/實體裝置即時同步
+      // 廣播給其他視窗/實體裝置即時同步 (含雲端公網即時廣播)
       broadcastSync({
         action_type: 'dispatch_created',
         title: '住戶手機異常拍照通報',
@@ -3690,6 +4011,12 @@
 
       // 更新右側清單
       renderDispatches();
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origBtnHtml;
+        lucide.createIcons();
+      }
 
       // 開啟管理室主動推播告知彈窗
       openDispatchNotifyModal(newDisp);
