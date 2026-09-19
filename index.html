@@ -415,7 +415,7 @@
               <input type="file" id="vision-album-input" accept="image/*" class="hidden" onchange="handleVisionPhotoUpload(event)">
               
               <!-- 開啟手機相機拍照按鈕 -->
-              <button type="button" onclick="triggerCameraCapture()" class="flex-1 py-2.5 px-3 rounded-xl border-2 border-rose-500 bg-rose-50 hover:bg-rose-100 text-rose-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer">
+              <button type="button" onclick="openLiveCamera()" class="flex-1 py-2.5 px-3 rounded-xl border-2 border-rose-500 bg-rose-50 hover:bg-rose-100 text-rose-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer">
                 <i data-lucide="camera" class="w-4 h-4 text-rose-600"></i>
                 <span>開啟手機相機拍照</span>
               </button>
@@ -435,8 +435,8 @@
               <button type="button" onclick="loadSampleVisionPhoto('trash')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 font-medium border border-slate-200 transition-colors">垃圾髒亂</button>
             </div>
 
-            <!-- 照片預覽框 -->
-            <div class="relative w-full h-40 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200 group">
+            <!-- 照片預覽框 (點擊亦可開啟鏡頭拍照) -->
+            <div onclick="openLiveCamera()" class="relative w-full h-40 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200 group cursor-pointer" title="點擊開啟相機鏡頭即時拍照">
               <img id="vision-preview-img" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60" class="w-full h-full object-cover">
               <div class="absolute top-2 left-2 flex items-center gap-1.5">
                 <span id="vision-tag-badge" class="px-2.5 py-1 text-xs font-black rounded-lg bg-slate-900/85 text-white shadow-xs backdrop-blur-xs">
@@ -940,6 +940,129 @@
       </div>
     </section>
   </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 即時相機拍照取景視窗 (支援手機與電腦鏡頭拍照存證) -->
+  <!-- ============================================== -->
+  <div id="camera-viewfinder-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4" style="z-index: 9998;">
+    <div class="bg-slate-900 text-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-2 border-slate-700 flex flex-col animate-in fade-in zoom-in duration-200">
+      
+      <!-- 頂部標題列 -->
+      <div class="p-3.5 sm:p-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold shadow-xs">
+            <i data-lucide="camera" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="text-sm font-black text-white flex items-center gap-1.5">
+              <span>現場相機拍照存證</span>
+              <span id="camera-modal-loc-badge" class="px-2 py-0.5 rounded bg-rose-500/30 text-rose-300 text-xs font-bold border border-rose-400/30">📍 健身房</span>
+            </div>
+            <div class="text-[11px] text-slate-400">鏡頭即時取景 · 點擊下方快門拍照</div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-1">
+          <button type="button" onclick="switchCameraFacing()" id="btn-switch-camera" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-700 transition-colors" title="切換前後鏡頭">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          </button>
+          <button type="button" onclick="closeCameraModal()" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-700 transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 視訊取景區域 -->
+      <div class="relative w-full aspect-[4/3] bg-black overflow-hidden flex items-center justify-center">
+        <!-- Live Video Element -->
+        <video id="camera-stream-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+        
+        <!-- Snapshot Preview Image (拍照後凍結檢視) -->
+        <img id="camera-snapshot-img" class="hidden w-full h-full object-cover">
+        
+        <!-- Canvas 用於擷取影像 (隱藏) -->
+        <canvas id="camera-canvas" class="hidden"></canvas>
+
+        <!-- 取景準心與相機水印 -->
+        <div id="camera-viewfinder-overlay" class="absolute inset-0 pointer-events-none flex flex-col justify-between p-3 border-2 border-white/25 m-2 rounded-xl">
+          <div class="flex justify-between items-start">
+            <span class="px-2 py-1 rounded bg-black/60 backdrop-blur-xs text-[11px] font-mono text-white flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+              <span>LIVE CAM</span>
+            </span>
+            <span id="camera-watermark-loc" class="px-2 py-1 rounded bg-black/60 backdrop-blur-xs text-[11px] font-bold text-rose-300">
+              大清天朵二期
+            </span>
+          </div>
+
+          <!-- 對焦中心十字方框 -->
+          <div class="self-center w-28 h-28 border-2 border-dashed border-white/40 rounded-xl flex items-center justify-center">
+            <div class="w-3 h-3 bg-white/60 rounded-full"></div>
+          </div>
+
+          <div class="text-[11px] text-white/80 font-mono text-right bg-black/50 px-2 py-0.5 rounded self-end">
+            <span id="camera-live-timestamp">2026-09-19 16:05</span>
+          </div>
+        </div>
+
+        <!-- 相機連線中提示 -->
+        <div id="camera-loading-box" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center space-y-3">
+          <div class="w-12 h-12 rounded-full border-4 border-rose-500 border-t-transparent animate-spin"></div>
+          <div class="text-sm font-bold text-white">正在啟動相機鏡頭...</div>
+          <div class="text-xs text-slate-400">若瀏覽器跳出「要求使用相機」權限，請點選【允許】</div>
+        </div>
+
+        <!-- 權限受限或無鏡頭時的替代模式 -->
+        <div id="camera-error-box" class="absolute inset-0 bg-slate-950 hidden flex flex-col items-center justify-center p-6 text-center space-y-3">
+          <i data-lucide="camera-off" class="w-12 h-12 text-rose-400"></i>
+          <div class="text-sm font-bold text-white">相機無法連線或權限未開放</div>
+          <div class="text-xs text-slate-400 max-w-xs leading-relaxed">
+            沒關係！您可以直接透過「手機原生拍照／相簿」選取現場照片。
+          </div>
+          <button type="button" onclick="fallbackToFileCamera()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition-colors">
+            開啟手機相簿 / 原生相機選取
+          </button>
+        </div>
+      </div>
+
+      <!-- 底部控制按鈕列 -->
+      <div class="p-4 bg-slate-900 border-t border-slate-800">
+        
+        <!-- 拍攝模式下的快門按鈕 -->
+        <div id="camera-capture-controls" class="flex items-center justify-around">
+          <button type="button" onclick="fallbackToFileCamera()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 flex items-center gap-1 transition-colors">
+            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+            <span>改選相簿</span>
+          </button>
+
+          <!-- 圓形大快門按鈕 -->
+          <button type="button" onclick="takeCameraSnapshot()" id="btn-shutter" class="w-16 h-16 rounded-full border-4 border-white bg-rose-600 hover:bg-rose-500 active:scale-95 transition-transform flex items-center justify-center shadow-lg shadow-rose-600/50 cursor-pointer" title="點擊拍照">
+            <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+              <i data-lucide="camera" class="w-6 h-6 text-white"></i>
+            </div>
+          </button>
+
+          <button type="button" onclick="closeCameraModal()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 transition-colors">
+            取消
+          </button>
+        </div>
+
+        <!-- 拍照完成後的確認 / 重拍按鈕 -->
+        <div id="camera-review-controls" class="hidden flex items-center justify-between gap-3">
+          <button type="button" onclick="retakeCameraSnapshot()" class="flex-1 py-2.5 rounded-xl border-2 border-slate-600 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span>重新拍攝</span>
+          </button>
+          
+          <button type="button" onclick="confirmCameraSnapshot()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/40 transition-colors cursor-pointer">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>確認使用此照片</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
 
   <!-- ============================================== -->
   <!-- MODAL: 管理室主動推播告知視窗 (即時推播通知成功) -->
@@ -2747,9 +2870,196 @@
       if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
     }
 
-    function triggerCameraCapture() {
+    let cameraStream = null;
+    let currentCameraFacing = 'environment';
+    let tempSnapshotData = null;
+
+    async function openLiveCamera() {
+      const modal = document.getElementById('camera-viewfinder-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+
+      const locBadge = document.getElementById('camera-modal-loc-badge');
+      if (locBadge) locBadge.textContent = `📍 ${currentVisionLocation}`;
+      const waterLoc = document.getElementById('camera-watermark-loc');
+      if (waterLoc) waterLoc.textContent = `大清天朵二期 · ${currentVisionLocation}`;
+      const liveTime = document.getElementById('camera-live-timestamp');
+      if (liveTime) liveTime.textContent = new Date().toLocaleString();
+
+      // 重置相機控制項介面
+      document.getElementById('camera-capture-controls').classList.remove('hidden');
+      document.getElementById('camera-review-controls').classList.add('hidden');
+      document.getElementById('camera-stream-video').classList.remove('hidden');
+      document.getElementById('camera-snapshot-img').classList.add('hidden');
+      document.getElementById('camera-viewfinder-overlay').classList.remove('hidden');
+      document.getElementById('camera-loading-box').classList.remove('hidden');
+      document.getElementById('camera-error-box').classList.add('hidden');
+
+      lucide.createIcons();
+      await startCameraStream(currentCameraFacing);
+    }
+
+    async function startCameraStream(facing) {
+      stopCameraStream();
+
+      const video = document.getElementById('camera-stream-video');
+      const loadingBox = document.getElementById('camera-loading-box');
+      const errorBox = document.getElementById('camera-error-box');
+
+      loadingBox.classList.remove('hidden');
+      errorBox.classList.add('hidden');
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        loadingBox.classList.add('hidden');
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const constraints = {
+          video: {
+            facingMode: { ideal: facing },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        };
+
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = cameraStream;
+        video.onloadedmetadata = () => {
+          video.play().catch(e => console.warn('video play error:', e));
+          loadingBox.classList.add('hidden');
+        };
+      } catch (err) {
+        console.warn('getUserMedia ideal facingMode failed, falling back to basic video:', err);
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          video.srcObject = cameraStream;
+          video.onloadedmetadata = () => {
+            video.play().catch(e => console.warn('video play error:', e));
+            loadingBox.classList.add('hidden');
+          };
+        } catch (e2) {
+          console.error('All camera attempts failed:', e2);
+          loadingBox.classList.add('hidden');
+          errorBox.classList.remove('hidden');
+        }
+      }
+    }
+
+    function stopCameraStream() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => {
+          try { track.stop(); } catch (e) {}
+        });
+        cameraStream = null;
+      }
+      const video = document.getElementById('camera-stream-video');
+      if (video) video.srcObject = null;
+    }
+
+    async function switchCameraFacing() {
+      currentCameraFacing = currentCameraFacing === 'environment' ? 'user' : 'environment';
+      await startCameraStream(currentCameraFacing);
+    }
+
+    function takeCameraSnapshot() {
+      const video = document.getElementById('camera-stream-video');
+      const canvas = document.getElementById('camera-canvas');
+      if (!video || !video.videoWidth) {
+        alert('相機鏡頭尚未連線完成，請稍候重試！');
+        return;
+      }
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+
+      if (currentCameraFacing === 'user') {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // 繪製現場存證浮水印
+      ctx.restore();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+      ctx.fillRect(20, canvas.height - 80, Math.min(canvas.width - 40, 560), 60);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px sans-serif';
+      const timeStr = new Date().toLocaleString();
+      ctx.fillText(`大清天朵二期 · 現場存證 · 📍 ${currentVisionLocation}`, 35, canvas.height - 48);
+      ctx.font = '16px monospace';
+      ctx.fillStyle = '#fca5a5';
+      ctx.fillText(`${timeStr} (住戶線上通報存證)`, 35, canvas.height - 26);
+
+      tempSnapshotData = canvas.toDataURL('image/jpeg', 0.88);
+
+      // 凍結預覽影像
+      const snapshotImg = document.getElementById('camera-snapshot-img');
+      snapshotImg.src = tempSnapshotData;
+      snapshotImg.classList.remove('hidden');
+      video.classList.add('hidden');
+
+      document.getElementById('camera-viewfinder-overlay').classList.add('hidden');
+      document.getElementById('camera-capture-controls').classList.add('hidden');
+      document.getElementById('camera-review-controls').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function retakeCameraSnapshot() {
+      const video = document.getElementById('camera-stream-video');
+      const snapshotImg = document.getElementById('camera-snapshot-img');
+      snapshotImg.classList.add('hidden');
+      video.classList.remove('hidden');
+
+      document.getElementById('camera-viewfinder-overlay').classList.remove('hidden');
+      document.getElementById('camera-capture-controls').classList.remove('hidden');
+      document.getElementById('camera-review-controls').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    function confirmCameraSnapshot() {
+      if (!tempSnapshotData) return;
+
+      currentVisionPhotoData = tempSnapshotData;
+      isCustomPhotoTaken = true;
+
+      const imgEl = document.getElementById('vision-preview-img');
+      if (imgEl) imgEl.src = currentVisionPhotoData;
+
+      const statusBadge = document.getElementById('vision-photo-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = '✅ 已完成相機拍照存證';
+        statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-600 text-white shadow-xs backdrop-blur-xs';
+      }
+
+      const tipEl = document.getElementById('vision-photo-tip');
+      if (tipEl) tipEl.textContent = '✅ 現場拍照存證已就緒，請點選下方確認上傳！';
+
+      const timeBadge = document.getElementById('vision-timestamp-badge');
+      if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+      closeCameraModal();
+    }
+
+    function closeCameraModal() {
+      stopCameraStream();
+      const modal = document.getElementById('camera-viewfinder-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function fallbackToFileCamera() {
+      closeCameraModal();
       const input = document.getElementById('vision-camera-input');
-      if (input) input.click();
+      if (input) {
+        input.click();
+      }
+    }
+
+    function triggerCameraCapture() {
+      openLiveCamera();
     }
 
     function triggerAlbumUpload() {
@@ -2771,7 +3081,7 @@
 
         const statusBadge = document.getElementById('vision-photo-status-badge');
         if (statusBadge) {
-          statusBadge.textContent = '✅ 已完成拍照存證';
+          statusBadge.textContent = '✅ 已拍照／上傳完成';
           statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-600 text-white shadow-xs backdrop-blur-xs';
         }
 
@@ -2782,6 +3092,7 @@
         if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
       };
       reader.readAsDataURL(file);
+      e.target.value = ''; // 重置以確保再次選擇同檔名時仍能觸發
     }
 
     function loadSampleVisionPhoto(type) {
