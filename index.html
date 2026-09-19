@@ -1065,86 +1065,100 @@
   </div>
 
   <!-- ============================================== -->
-  <!-- MODAL: 管理室主動推播告知視窗 (即時推播通知成功) -->
+  <!-- MODAL: 管理室主動推播告知視窗 (滿版可上下滑動檢視，不截斷) -->
   <!-- ============================================== -->
-  <div id="dispatch-notify-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs hidden flex items-center justify-center p-4" style="z-index: 9997;" onclick="if(event.target === this) closeDispatchNotifyModal()">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-2 border-rose-300">
-      
-      <!-- 頂部標題與即時推播橫幅 -->
-      <div class="p-4 sm:p-5 bg-gradient-to-r from-rose-600 via-rose-700 to-red-800 text-white flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-white/20 border border-white/30 text-white flex items-center justify-center font-bold shadow-xs">
-            <i data-lucide="bell-ring" class="w-5 h-5 text-white"></i>
+  <div id="dispatch-notify-modal" class="fixed inset-0 bg-white z-[9997] hidden flex flex-col overflow-hidden">
+    
+    <!-- 頂部固定標題列 (flex-shrink-0) -->
+    <div class="p-4 sm:p-5 bg-gradient-to-r from-rose-600 via-rose-700 to-red-800 text-white flex-shrink-0 shadow-md">
+      <div class="max-w-2xl mx-auto w-full flex items-center justify-between">
+        <div class="flex items-center space-x-3 min-w-0">
+          <div class="w-10 h-10 rounded-xl bg-white/20 border border-white/30 text-white flex items-center justify-center font-bold shadow-xs flex-shrink-0">
+            <i data-lucide="bell-ring" class="w-5 h-5 text-white animate-bounce"></i>
           </div>
-          <div>
-            <div class="flex items-center gap-1.5">
-              <span class="px-2 py-0.5 rounded-md bg-white/20 text-white font-bold text-[10px] border border-white/30">即時連線推播</span>
-              <span class="text-[11px] text-rose-200 font-bold">LINE官方推播發送成功</span>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-0.5">
+              <span class="px-2 py-0.5 rounded-md bg-white/25 text-white font-bold text-[10px] border border-white/30">即時連線推播</span>
+              <span class="text-[11px] text-rose-100 font-bold">LINE官方推播發送成功</span>
             </div>
-            <h3 class="text-base sm:text-lg font-black text-white">管理室已主動推播告知！</h3>
+            <h3 class="text-base sm:text-lg font-black text-white truncate">管理室已主動推播告知！</h3>
           </div>
         </div>
-        <button onclick="closeDispatchNotifyModal()" class="p-1.5 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="closeDispatchNotifyModal()" class="p-2 text-white/80 hover:text-white rounded-xl hover:bg-white/20 transition-colors flex-shrink-0 cursor-pointer" title="關閉視窗">
+          <i data-lucide="x" class="w-6 h-6"></i>
         </button>
       </div>
+    </div>
 
-      <div class="p-5 sm:p-6 space-y-4">
+    <!-- 中間內容滑動區域 (滿版滾動，絕不截斷，可上下滑動) -->
+    <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-50">
+      <div class="max-w-2xl mx-auto space-y-4">
         
-        <!-- 成功告知提示 -->
-        <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start space-x-2.5">
+        <!-- 成功告知提示條 -->
+        <div class="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl flex items-start space-x-3 shadow-2xs">
           <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5"></i>
           <div class="text-xs sm:text-sm text-emerald-950 leading-relaxed">
-            <span class="font-bold">已同步推播通知管理室：</span>
-            <span>系統已透過 LINE 官方管理群組及物業中控台主動推播至【固德物業高瑞彣總幹事／值勤保全櫃檯】，值勤人員已排程前往現場查看！</span>
+            <div class="font-black text-sm text-emerald-900 mb-0.5">已同步推播通知管理室！</div>
+            <div>系統已透過 LINE 官方管理群組及物業中控台主動推播至【固德物業高瑞彣總幹事／值勤保全櫃檯】，值勤人員已排程前往現場查看！</div>
           </div>
         </div>
 
         <!-- 通報工單詳細資訊卡片 -->
-        <div class="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 space-y-2.5 text-xs sm:text-sm">
-          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+        <div class="bg-white border-2 border-slate-200 rounded-2xl p-5 space-y-3.5 text-xs sm:text-sm shadow-xs">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
             <span class="text-slate-500 font-bold">工單編號</span>
-            <span id="modal-disp-id" class="font-mono font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">#DISP-20260919-001</span>
+            <span id="modal-disp-id" class="font-mono font-black text-rose-700 bg-rose-50 px-3 py-1 rounded-lg border border-rose-200 text-sm">#DISP-20260919-001</span>
           </div>
-          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
             <span class="text-slate-500 font-bold">通報地點</span>
-            <span id="modal-disp-loc" class="font-black text-slate-900 text-sm">健身房</span>
+            <span id="modal-disp-loc" class="font-black text-slate-900 text-base">健身房</span>
           </div>
-          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
             <span class="text-slate-500 font-bold">通報住戶</span>
             <span id="modal-disp-reporter" class="font-bold text-slate-800">住戶（A棟8樓之1 · 饒先生）</span>
           </div>
-          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
             <span class="text-slate-500 font-bold">通報時間</span>
-            <span id="modal-disp-time" class="font-mono text-slate-700">2026-09-19 15:48</span>
+            <span id="modal-disp-time" class="font-mono font-medium text-slate-700">2026-09-19 15:48</span>
+          </div>
+          <div class="pb-3 border-b border-slate-100">
+            <span class="text-slate-500 font-bold block mb-1.5">現場狀況描述</span>
+            <div id="modal-disp-desc" class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-800 font-medium leading-relaxed"></div>
           </div>
           <div>
-            <span class="text-slate-500 font-bold block mb-1">現場狀況描述</span>
-            <div id="modal-disp-desc" class="p-2.5 bg-white rounded-lg border border-slate-200 text-slate-800 font-medium leading-relaxed"></div>
-          </div>
-          <div>
-            <span class="text-slate-500 font-bold block mb-1">手機拍照存證照片</span>
-            <div class="h-36 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 relative">
-              <img id="modal-disp-img" src="" class="w-full h-full object-cover">
-              <span class="absolute bottom-2 right-2 px-2 py-0.5 text-[10px] rounded bg-slate-900/80 text-white font-medium">存證影像已入庫</span>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-slate-500 font-bold">手機拍照存證照片</span>
+              <span class="text-[11px] text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">存證影像已入庫</span>
+            </div>
+            <div class="rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-100 max-h-80 relative flex items-center justify-center">
+              <img id="modal-disp-img" src="" class="w-full h-auto max-h-80 object-contain rounded-lg">
             </div>
           </div>
         </div>
 
-        <div class="p-3 bg-slate-100 rounded-xl text-slate-600 text-[11px] leading-relaxed flex items-center gap-2">
-          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+        <!-- 追蹤進度提示條 -->
+        <div class="p-3.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 text-xs leading-relaxed flex items-center gap-2.5">
+          <i data-lucide="shield-check" class="w-5 h-5 text-emerald-600 flex-shrink-0"></i>
           <span>右側「即時派單工單清單」已即時置頂本筆工單，您可以隨時在線追蹤處理狀態！</span>
         </div>
 
       </div>
+    </div>
 
-      <div class="p-4 border-t bg-slate-50 flex items-center justify-end">
-        <button onclick="closeDispatchNotifyModal()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer">
-          確認，我知道了
+    <!-- 底部固定確認列 (flex-shrink-0) -->
+    <div class="p-4 bg-white border-t border-slate-200 flex-shrink-0 shadow-lg">
+      <div class="max-w-2xl mx-auto flex items-center justify-between gap-3">
+        <div class="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+          <i data-lucide="info" class="w-4 h-4 text-slate-400"></i>
+          <span>管理室值勤保全已接獲推播通知</span>
+        </div>
+        <button onclick="closeDispatchNotifyModal()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-black text-sm sm:text-base shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <i data-lucide="check" class="w-5 h-5"></i>
+          <span>確認，我知道了</span>
         </button>
       </div>
-
     </div>
+
   </div>
 
   <!-- ============================================== -->
