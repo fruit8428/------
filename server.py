@@ -560,36 +560,53 @@ class CommunityAppHandler(SimpleHTTPRequestHandler):
             })
 
         elif path == "/api/vision_dispatch":
-            category = body.get("category", "Trash")
-            location = body.get("location", "公共區域")
-            description = body.get("description", "系統自動辨識通報")
-            reporter = body.get("reporter", "住戶 LINE 傳送")
-            image_url = body.get("image_url", "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60")
+            category = body.get("category", "Damage")
+            location = body.get("location", "健身房")
+            description = body.get("description", "住戶拍照通報現場異常狀況")
+            reporter = body.get("reporter", "住戶（A棟8樓之1 · 饒先生）")
+            image_url = body.get("image_url", "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60")
 
             cat_map = {
-                "Trash": ("垃圾棄置", "清潔人員/物業群組"),
-                "Lost Item": ("遺失物", "管理中心"),
-                "Damage": ("設施損壞", "物業機電/修繕組"),
+                "Trash": ("垃圾棄置", "物業清潔組"),
+                "Lost Item": ("遺失物", "物業管理中心"),
+                "Damage": ("設施異常", "物業機電/修繕組"),
+                "ResidentReport": ("異常通報", "物業管理室 / 總幹事"),
                 "Other": ("其他/違規行為", "物業主管與管委會")
             }
-            cat_name, target_team = cat_map.get(category, ("一般通報", "管理中心"))
+            cat_name = body.get("category_name") or cat_map.get(category, ("異常通報", "物業管理室"))[0]
+            target_team = body.get("target_team") or cat_map.get(category, ("異常通報", "物業管理室 / 總幹事"))[1]
+            status = body.get("status", "處理中")
 
-            disp_id = f"DISP-{datetime.datetime.now().strftime('%Y%m%d')}-{len(data['dispatches'])+1:03d}"
+            disp_id = body.get("id") or f"DISP-{datetime.datetime.now().strftime('%Y%m%d')}-{len(data['dispatches'])+1:03d}"
+            disp_time = body.get("time") or datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             new_disp = {
                 "id": disp_id,
-                "time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                "time": disp_time,
                 "category": category,
                 "category_name": cat_name,
                 "location": location,
                 "reporter": reporter,
                 "description": description,
-                "status": "處理中" if category in ["Trash", "Damage"] else "已登記等待認領",
+                "status": status,
                 "target_team": target_team,
-                "image_url": image_url
+                "image_url": image_url,
+                "notified_management": True,
+                "management_push_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             data["dispatches"].insert(0, new_disp)
             save_data(data)
-            self.send_json({"success": True, "dispatch": new_disp})
+            self.send_json({
+                "success": True, 
+                "dispatch": new_disp,
+                "management_notified": True,
+                "push_details": {
+                    "receiver": "固德物業管理室（高瑞彣總幹事／保全櫃檯）",
+                    "channel": "LINE 官方群組推播 & 中控台警示",
+                    "title": f"【即時異常通報提醒】{location} 發生狀況",
+                    "content": f"住戶（{reporter}）已拍照通報【{location}】：{description}，管理室已即時收到派單！",
+                    "time": disp_time
+                }
+            })
 
         elif path == "/api/reconcile":
             amount = float(body.get("amount", 0))
@@ -897,13 +914,25 @@ def generate_ai_response(msg, role, unit, data):
             "📌【建置進度說明】：目前各項服務介面已建置完成（先建置好，後續再來連結），管委會與物業團隊刻正接洽周邊商家與串接線上預約系統！住戶可點選頂部「生活小幫手」頁籤查看各項服務介紹。"
         )
 
+    # 6. 異常拍照通報與管理室即時連線推播（健身房、KTV室、2F~15F）
+    if any(k in msg for k in ["異常通報", "通報", "拍照通報", "手機拍照", "報修", "派單", "拍照"]):
+        return (
+            "【大清天朵二期 · 異常拍照通報與管理室即時派單】\n"
+            "住戶可於上方切換至「異常通報」頁籤進行快速線上派單：\n\n"
+            "1. 📍【16處區域一鍵點選】：系統提供「健身房、KTV室、2F、3F、4F、5F、6F、7F、8F、9F、10F、11F、12F、13F、14F、15F」等可點選選項。\n"
+            "2. 📸【手機相機拍照存證】：點選地點後，直接啟用手機相機拍照存證、從相簿上傳，或選取現場實景快照範例。\n"
+            "3. 📝【狀況描述與上傳】：填寫狀況說明後點擊確認上傳。\n"
+            "4. 📋【右側清單即時顯示】：派單成功後，右側「即時派單工單清單」將即刻置頂顯示該項通報與縮圖（點選可放大檢視）。\n"
+            "5. 📢【管理室主動推播告知】：系統同步發送即時推播通知至固德物業管理室（高瑞彣總幹事／值班保全櫃檯），值勤人員將即刻前往現場查看處理！"
+        )
+
     # 一般預設招呼
     return (
         f"您好！我是大清天朵二期社區 AI 管理助手（當前身分：{role}）。\n"
         "我能協助您處理：\n"
         "1. 公寓大廈管理條例與決議邏輯檢核（含走廊鞋櫃、地下室防水閘門定期操演規約）\n"
         "2. 防汛演練與氣象署連線（每年5月自動提醒演練、中央氣象局豪大雨主動推播）\n"
-        "3. 影像辨識與設施維護派單（垃圾棄置、遺失物、修繕報修）\n"
+        "3. 異常通報與管理室即時推播（健身房、KTV室、2F~15F共16處選項＋手機拍照上傳）\n"
         "4. 社區財務自動銷帳（銀行入帳自動比對、住戶個人收據）\n"
         "5. 固德高瑞彣一般費用報支與三委員多重簽核自動化（含JPG/PDF附件高清預覽）\n"
         "6. 社區生活小幫手（水電維修、附近餐館預訂、生鮮團購、燙髮預約、衣服送洗）\n"

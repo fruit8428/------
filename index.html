@@ -328,47 +328,178 @@
     <!-- ============================================== -->
     <!-- TAB 4: 異常通報 (情境按鈕鮮明、字體大) -->
     <!-- ============================================== -->
-    <section id="view-vision" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- 快速通報卡 -->
-      <div class="bg-white p-5 sm:p-6 rounded-2xl border-2 border-rose-200 shadow-sm space-y-3.5">
-        <span class="font-bold text-slate-900 text-base sm:text-lg block">拍照通報異常</span>
+    <!-- TAB 4: 異常通報 (住戶端拍照通報 16處區域 + 手機照相功能 + 管理室即時推播) -->
+    <!-- ============================================== -->
+    <section id="view-vision" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <!-- 左側：拍照通報異常卡片 (佔 5 欄) -->
+      <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-2xl border-2 border-rose-200 shadow-sm space-y-4 flex flex-col justify-between">
         
-        <!-- 四大情境按鈕 (按鈕外框色彩鮮明) -->
-        <div class="grid grid-cols-2 gap-2 text-sm font-bold">
-          <button onclick="selectDemoVision('trash')" class="p-2.5 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-950 text-left transition-all">
-            🗑️ 走廊垃圾
-          </button>
-          <button onclick="selectDemoVision('lost')" class="p-2.5 rounded-xl border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-950 text-left transition-all">
-            🎒 大廳遺失物
-          </button>
-          <button onclick="selectDemoVision('damage')" class="p-2.5 rounded-xl border-2 border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-950 text-left transition-all">
-            ⚠️ 設施破損
-          </button>
-          <button onclick="selectDemoVision('cctv')" class="p-2.5 rounded-xl border-2 border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-950 text-left transition-all">
-            📹 CCTV 違規
-          </button>
+        <div class="space-y-3.5">
+          <!-- 標題列 -->
+          <div class="flex items-center justify-between pb-2 border-b border-rose-100">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold shadow-xs flex-shrink-0">
+                <i data-lucide="camera" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="font-black text-slate-900 text-base sm:text-lg block leading-tight">拍照通報異常</span>
+                <span class="text-[11px] text-slate-500 font-medium">住戶點擊區域 · 手機拍照上傳 · 管理室即時推播</span>
+              </div>
+            </div>
+            <span id="vision-selected-badge" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-50 text-rose-700 border border-rose-200">
+              📍 請點選地點
+            </span>
+          </div>
+
+          <!-- 步驟 1：可點擊的選項 (健身房、KTV室、2F ~ 15F) -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <span class="w-4 h-4 rounded-full bg-rose-600 text-white text-[10px] inline-flex items-center justify-center font-bold">1</span>
+                <span>點選通報地點／樓層（共 16 處選項）：</span>
+              </label>
+              <span class="text-[11px] text-rose-600 font-semibold">點擊即可切換</span>
+            </div>
+
+            <!-- 公共設施特色選項：健身房、KTV室 -->
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" onclick="selectVisionLocation('健身房')" id="btn-loc-健身房" class="vision-loc-btn py-2 px-3 rounded-xl border-2 border-amber-300 bg-amber-50/70 hover:bg-amber-100 text-amber-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                <span>🏋️ 健身房</span>
+              </button>
+              <button type="button" onclick="selectVisionLocation('KTV室')" id="btn-loc-KTV室" class="vision-loc-btn py-2 px-3 rounded-xl border-2 border-purple-300 bg-purple-50/70 hover:bg-purple-100 text-purple-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                <span>🎤 KTV室</span>
+              </button>
+            </div>
+
+            <!-- 各樓層選項：2F ~ 15F (分兩排，每排 7 個按鈕，清楚好按) -->
+            <div class="space-y-1.5 pt-0.5">
+              <div class="text-[11px] font-bold text-slate-500">住戶各樓層（2F ~ 15F）：</div>
+              
+              <!-- 2F ~ 8F -->
+              <div class="grid grid-cols-7 gap-1.5 text-xs font-bold">
+                <button type="button" onclick="selectVisionLocation('2F')" id="btn-loc-2F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">2F</button>
+                <button type="button" onclick="selectVisionLocation('3F')" id="btn-loc-3F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">3F</button>
+                <button type="button" onclick="selectVisionLocation('4F')" id="btn-loc-4F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">4F</button>
+                <button type="button" onclick="selectVisionLocation('5F')" id="btn-loc-5F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">5F</button>
+                <button type="button" onclick="selectVisionLocation('6F')" id="btn-loc-6F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">6F</button>
+                <button type="button" onclick="selectVisionLocation('7F')" id="btn-loc-7F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">7F</button>
+                <button type="button" onclick="selectVisionLocation('8F')" id="btn-loc-8F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">8F</button>
+              </div>
+
+              <!-- 9F ~ 15F -->
+              <div class="grid grid-cols-7 gap-1.5 text-xs font-bold">
+                <button type="button" onclick="selectVisionLocation('9F')" id="btn-loc-9F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">9F</button>
+                <button type="button" onclick="selectVisionLocation('10F')" id="btn-loc-10F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">10F</button>
+                <button type="button" onclick="selectVisionLocation('11F')" id="btn-loc-11F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">11F</button>
+                <button type="button" onclick="selectVisionLocation('12F')" id="btn-loc-12F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">12F</button>
+                <button type="button" onclick="selectVisionLocation('13F')" id="btn-loc-13F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">13F</button>
+                <button type="button" onclick="selectVisionLocation('14F')" id="btn-loc-14F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">14F</button>
+                <button type="button" onclick="selectVisionLocation('15F')" id="btn-loc-15F" class="vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 transition-all cursor-pointer">15F</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 步驟 2：手機照相功能 (當住戶點擊選項後提供照相與上傳) -->
+          <div id="vision-photo-panel" class="space-y-2.5 pt-2.5 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <span class="w-4 h-4 rounded-full bg-rose-600 text-white text-[10px] inline-flex items-center justify-center font-bold">2</span>
+                <span>手機照相功能／照片上傳：</span>
+              </label>
+              <span id="vision-photo-tip" class="text-[11px] text-slate-500 font-medium">請拍照或選取照片</span>
+            </div>
+
+            <!-- 照片拍照與選取按鈕組 -->
+            <div class="flex items-center gap-2">
+              <input type="file" id="vision-camera-input" accept="image/*" capture="environment" class="hidden" onchange="handleVisionPhotoUpload(event)">
+              <input type="file" id="vision-album-input" accept="image/*" class="hidden" onchange="handleVisionPhotoUpload(event)">
+              
+              <!-- 開啟手機相機拍照按鈕 -->
+              <button type="button" onclick="triggerCameraCapture()" class="flex-1 py-2.5 px-3 rounded-xl border-2 border-rose-500 bg-rose-50 hover:bg-rose-100 text-rose-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer">
+                <i data-lucide="camera" class="w-4 h-4 text-rose-600"></i>
+                <span>開啟手機相機拍照</span>
+              </button>
+
+              <!-- 從相簿上傳照片按鈕 -->
+              <button type="button" onclick="triggerAlbumUpload()" class="py-2.5 px-3 rounded-xl border-2 border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-2xs transition-all cursor-pointer">
+                <i data-lucide="image-plus" class="w-4 h-4 text-slate-500"></i>
+                <span>相簿選取</span>
+              </button>
+            </div>
+
+            <!-- 模擬實景快照按鈕 (方便電腦端或快速示範) -->
+            <div class="flex items-center gap-1.5 text-[11px] bg-slate-50 p-2 rounded-xl border border-slate-200">
+              <span class="text-slate-500 font-bold flex-shrink-0">快照範例：</span>
+              <button type="button" onclick="loadSampleVisionPhoto('clutter')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 font-medium border border-slate-200 transition-colors">走道雜物</button>
+              <button type="button" onclick="loadSampleVisionPhoto('damage')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 font-medium border border-slate-200 transition-colors">器材破損</button>
+              <button type="button" onclick="loadSampleVisionPhoto('trash')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 font-medium border border-slate-200 transition-colors">垃圾髒亂</button>
+            </div>
+
+            <!-- 照片預覽框 -->
+            <div class="relative w-full h-40 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200 group">
+              <img id="vision-preview-img" src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60" class="w-full h-full object-cover">
+              <div class="absolute top-2 left-2 flex items-center gap-1.5">
+                <span id="vision-tag-badge" class="px-2.5 py-1 text-xs font-black rounded-lg bg-slate-900/85 text-white shadow-xs backdrop-blur-xs">
+                  📍 健身房
+                </span>
+                <span id="vision-photo-status-badge" class="px-2 py-0.5 text-[11px] font-bold rounded-md bg-rose-600 text-white shadow-xs backdrop-blur-xs">
+                  待確認上傳
+                </span>
+              </div>
+              <div id="vision-timestamp-badge" class="absolute bottom-2 right-2 px-2 py-0.5 text-[11px] font-mono rounded bg-slate-900/70 text-slate-200 backdrop-blur-xs">
+                2026-09-19 15:48
+              </div>
+            </div>
+
+            <!-- 狀況描述輸入框 -->
+            <div>
+              <label class="text-[11px] font-bold text-slate-500 block mb-1">狀況描述（可自行編輯補充）：</label>
+              <input type="text" id="vision-desc" value="健身房 跑步機器材異常或環境待維護" class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-200 focus:border-rose-500 rounded-xl text-xs sm:text-sm font-medium transition-colors" placeholder="請輸入狀況描述（例如：梯廳堆積雜物、設備破損等）">
+            </div>
+            <input type="hidden" id="vision-location" value="健身房">
+          </div>
         </div>
 
-        <div class="relative w-full h-36 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200">
-          <img id="vision-preview-img" src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60" class="w-full h-full object-cover">
-          <span id="vision-tag-badge" class="absolute top-2 left-2 px-2.5 py-1 text-xs font-bold rounded-lg bg-slate-900 text-white shadow-xs">垃圾棄置</span>
+        <!-- 步驟 3：確認上傳並自動派單按鈕 -->
+        <div class="pt-2">
+          <button type="button" onclick="submitVisionDispatch()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm sm:text-base font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>確認拍照上傳 · 自動派單推播管理室</span>
+          </button>
+          <div class="text-[11px] text-center text-slate-400 font-medium mt-1.5 flex items-center justify-center gap-1">
+            <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-rose-500"></i>
+            <span>上傳後右側將顯示通報事項，並主動推播告知物業管理室</span>
+          </div>
         </div>
 
-        <input type="text" id="vision-location" value="B1 資源回收室旁走道" class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-medium" placeholder="通報地點">
-        <input type="text" id="vision-desc" value="走道堆積大型紙箱與保麗龍" class="w-full px-3 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-medium" placeholder="狀況描述">
-
-        <button onclick="submitVisionDispatch()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm sm:text-base font-bold shadow-xs transition-all">
-          送出自動派單
-        </button>
       </div>
 
-      <!-- 派單處理列表 -->
-      <div class="md:col-span-2 bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col">
-        <div class="flex items-center justify-between pb-3 mb-3 border-b-2 border-slate-100">
-          <span class="font-bold text-slate-900 text-base sm:text-lg">即時派單工單清單</span>
-          <span class="text-sm font-bold text-slate-500" id="dispatch-count-text">共 2 筆</span>
+      <!-- 右側：即時派單工單清單 (佔 7 欄) -->
+      <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-2xl border-2 border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between pb-3 mb-3 border-b-2 border-slate-100">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="clipboard-list" class="w-5 h-5 text-rose-600"></i>
+              <span class="font-bold text-slate-900 text-base sm:text-lg">即時派單工單清單</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                <i data-lucide="wifi" class="w-3.5 h-3.5"></i>
+                <span>管理室連線中</span>
+              </span>
+              <span class="text-sm font-bold text-slate-500" id="dispatch-count-text">共 2 筆</span>
+            </div>
+          </div>
+          <div id="dispatch-list" class="space-y-3 flex-1 overflow-y-auto max-h-[520px] pr-1"></div>
         </div>
-        <div id="dispatch-list" class="space-y-2.5 flex-1 overflow-y-auto max-h-[480px]"></div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span class="flex items-center gap-1">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>點擊縮圖可直接放大預覽通報存證照片</span>
+          </span>
+          <span class="font-medium">管理室平均到場處理時效：15 分鐘</span>
+        </div>
       </div>
     </section>
 
@@ -809,6 +940,89 @@
       </div>
     </section>
   </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL: 管理室主動推播告知視窗 (即時推播通知成功) -->
+  <!-- ============================================== -->
+  <div id="dispatch-notify-modal" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs hidden flex items-center justify-center p-4" style="z-index: 9997;" onclick="if(event.target === this) closeDispatchNotifyModal()">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-2 border-rose-300">
+      
+      <!-- 頂部標題與即時推播橫幅 -->
+      <div class="p-4 sm:p-5 bg-gradient-to-r from-rose-600 via-rose-700 to-red-800 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-white/20 border border-white/30 text-white flex items-center justify-center font-bold shadow-xs">
+            <i data-lucide="bell-ring" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded-md bg-white/20 text-white font-bold text-[10px] border border-white/30">即時連線推播</span>
+              <span class="text-[11px] text-rose-200 font-bold">LINE官方推播發送成功</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-black text-white">管理室已主動推播告知！</h3>
+          </div>
+        </div>
+        <button onclick="closeDispatchNotifyModal()" class="p-1.5 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 sm:p-6 space-y-4">
+        
+        <!-- 成功告知提示 -->
+        <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start space-x-2.5">
+          <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5"></i>
+          <div class="text-xs sm:text-sm text-emerald-950 leading-relaxed">
+            <span class="font-bold">已同步推播通知管理室：</span>
+            <span>系統已透過 LINE 官方管理群組及物業中控台主動推播至【固德物業高瑞彣總幹事／值勤保全櫃檯】，值勤人員已排程前往現場查看！</span>
+          </div>
+        </div>
+
+        <!-- 通報工單詳細資訊卡片 -->
+        <div class="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 space-y-2.5 text-xs sm:text-sm">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+            <span class="text-slate-500 font-bold">工單編號</span>
+            <span id="modal-disp-id" class="font-mono font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">#DISP-20260919-001</span>
+          </div>
+          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+            <span class="text-slate-500 font-bold">通報地點</span>
+            <span id="modal-disp-loc" class="font-black text-slate-900 text-sm">健身房</span>
+          </div>
+          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+            <span class="text-slate-500 font-bold">通報住戶</span>
+            <span id="modal-disp-reporter" class="font-bold text-slate-800">住戶（A棟8樓之1 · 饒先生）</span>
+          </div>
+          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+            <span class="text-slate-500 font-bold">通報時間</span>
+            <span id="modal-disp-time" class="font-mono text-slate-700">2026-09-19 15:48</span>
+          </div>
+          <div>
+            <span class="text-slate-500 font-bold block mb-1">現場狀況描述</span>
+            <div id="modal-disp-desc" class="p-2.5 bg-white rounded-lg border border-slate-200 text-slate-800 font-medium leading-relaxed"></div>
+          </div>
+          <div>
+            <span class="text-slate-500 font-bold block mb-1">手機拍照存證照片</span>
+            <div class="h-36 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 relative">
+              <img id="modal-disp-img" src="" class="w-full h-full object-cover">
+              <span class="absolute bottom-2 right-2 px-2 py-0.5 text-[10px] rounded bg-slate-900/80 text-white font-medium">存證影像已入庫</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-100 rounded-xl text-slate-600 text-[11px] leading-relaxed flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+          <span>右側「即時派單工單清單」已即時置頂本筆工單，您可以隨時在線追蹤處理狀態！</span>
+        </div>
+
+      </div>
+
+      <div class="p-4 border-t bg-slate-50 flex items-center justify-end">
+        <button onclick="closeDispatchNotifyModal()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-xs transition-colors cursor-pointer">
+          確認，我知道了
+        </button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- ============================================== -->
   <!-- MODAL: 生活小幫手服務詳情彈窗 (建置中說明) -->
@@ -2072,6 +2286,7 @@
       renderRoleUI();
       renderBylaws();
       renderDispatches();
+      selectVisionLocation('健身房');
       renderPettyCash();
       renderResidentsTable();
       renderFloodSystem();
@@ -2260,6 +2475,9 @@
       if (/生活小幫手|水電|餐館|餐廳|團購|生鮮|燙髮|美髮|送洗|洗衣|便民/.test(msg)) {
         return "【大清天朵二期 · 生活小幫手服務】\n社區已建置五大專屬便民生活服務板塊：\n1. 🔧 水電維修：專業持證技師、透明收費標準、到府檢測維修。\n2. 🍽️ 附近餐館預訂：精選周邊人氣名店、住戶專屬9折優惠、免排隊保留席。\n3. 🥬 生鮮團購：有機當令蔬果箱、產地海陸肉品、社區物業低溫冷藏代收。\n4. 💇 燙髮美髮預約：周邊口碑名店沙龍、天朵住戶85折禮遇、指定設計師。\n5. 👔 衣服送洗：專業乾洗水洗、蒸氣立體整燙、物業櫃檯代收代送。\n📌 說明：各功能板塊目前已先建置完成，後續將陸續完成特約商家簽約與線上預約系統串接！您可直接切換至「生活小幫手」頁籤查看詳情。";
       }
+      if (/異常通報|拍照通報|通報|手機拍照|拍照|健身房|KTV|走道堆物|派單/.test(msg)) {
+        return "【大清天朵二期 · 異常拍照通報與管理室即時連線】\n住戶可切換至「異常通報」頁籤進行快速線上通報：\n1. 📍 點選通報地點：提供「健身房、KTV室、2F~15F」共 16 處區域一鍵點選。\n2. 📸 提供手機照相功能：可啟用手機鏡頭即時拍照或從相簿上傳現場照片。\n3. 📤 確認拍照上傳：點擊送出後，右側清單將即刻置頂顯示該筆通報工單。\n4. 📢 管理室主動推播告知：系統將同步發送 LINE 官方推播及中控台響鈴通知固德物業管理室（高瑞彣總幹事／值班保全），迅速派員前往現場確認處理！";
+      }
       return `收到提問。您可在上方功能按鈕快速執行規約比對、氣象警特報模擬、異常拍照派單或管理費對帳！`;
     }
 
@@ -2443,37 +2661,177 @@
       alert(level === 'heavy_rain' ? '已發布豪大雨特報並啟動一級防汛SOP！' : '特報已解除。');
     }
 
-    // Skill 2: 異常拍照派單
-    const demoVisionScenarios = {
-      trash: { category: 'Trash', name: '垃圾棄置', loc: 'B1 資源回收室旁', desc: '堆積紙箱與保麗龍', img: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60' },
-      lost: { category: 'Lost Item', name: '遺失物', loc: '1F 中庭沙發', desc: '黑色雙肩背包一只', img: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=60' },
-      damage: { category: 'Damage', name: '設施損壞', loc: 'A棟7F梯廳', desc: '天花板感應燈脫落', img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=60' },
-      cctv: { category: 'Other', name: 'CCTV 違規', loc: 'B2 逃生門口', desc: '推車阻擋防火門', img: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=600&auto=format&fit=crop&q=60' }
-    };
-    let selectedScenario = demoVisionScenarios.trash;
+    // Skill 2: 異常拍照派單 (住戶端 16處區域點選 + 手機相機拍照/相簿上傳 + 管理室即時推播告知)
+    const VISION_LOCATIONS = ['健身房', 'KTV室', '2F', '3F', '4F', '5F', '6F', '7F', '8F', '9F', '10F', '11F', '12F', '13F', '14F', '15F'];
+    let currentVisionLocation = '健身房';
+    let currentVisionPhotoData = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60';
+    let isCustomPhotoTaken = false;
 
-    function selectDemoVision(k) {
-      selectedScenario = demoVisionScenarios[k];
-      document.getElementById('vision-preview-img').src = selectedScenario.img;
-      document.getElementById('vision-location').value = selectedScenario.loc;
-      document.getElementById('vision-desc').value = selectedScenario.desc;
-      document.getElementById('vision-tag-badge').textContent = selectedScenario.name;
+    const visionPresetPhotos = {
+      '健身房': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60',
+      'KTV室': 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&auto=format&fit=crop&q=60',
+      'floor_corridor': 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=60',
+      'clutter': 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=60',
+      'damage': 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=60',
+      'trash': 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=600&auto=format&fit=crop&q=60'
+    };
+
+    function selectVisionLocation(loc) {
+      currentVisionLocation = loc;
+      isCustomPhotoTaken = false;
+
+      // 更新按鈕選中樣式
+      VISION_LOCATIONS.forEach(l => {
+        const btn = document.getElementById(`btn-loc-${l}`);
+        if (!btn) return;
+        if (l === loc) {
+          btn.className = l === '健身房' || l === 'KTV室' ?
+            'vision-loc-btn py-2 px-3 rounded-xl border-2 border-rose-600 bg-rose-600 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 shadow-xs ring-2 ring-rose-300 scale-102 transition-all cursor-pointer' :
+            'vision-loc-btn py-1.5 text-center rounded-xl border-2 border-rose-600 bg-rose-600 text-white text-xs sm:text-sm font-black shadow-xs ring-2 ring-rose-300 scale-105 transition-all cursor-pointer';
+        } else {
+          btn.className = l === '健身房' ?
+            'vision-loc-btn py-2 px-3 rounded-xl border-2 border-amber-300 bg-amber-50/70 hover:bg-amber-100 text-amber-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer' :
+            (l === 'KTV室' ?
+              'vision-loc-btn py-2 px-3 rounded-xl border-2 border-purple-300 bg-purple-50/70 hover:bg-purple-100 text-purple-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer' :
+              'vision-loc-btn py-1.5 text-center rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-rose-50 hover:border-rose-300 text-slate-800 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer');
+        }
+      });
+
+      // 更新地點顯示標籤
+      const badge = document.getElementById('vision-selected-badge');
+      if (badge) {
+        badge.textContent = `📍 已選定：${loc}`;
+        badge.className = 'px-2.5 py-1 text-xs font-bold rounded-lg bg-rose-600 text-white shadow-xs';
+      }
+
+      const tagBadge = document.getElementById('vision-tag-badge');
+      if (tagBadge) tagBadge.textContent = `📍 ${loc}`;
+
+      const locInput = document.getElementById('vision-location');
+      if (locInput) locInput.value = loc;
+
+      // 依區域提供智慧描述
+      const descInput = document.getElementById('vision-desc');
+      if (descInput) {
+        if (loc === '健身房') {
+          descInput.value = '健身房 跑步機器材異常或環境待維護';
+        } else if (loc === 'KTV室') {
+          descInput.value = 'KTV室 音響設備連線異常 / 需清潔整理';
+        } else {
+          descInput.value = `${loc} 梯廳走道堆放雜物鞋物 / 感應燈具需檢修`;
+        }
+      }
+
+      // 切換預設照片
+      if (loc === '健身房') {
+        currentVisionPhotoData = visionPresetPhotos['健身房'];
+      } else if (loc === 'KTV室') {
+        currentVisionPhotoData = visionPresetPhotos['KTV室'];
+      } else {
+        currentVisionPhotoData = visionPresetPhotos['floor_corridor'];
+      }
+
+      const imgEl = document.getElementById('vision-preview-img');
+      if (imgEl) imgEl.src = currentVisionPhotoData;
+
+      const statusBadge = document.getElementById('vision-photo-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = '待確認上傳';
+        statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-rose-600 text-white shadow-xs backdrop-blur-xs';
+      }
+
+      const tipEl = document.getElementById('vision-photo-tip');
+      if (tipEl) tipEl.textContent = `已選定【${loc}】，請拍照或選取照片`;
+
+      const timeBadge = document.getElementById('vision-timestamp-badge');
+      if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+    }
+
+    function triggerCameraCapture() {
+      const input = document.getElementById('vision-camera-input');
+      if (input) input.click();
+    }
+
+    function triggerAlbumUpload() {
+      const input = document.getElementById('vision-album-input');
+      if (input) input.click();
+    }
+
+    function handleVisionPhotoUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        currentVisionPhotoData = evt.target.result;
+        isCustomPhotoTaken = true;
+
+        const imgEl = document.getElementById('vision-preview-img');
+        if (imgEl) imgEl.src = currentVisionPhotoData;
+
+        const statusBadge = document.getElementById('vision-photo-status-badge');
+        if (statusBadge) {
+          statusBadge.textContent = '✅ 已完成拍照存證';
+          statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-600 text-white shadow-xs backdrop-blur-xs';
+        }
+
+        const tipEl = document.getElementById('vision-photo-tip');
+        if (tipEl) tipEl.textContent = '✅ 現場照片已準備完成，請點選下方確認上傳！';
+
+        const timeBadge = document.getElementById('vision-timestamp-badge');
+        if (timeBadge) timeBadge.textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function loadSampleVisionPhoto(type) {
+      currentVisionPhotoData = visionPresetPhotos[type] || visionPresetPhotos['floor_corridor'];
+      isCustomPhotoTaken = true;
+
+      const imgEl = document.getElementById('vision-preview-img');
+      if (imgEl) imgEl.src = currentVisionPhotoData;
+
+      const descInput = document.getElementById('vision-desc');
+      if (descInput) {
+        if (type === 'clutter') descInput.value = `${currentVisionLocation} 走道堆積大型雜物紙箱，影響通行與避難`;
+        if (type === 'damage') descInput.value = `${currentVisionLocation} 設施壁面感應燈具破損故障，請派員檢修`;
+        if (type === 'trash') descInput.value = `${currentVisionLocation} 現場垃圾雜物散落未依規定清理，需派員打掃`;
+      }
+
+      const statusBadge = document.getElementById('vision-photo-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = '✅ 快照已載入';
+        statusBadge.className = 'px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-600 text-white shadow-xs backdrop-blur-xs';
+      }
+
+      const tipEl = document.getElementById('vision-photo-tip');
+      if (tipEl) tipEl.textContent = '快照已就緒，請點選下方確認上傳！';
     }
 
     async function submitVisionDispatch() {
-      const loc = document.getElementById('vision-location').value;
-      const desc = document.getElementById('vision-desc').value;
+      if (!currentVisionLocation) {
+        alert('請先點選通報地點（例如：健身房、KTV室、2F~15F）！');
+        return;
+      }
+
+      const loc = currentVisionLocation;
+      const desc = document.getElementById('vision-desc').value.trim() || `${loc} 現場異常通報`;
       const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+      const isFacility = loc === '健身房' || loc === 'KTV室';
+
       const newDisp = {
-        id: `DISP-${new Date().getTime().toString().slice(-6)}`,
+        id: `DISP-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 900) + 100)}`,
         time: nowStr,
-        category: selectedScenario.category,
-        category_name: selectedScenario.name,
+        category: isFacility ? 'Damage' : 'Trash',
+        category_name: isFacility ? '公設異常' : '樓層通報',
         location: loc,
+        reporter: '住戶（A棟8樓之1 · 饒先生）',
         description: desc,
         status: '處理中',
-        target_team: selectedScenario.category === 'Lost Item' ? '管理中心' : '清潔/物業組',
-        image_url: selectedScenario.img
+        target_team: '物業管理室 / 總幹事',
+        image_url: currentVisionPhotoData,
+        is_new: true,
+        notified_management: true
       };
 
       if (!isStandalone) {
@@ -2484,38 +2842,82 @@
             body: JSON.stringify(newDisp)
           });
           if (res.ok) {
-            await fetchStatusAndData();
-            renderDispatches();
-            alert(`已派單至：${newDisp.target_team}`);
-            return;
+            const data = await res.json();
+            if (data.dispatch) {
+              newDisp.id = data.dispatch.id;
+            }
           }
-        } catch (e) {}
+        } catch (e) {
+          console.warn('API vision dispatch error, falling back to local:', e);
+        }
       }
 
+      // 本地存檔與更新
+      if (!appData.dispatches) appData.dispatches = [];
       appData.dispatches.unshift(newDisp);
       saveLocal();
+
+      // 更新右側清單
       renderDispatches();
-      alert(`已派單至：${newDisp.target_team}`);
+
+      // 開啟管理室主動推播告知彈窗
+      openDispatchNotifyModal(newDisp);
+    }
+
+    function openDispatchNotifyModal(disp) {
+      document.getElementById('modal-disp-id').textContent = disp.id || '#DISP-20260919-001';
+      document.getElementById('modal-disp-loc').textContent = disp.location;
+      document.getElementById('modal-disp-reporter').textContent = disp.reporter || '住戶（A棟8樓之1 · 饒先生）';
+      document.getElementById('modal-disp-time').textContent = disp.time;
+      document.getElementById('modal-disp-desc').textContent = disp.description;
+      document.getElementById('modal-disp-img').src = disp.image_url;
+
+      document.getElementById('dispatch-notify-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDispatchNotifyModal() {
+      const modal = document.getElementById('dispatch-notify-modal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function renderDispatches() {
       if (!appData || !appData.dispatches) return;
       document.getElementById('dispatch-count-text').textContent = `共 ${appData.dispatches.length} 筆`;
-      document.getElementById('dispatch-list').innerHTML = appData.dispatches.map(d => `
-        <div class="p-3 rounded-xl border-2 border-slate-200 bg-white flex items-center justify-between shadow-xs">
-          <div class="flex items-center space-x-3">
-            <img src="${d.image_url}" class="w-12 h-12 rounded-lg object-cover border flex-shrink-0">
-            <div>
-              <div class="font-bold text-slate-900 text-sm sm:text-base">${d.category_name} · ${d.location}</div>
-              <div class="text-xs text-slate-500 line-clamp-1 mt-0.5">${d.description} (${d.time})</div>
+      document.getElementById('dispatch-list').innerHTML = appData.dispatches.map((d, idx) => {
+        const isLatest = idx === 0 && d.is_new;
+        const borderClass = isLatest ? 'border-2 border-rose-500 bg-rose-50/40 shadow-sm' : 'border-2 border-slate-200 bg-white';
+        const imgUrl = d.image_url || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=60';
+        return `
+          <div class="p-3.5 rounded-xl ${borderClass} flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs transition-all">
+            <div class="flex items-start sm:items-center space-x-3">
+              <img src="${imgUrl}" onclick="openAttachmentModal('${imgUrl}', '通報照片 (${d.location})', '${d.category_name || '現場照片'}', 'jpg')" class="w-14 h-14 rounded-xl object-cover border-2 border-slate-200 flex-shrink-0 cursor-pointer hover:opacity-85 hover:border-rose-400 transition-all shadow-2xs" title="點擊查看拍照大圖">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="font-black text-slate-900 text-sm sm:text-base">${d.location}</span>
+                  <span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-xs font-bold">${d.category_name || '異常通報'}</span>
+                  ${isLatest ? '<span class="px-2 py-0.5 rounded-md bg-rose-600 text-white text-[10px] font-bold animate-pulse">最新通報</span>' : ''}
+                </div>
+                <div class="text-xs sm:text-sm text-slate-700 font-medium">${d.description}</div>
+                <div class="text-[11px] text-slate-400 flex flex-wrap items-center gap-2">
+                  <span>${d.time}</span>
+                  <span>·</span>
+                  <span>通報者：${d.reporter || '住戶（A棟8樓之1 · 饒先生）'}</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center flex-shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+              <span class="px-2.5 py-1 rounded-lg bg-amber-100 border border-amber-300 font-bold text-xs text-amber-900">${d.status || '處理中'}</span>
+              <div class="text-[11px] text-emerald-700 font-bold mt-1 flex items-center gap-1">
+                <i data-lucide="bell-ring" class="w-3 h-3 text-emerald-600"></i>
+                <span>已推播告知管理室</span>
+              </div>
+              <div class="text-[11px] text-slate-500 font-medium">${d.target_team || '物業管理室 / 總幹事'}</div>
             </div>
           </div>
-          <div class="text-right flex-shrink-0">
-            <span class="px-2.5 py-1 rounded-lg bg-slate-100 font-bold text-xs text-slate-800">${d.status}</span>
-            <div class="text-xs text-slate-500 font-medium mt-1">${d.target_team}</div>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+      lucide.createIcons();
     }
 
     // Skill 3: 財務對帳
